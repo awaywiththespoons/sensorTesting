@@ -16,10 +16,12 @@ public class VisualiseTouches : MonoBehaviour
     private Text debugText;
 
     public IndexedPool<Image> touchIndicators;
+    public IndexedPool<Image> touchIndicators2;
 
     private void Awake()
     {
         touchIndicators = new IndexedPool<Image>(touchPrefab, transform);
+        touchIndicators2 = new IndexedPool<Image>(touchPrefab, transform);
     }
 
     private void Update()
@@ -29,19 +31,20 @@ public class VisualiseTouches : MonoBehaviour
         debugText.text = string.Format("Touches: {0}", count);
 
         touchIndicators.SetActive(count);
-
-        float sum = 0;
+        touchIndicators2.SetActive(count);
 
         for (int i = 0; i < count; ++i)
         {
             var touch = Input.GetTouch(i);
 
             touchIndicators[i].transform.position = touch.position;
-            touchIndicators[i].color = Color.HSVToRGB(touch.fingerId / 10f, 1, 1);
+            touchIndicators[i].color = Color.HSVToRGB(touch.fingerId / 10f, .75f, 1);
+            touchIndicators[i].GetComponentInChildren<Text>().text = touch.fingerId.ToString();
 
-            sum += touch.pressure;
+            touchIndicators2[i].transform.position = touch.position * 0.2f;
+            touchIndicators2[i].GetComponentInChildren<Text>().text = touch.fingerId.ToString();
+            touchIndicators2[i].transform.localScale = Vector3.one * 0.2f;
+            touchIndicators2[i].color = Color.HSVToRGB(touch.fingerId / 10f, 1, 1);
         }
-
-        debugText.text += string.Format(" - avg pressure {0}", sum / count);
     }
 }
