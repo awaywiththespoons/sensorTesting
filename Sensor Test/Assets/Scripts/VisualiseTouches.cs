@@ -10,13 +10,6 @@ using Random = UnityEngine.Random;
 
 public class Context
 {
-    public class Contact
-    {
-        public Color color;
-        public List<Vector2> history = new List<Vector2>();
-    }
-
-    public List<Contact> contacts = new List<Contact>();
 }
 
 public class VisualiseTouches : MonoBehaviour 
@@ -28,6 +21,8 @@ public class VisualiseTouches : MonoBehaviour
         public GameObject container;
         public Transform anchor;
     }
+
+    public Sensing sensing;
 
     public Camera camera;
 
@@ -88,6 +83,7 @@ public class VisualiseTouches : MonoBehaviour
             touchIndicators2[i].color = Color.HSVToRGB(touch.fingerId / 10f, 1, 1);
         }
 
+        /*
         try
         {
             if (count == 3)
@@ -122,6 +118,10 @@ public class VisualiseTouches : MonoBehaviour
         {
             debugs.Add(e.ToString());
         }
+        */
+
+        container.transform.position = sensing.position;
+        container.transform.eulerAngles = Vector3.forward * (sensing.angle - 90);
 
         float avg = runningAngle;//totalAngle / countAngle;
 

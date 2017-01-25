@@ -15,18 +15,22 @@ public class DebugToText : MonoBehaviour
     [SerializeField]
     private bool showTrace;
 
+    private List<string> debugs = new List<string>();
+
     private void Awake()
     {
         Application.logMessageReceived += (log, trace, type) =>
         {
             if (showTrace)
             {
-                text.text += string.Format("{0}\n{1}\n", log, trace);
+                debugs.Add(string.Format("{0}\n{1}\n", log, trace));
             }
             else
             {
-                text.text += string.Format("{0}\n", log);
+                debugs.Add(string.Format("{0}\n", log));
             }
+
+            text.text = string.Join("", debugs.Reverse<string>().Take(16).Reverse<string>().ToArray());
         };
     }
 }

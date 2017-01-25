@@ -12,8 +12,8 @@ public class Sensing : MonoBehaviour
 {
     public Transform testObject;
 
-    public float lineAngleMinimum;
-    public float lineAngleMaximum;
+    [Tooltip("How many degrees can the angles in a triangle deviate from 180 / 0 and yet still be considered a line?")]
+    public float lineTolerance;
 
     public float triangleAngleMinimum;
     public float triangleAngleMaximum;
@@ -37,7 +37,17 @@ public class Sensing : MonoBehaviour
         {
             ProcessFrameImmediately(frame);
         }
+
+        // in the future there should be a distinct initial phase in which we
+        // trying to determine which shape we are seeing. once determined, we
+        // cease trying to identify shape and instead try to find the most
+        // likely orientation of the known shape based on points we observe and
+        // the previously known state
     }
+
+    private float minD = 9999, maxD = 0;
+    public Vector2 position;
+    public float angle;
 
     public void ProcessFrameImmediately(TouchFrame frame)
     {
@@ -54,15 +64,13 @@ public class Sensing : MonoBehaviour
         float cab = AngleOfCorner(c, a, b) * Mathf.Rad2Deg;
         float bca = AngleOfCorner(b, c, a) * Mathf.Rad2Deg;
         float abc = AngleOfCorner(a, b, c) * Mathf.Rad2Deg;
-
-        Debug.LogFormat("{0:0.0}, {1:0.0}, {2:0.0}", cab, abc, bca);
-
+        
         var points = new List<Vector2> { a, b, c };
         var angles = new List<float> { cab, bca, abc };
 
-        bool line = angles.All(angle => angle >= lineAngleMaximum
-                                     || angle <= lineAngleMinimum);
-
+        bool line = angles.All(angle => Mathf.Abs(angle - 180) <= lineTolerance
+                                     || Mathf.Abs(angle -   0) <= lineTolerance);
+        
         bool triangle = angles.All(angle => angle <= triangleAngleMaximum
                                          && angle >= triangleAngleMinimum);
 
@@ -76,7 +84,7 @@ public class Sensing : MonoBehaviour
 
             // 2. "front" is the closest point to "middle" and "back" is the
             // furthest
-            var furthest = points.OrderBy(point => (middle - point).sqrMagnitude).ToList();
+            var furthest = points.OrderByDescending(point => (middle - point).sqrMagnitude).ToList();
             Vector2 back = furthest[0];
             Vector2 front = furthest[1];
 
@@ -86,14 +94,42 @@ public class Sensing : MonoBehaviour
             // 4. determine the angle of that arrow
             float angle = Mathf.Atan2(arrow.y, arrow.x) * Mathf.Rad2Deg;
 
-            Debug.LogFormat("Line ({0} degrees)", angle);
+            // 5. determine the length of the back line
+            float length = (back - middle).magnitude;
 
             testObject.transform.eulerAngles = Vector3.forward * angle;
+
+            minD = Mathf.Min(length, minD);
+            maxD = Mathf.Max(length, maxD);
+
+            Debug.LogFormat("Line ({0:0.0} degrees, {2:0}-{1:0}-{3:0} species)", angle, length, minD, maxD);
+
+            this.position = center;
+            this.angle = angle;
         }
 
         if (triangle)
         {
-            Debug.Log("Triangle");
+            // 1. sort points in order of sum of squared distance to other 
+            // points, the "front" point is the first 
+            var corners = points.OrderBy(point => points.Sum(other => (other - point).sqrMagnitude)).ToList();
+
+            // 2. find angle on "front" corner and use this to determine the
+            // shape type
+            float species = AngleOfCorner(corners[1], corners[0], corners[2]) * Mathf.Rad2Deg;
+
+            // 3. the object points like an arrow from the center of all points
+            // to the "front" point
+            Vector2 center = (points[0] + points[1] + points[2]) / 3;
+            Vector2 arrow = corners[0] - center;
+
+            // 4. determine the angle of that arrow
+            float angle = Mathf.Atan2(arrow.y, arrow.x) * Mathf.Rad2Deg;
+
+            Debug.LogFormat("Triangle ({0:0.0} degrees, {1:0} species)", angle, species);
+
+            this.position = center;
+            this.angle = angle;
         }
 
         if (!line && !triangle)
