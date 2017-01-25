@@ -17,7 +17,9 @@ public class VisualiseTouches : MonoBehaviour
     [Serializable]
     public class Entry
     {
-        public float angle;
+        [UnityEngine.Serialization.FormerlySerializedAs("angle")]
+        public float variable;
+        public Sensing.Type type;
         public GameObject container;
         public Transform anchor;
     }
@@ -74,13 +76,9 @@ public class VisualiseTouches : MonoBehaviour
             var touch = Input.GetTouch(i);
 
             touchIndicators[i].transform.position = touch.position;
-            touchIndicators[i].color = Color.HSVToRGB(touch.fingerId / 10f, .75f, 1);
-            touchIndicators[i].GetComponentInChildren<Text>().text = touch.fingerId.ToString();
 
             touchIndicators2[i].transform.position = touch.position * 0.2f;
-            touchIndicators2[i].GetComponentInChildren<Text>().text = touch.fingerId.ToString();
             touchIndicators2[i].transform.localScale = Vector3.one * 0.2f;
-            touchIndicators2[i].color = Color.HSVToRGB(touch.fingerId / 10f, 1, 1);
         }
 
         /*
@@ -127,9 +125,9 @@ public class VisualiseTouches : MonoBehaviour
 
         if (context != null)
         {
-            float deg = avg * Mathf.Rad2Deg;
-
-            var closest = entries.OrderBy(entry => Math.Abs(entry.angle - deg)).First();
+            var closest = entries.Where(entry => entry.type == sensing.type)
+                                 .OrderBy(entry => Math.Abs(entry.variable - sensing.variable))
+                                 .First();
             
             for (int i = 0; i < entries.Count; ++i)
             {

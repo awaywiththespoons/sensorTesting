@@ -10,13 +10,18 @@ using Random = UnityEngine.Random;
 
 public class Sensing : MonoBehaviour 
 {
-    public Transform testObject;
-
     [Tooltip("How many degrees can the angles in a triangle deviate from 180 / 0 and yet still be considered a line?")]
     public float lineTolerance;
 
     public float triangleAngleMinimum;
     public float triangleAngleMaximum;
+    
+    public enum Type
+    {
+        None,
+        Line,
+        Triangle,
+    }
 
     public class TouchFrame
     {
@@ -44,10 +49,11 @@ public class Sensing : MonoBehaviour
         // likely orientation of the known shape based on points we observe and
         // the previously known state
     }
-
-    private float minD = 9999, maxD = 0;
+    
     public Vector2 position;
     public float angle;
+    public Type type;
+    public float variable;
 
     public void ProcessFrameImmediately(TouchFrame frame)
     {
@@ -97,15 +103,12 @@ public class Sensing : MonoBehaviour
             // 5. determine the length of the back line
             float length = (back - middle).magnitude;
 
-            testObject.transform.eulerAngles = Vector3.forward * angle;
-
-            minD = Mathf.Min(length, minD);
-            maxD = Mathf.Max(length, maxD);
-
-            Debug.LogFormat("Line ({0:0.0} degrees, {2:0}-{1:0}-{3:0} species)", angle, length, minD, maxD);
+            Debug.LogFormat("Line ({0:0.0} degrees, {1:0} species)", angle, length);
 
             this.position = center;
             this.angle = angle;
+            this.type = Type.Line;
+            this.variable = length;
         }
 
         if (triangle)
@@ -130,11 +133,14 @@ public class Sensing : MonoBehaviour
 
             this.position = center;
             this.angle = angle;
+            this.type = Type.Triangle;
+            this.variable = species;
         }
 
         if (!line && !triangle)
         {
             Debug.Log("???");
+            this.type = Type.None;
         }
     }
 
