@@ -28,8 +28,21 @@ public class Sensing : MonoBehaviour
         public List<Vector2> touches;
     }
 
+    private Vector2 Average(IEnumerable<Vector2> vectors)
+    {
+        Vector2 sum = Vector2.zero;
+
+        foreach (var vector in vectors)
+            sum += vector;
+
+        return sum / vectors.Count();
+    }
+
     public void Update()
     {
+        // default to position tracking as centroid
+        this.position = Average(Input.touches.Select(touch => touch.position));
+
         // collect the current touch data together
         var frame = new TouchFrame
         {

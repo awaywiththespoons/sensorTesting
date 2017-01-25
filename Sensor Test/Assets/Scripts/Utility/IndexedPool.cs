@@ -22,7 +22,7 @@ public class IndexedPool<TInstance>
     public IndexedPool(TInstance prefab, Transform parent = null)
     {
         this.prefab = prefab;
-        this.parent = parent;
+        this.parent = parent ?? prefab.transform.parent;
     }
 
     private TInstance CreateInstance()
