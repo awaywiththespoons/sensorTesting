@@ -41,8 +41,6 @@ public class VisualiseTouches : MonoBehaviour
     public IndexedPool<Image> touchIndicators;
     public IndexedPool<Image> touchIndicators2;
 
-    public LineRenderer chevron;
-
     public Transform container;
 
     private void Awake()
@@ -99,10 +97,6 @@ public class VisualiseTouches : MonoBehaviour
                                         .OrderBy(i => ScorePoint(i, points))
                                         .Select(i => points[i])
                                         .ToList();
-
-                chevron.SetPosition(0, ordered[1]);
-                chevron.SetPosition(1, ordered[0]);
-                chevron.SetPosition(2, ordered[2]);
 
                 float p12s = Vector2.SqrMagnitude(ordered[1] - ordered[0]);
                 float p13s = Vector2.SqrMagnitude(ordered[2] - ordered[0]);
@@ -189,10 +183,6 @@ public class VisualiseTouches : MonoBehaviour
                 entry.container.SetActive(false);
             }
         }
-
-        chevron.gameObject.SetActive(context != null);
-        chevron.sharedMaterial.color = Color.HSVToRGB((avg - Mathf.PI * 0.5f) / (Mathf.PI * 0.5f), 1, 1);
-
         debugText.text = string.Format("{0}\n{1}", 
                                 main,
                                 string.Join("\n", debugs.Reverse<string>().Take(3).Reverse<string>().ToArray()));
