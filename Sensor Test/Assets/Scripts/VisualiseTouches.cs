@@ -32,8 +32,6 @@ public class VisualiseTouches : MonoBehaviour
 
     [SerializeField]
     private Image touchPrefab;
-    [SerializeField]
-    private Text debugText;
 
     public IndexedPool<Image> touchIndicators;
     public IndexedPool<Image> touchIndicators2;
@@ -49,7 +47,6 @@ public class VisualiseTouches : MonoBehaviour
     private float removeTimeout;
 
     private Context context;
-    private List<string> debugs = new List<string>();
 
     private float totalAngle = 0;
     private int countAngle = 0;
@@ -67,15 +64,20 @@ public class VisualiseTouches : MonoBehaviour
         touchIndicators.SetActive(count);
         touchIndicators2.SetActive(count);
 
-        string main = "Debug";
-
-
-
         for (int i = 0; i < count; ++i)
         {
             var touch = Input.GetTouch(i);
 
             touchIndicators[i].transform.position = touch.position;
+
+            if ((touch.position - sensing.position).magnitude < .1f)
+            {
+                touchIndicators[i].color = Color.red;
+            }
+            else
+            {
+                touchIndicators[i].color = Color.white;
+            }
 
             touchIndicators2[i].transform.position = touch.position * 0.2f;
             touchIndicators2[i].transform.localScale = Vector3.one * 0.2f;
@@ -127,26 +129,26 @@ public class VisualiseTouches : MonoBehaviour
         {
             var closest = entries.Where(entry => entry.type == sensing.type)
                                  .OrderBy(entry => Math.Abs(entry.variable - sensing.variable))
-                                 .First();
+                                 .FirstOrDefault();
             
-            for (int i = 0; i < entries.Count; ++i)
+            if (closest != null)
             {
-                var entry = entries[i];
+                for (int i = 0; i < entries.Count; ++i)
+                {
+                    var entry = entries[i];
 
-                if (entry != closest)
-                {
-                    entry.container.SetActive(false);
-                }
-                else
-                {
-                    entry.container.SetActive(true);
-                    container = entry.anchor;
+                    if (entry != closest)
+                    {
+                        entry.container.SetActive(false);
+                    }
+                    else
+                    {
+                        entry.container.SetActive(true);
+                        container = entry.anchor;
+                    }
                 }
             }
-            
         }
-
-        main = string.Format("Angle: {0:0.0}", avg * Mathf.Rad2Deg);
 
         if (count < 2 && context != null)
         {
@@ -154,7 +156,6 @@ public class VisualiseTouches : MonoBehaviour
         }
         else if (count >= 2 && context == null)
         {
-            debugs.Add("Placed");
             removeTimeout = 0;
             context = new Context();
 
@@ -170,7 +171,6 @@ public class VisualiseTouches : MonoBehaviour
 
         if (removeTimeout > .5f)
         {
-            debugs.Add("Removed");
             context = null;
             camera.backgroundColor = Color.black;
 
@@ -181,9 +181,5 @@ public class VisualiseTouches : MonoBehaviour
                 entry.container.SetActive(false);
             }
         }
-        debugText.text = string.Format("{0}\n{1}", 
-                                main,
-                                string.Join("\n", debugs.Reverse<string>().Take(3).Reverse<string>().ToArray()));
-
     }
 }

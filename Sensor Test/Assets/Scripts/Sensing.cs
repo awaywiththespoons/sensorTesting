@@ -55,6 +55,8 @@ public class Sensing : MonoBehaviour
     public Type type;
     public float variable;
 
+    public Vector2 debugFront;
+
     public void ProcessFrameImmediately(TouchFrame frame)
     {
         // assume we only get three points
@@ -67,9 +69,9 @@ public class Sensing : MonoBehaviour
         Vector2 ca = a - c;
 
         // angle on each point of the triangle formed
-        float cab = AngleOfCorner(c, a, b) * Mathf.Rad2Deg;
-        float bca = AngleOfCorner(b, c, a) * Mathf.Rad2Deg;
-        float abc = AngleOfCorner(a, b, c) * Mathf.Rad2Deg;
+        float cab = AngleOfCorner(a, c, b) * Mathf.Rad2Deg;
+        float bca = AngleOfCorner(c, b, a) * Mathf.Rad2Deg;
+        float abc = AngleOfCorner(b, a, c) * Mathf.Rad2Deg;
         
         var points = new List<Vector2> { a, b, c };
         var angles = new List<float> { cab, bca, abc };
@@ -103,38 +105,43 @@ public class Sensing : MonoBehaviour
             // 5. determine the length of the back line
             float length = (back - middle).magnitude;
 
-            Debug.LogFormat("Line ({0:0.0} degrees, {1:0} species)", angle, length);
+            Debug.LogFormat("Line (variable: {0:0})", length);
 
             this.position = center;
             this.angle = angle;
             this.type = Type.Line;
             this.variable = length;
+
+            this.debugFront = front;
         }
 
         if (triangle)
         {
+            Vector2 center = (points[0] + points[1] + points[2]) / 3;
+
             // 1. sort points in order of sum of squared distance to other 
             // points, the "front" point is the first 
-            var corners = points.OrderBy(point => points.Sum(other => (other - point).sqrMagnitude)).ToList();
+            var corners = points.OrderBy(point => (point - center).magnitude).ToList();
 
             // 2. find angle on "front" corner and use this to determine the
             // shape type
-            float species = AngleOfCorner(corners[1], corners[0], corners[2]) * Mathf.Rad2Deg;
+            float species = AngleOfCorner(corners[0], corners[1], corners[2]) * Mathf.Rad2Deg;
 
             // 3. the object points like an arrow from the center of all points
             // to the "front" point
-            Vector2 center = (points[0] + points[1] + points[2]) / 3;
             Vector2 arrow = corners[0] - center;
 
             // 4. determine the angle of that arrow
             float angle = Mathf.Atan2(arrow.y, arrow.x) * Mathf.Rad2Deg;
 
-            Debug.LogFormat("Triangle ({0:0.0} degrees, {1:0} species)", angle, species);
+            Debug.LogFormat("Triangle (variable: {0:0})", species);
 
             this.position = center;
             this.angle = angle;
             this.type = Type.Triangle;
             this.variable = species;
+
+            this.debugFront = corners[0];
         }
 
         if (!line && !triangle)
@@ -144,6 +151,10 @@ public class Sensing : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Return the angle (in radians) of the corner formed by the lines ab and
+    /// ac
+    /// </summary>
     private float AngleOfCorner(Vector2 a, Vector2 b, Vector2 c)
     {
         float ab = Vector2.SqrMagnitude(b - a);

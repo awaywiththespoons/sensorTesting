@@ -30,7 +30,8 @@ public class DebugToText : MonoBehaviour
                 debugs.Add(string.Format("{0}\n", log));
             }
 
-            text.text = string.Join("", debugs.Reverse<string>().Take(16).Reverse<string>().ToArray());
+            //text.text = debugs.Last();
+            text.text = string.Join("", debugs.Skip(debugs.Count - 16).Take(16).ToArray());
         };
     }
 }
