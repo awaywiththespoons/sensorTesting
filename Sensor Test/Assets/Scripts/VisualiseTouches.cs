@@ -14,29 +14,14 @@ public class Context
 
 public class VisualiseTouches : MonoBehaviour 
 {
-    [Serializable]
-    public class Entry
-    {
-        [UnityEngine.Serialization.FormerlySerializedAs("angle")]
-        public float variable;
-        public Sensing.Type type;
-        public GameObject container;
-        public Transform anchor;
-    }
-
     public Sensing sensing;
-
-    public Camera camera;
-
-    public List<Entry> entries;
+    public List<Token> tokens = new List<Token>();
 
     [SerializeField]
     private Image touchPrefab;
 
     public IndexedPool<Image> touchIndicators;
     public IndexedPool<Image> touchIndicators2;
-
-    public Transform container;
 
     private void Awake()
     {
@@ -47,15 +32,6 @@ public class VisualiseTouches : MonoBehaviour
     private float removeTimeout;
 
     private Context context;
-
-    private float totalAngle = 0;
-    private int countAngle = 0;
-    private float runningAngle = 0;
-
-    private float ScorePoint(int i, List<Vector2> points)
-    {
-        return points.Sum(point => Vector2.SqrMagnitude(point - points[i]));
-    }
 
     private void Update()
     {
@@ -83,70 +59,40 @@ public class VisualiseTouches : MonoBehaviour
             touchIndicators2[i].transform.localScale = Vector3.one * 0.2f;
         }
 
-        /*
-        try
-        {
-            if (count == 3)
-            {
-                var points = Enumerable.Range(0, 3).Select(i => Input.GetTouch(i).position).ToList();
-                var ordered = Enumerable.Range(0, 3)
-                                        .OrderBy(i => ScorePoint(i, points))
-                                        .Select(i => points[i])
-                                        .ToList();
-
-                float p12s = Vector2.SqrMagnitude(ordered[1] - ordered[0]);
-                float p13s = Vector2.SqrMagnitude(ordered[2] - ordered[0]);
-                float p23s = Vector2.SqrMagnitude(ordered[2] - ordered[1]);
-
-                float angle = Mathf.Acos((p12s + p13s - p23s) / (2 * Mathf.Sqrt(p12s) * Mathf.Sqrt(p13s)));
-
-                countAngle += 1;
-                totalAngle += angle;
-                runningAngle = Mathf.Lerp(runningAngle, angle, 0.25f);
-
-                var middle = Vector2.Lerp(ordered[1], ordered[2], 0.5f);
-                var forward = ordered[0] - middle;
-                var rotation = Quaternion.LookRotation(forward, Vector3.back);
-
-                float ang = Mathf.Atan2(forward.y, forward.x);
-
-                container.transform.position = ordered[0];
-                container.transform.eulerAngles = Vector3.forward * (ang * Mathf.Rad2Deg - 90);
-            }
-        }
-        catch (Exception e)
-        {
-            debugs.Add(e.ToString());
-        }
-        */
-
-        container.transform.position = sensing.position;
-        container.transform.eulerAngles = Vector3.forward * (sensing.angle - 90);
-
-        float avg = runningAngle;//totalAngle / countAngle;
-
         if (context != null)
         {
-            var closest = entries.Where(entry => entry.type == sensing.type)
-                                 .OrderBy(entry => Math.Abs(entry.variable - sensing.variable))
-                                 .FirstOrDefault();
+            var closest = tokens.Where(token => token.patternType == sensing.type)
+                                .OrderBy(token => Math.Abs(token.patternVariableTarget - sensing.variable))
+                                .FirstOrDefault();
             
             if (closest != null)
             {
-                for (int i = 0; i < entries.Count; ++i)
-                {
-                    var entry = entries[i];
+                Debug.LogFormat("{0}, variable: {1:0} -> {2}", sensing.type, sensing.variable, closest.name);
 
-                    if (entry != closest)
+                for (int i = 0; i < tokens.Count; ++i)
+                {
+                    var token = tokens[i];
+
+                    if (token == closest)
                     {
-                        entry.container.SetActive(false);
+                        token.Refresh(sensing.position, sensing.angle);
                     }
                     else
                     {
-                        entry.container.SetActive(true);
-                        container = entry.anchor;
+                        token.Disable();
                     }
                 }
+            }
+        }
+        else
+        {
+            Debug.LogFormat("{0}, variable: {1:0} -> ???", sensing.type, sensing.variable);
+
+            for (int i = 0; i < tokens.Count; ++i)
+            {
+                var token = tokens[i];
+
+                token.Disable();
             }
         }
 
@@ -158,11 +104,6 @@ public class VisualiseTouches : MonoBehaviour
         {
             removeTimeout = 0;
             context = new Context();
-
-            totalAngle = 0;
-            countAngle = 0;
-            runningAngle = 0;
-
         }
         else
         {
@@ -172,14 +113,6 @@ public class VisualiseTouches : MonoBehaviour
         if (removeTimeout > .5f)
         {
             context = null;
-            camera.backgroundColor = Color.black;
-
-            for (int i = 0; i < entries.Count; ++i)
-            {
-                var entry = entries[i];
-
-                entry.container.SetActive(false);
-            }
         }
     }
 }

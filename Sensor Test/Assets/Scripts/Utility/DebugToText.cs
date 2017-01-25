@@ -13,7 +13,7 @@ public class DebugToText : MonoBehaviour
     [SerializeField]
     private Text text;
     [SerializeField]
-    private bool showTrace;
+    private bool showAllTraces;
 
     private List<string> debugs = new List<string>();
 
@@ -21,7 +21,9 @@ public class DebugToText : MonoBehaviour
     {
         Application.logMessageReceived += (log, trace, type) =>
         {
-            if (showTrace)
+            if (showAllTraces 
+             || type == LogType.Error 
+             || type == LogType.Exception)
             {
                 debugs.Add(string.Format("{0}\n{1}\n", log, trace));
             }

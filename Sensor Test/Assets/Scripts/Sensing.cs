@@ -105,8 +105,6 @@ public class Sensing : MonoBehaviour
             // 5. determine the length of the back line
             float length = (back - middle).magnitude;
 
-            Debug.LogFormat("Line (variable: {0:0})", length);
-
             this.position = center;
             this.angle = angle;
             this.type = Type.Line;
@@ -133,8 +131,6 @@ public class Sensing : MonoBehaviour
 
             // 4. determine the angle of that arrow
             float angle = Mathf.Atan2(arrow.y, arrow.x) * Mathf.Rad2Deg;
-
-            Debug.LogFormat("Triangle (variable: {0:0})", species);
 
             this.position = center;
             this.angle = angle;
