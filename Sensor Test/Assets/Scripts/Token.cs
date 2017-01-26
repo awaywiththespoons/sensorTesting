@@ -12,6 +12,7 @@ public class Token : MonoBehaviour
 {
     public Sensing.Type patternType;
     public float patternVariableTarget;
+    public Vector3 featureTarget;
     public List<Hotspot> hotspots = new List<Hotspot>();
     public Hotspot defaultHotspot;
 

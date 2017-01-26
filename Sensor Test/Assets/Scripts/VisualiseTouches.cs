@@ -17,6 +17,8 @@ public class Context
     public float meanAngle;
     public float meanLength;
 
+    public Vector3 meanFeature;
+
     public Token token;
 }
 
@@ -87,6 +89,10 @@ public class VisualiseTouches : MonoBehaviour
         if (context == null && count >= 2)
         {
             context = new Context();
+            context.meanType = (int) sensing.type;
+            context.meanAngle = sensing.variable;
+            context.meanLength = sensing.variable;
+            context.meanFeature = sensing.feature;
         }
         else if (count < 2 && context != null)
         {
@@ -96,6 +102,8 @@ public class VisualiseTouches : MonoBehaviour
         if (context != null && context.missingTime > .5f)
         {
             context = null;
+
+            Debug.Log("Token has been removed");
         }
 
         if (context != null && context.token == null)
@@ -108,7 +116,9 @@ public class VisualiseTouches : MonoBehaviour
             {
                 context.dataFrames += 1;
                 context.meanType = Mathf.Lerp(context.meanType, (int) sensing.type, 0.5f);
-                
+
+                context.meanFeature = Vector3.Lerp(context.meanFeature, sensing.feature, 0.5f);
+
                 if (sensing.type == Sensing.Type.Line)
                 {
                     context.meanLength = Mathf.Lerp(context.meanLength, sensing.variable, 0.5f);
@@ -117,6 +127,11 @@ public class VisualiseTouches : MonoBehaviour
                 {
                     context.meanAngle = Mathf.Lerp(context.meanAngle, sensing.variable, 0.5f);
                 }
+
+                Debug.LogFormat("feature: {0:0}, {1:0}, {2:0}", 
+                                context.meanFeature.x, 
+                                context.meanFeature.y, 
+                                context.meanFeature.z);
             }
         }
 
@@ -147,6 +162,21 @@ public class VisualiseTouches : MonoBehaviour
         }
     }
 
+    private float BestDistance(Vector3 feature, Vector3 target)
+    {
+        Vector3 a = new Vector3(target.x, target.y, target.z);
+        Vector3 b = new Vector3(target.y, target.z, target.x);
+        Vector3 c = new Vector3(target.z, target.x, target.y);
+
+        Vector3 d = new Vector3(target.z, target.y, target.x);
+        Vector3 e = new Vector3(target.x, target.z, target.y);
+        Vector3 f = new Vector3(target.y, target.x, target.z);
+
+        var variants = new List<Vector3> { a, b, c, d, e, f };
+
+        return variants.Select(variant => (variant - feature).sqrMagnitude).Min();
+    }
+
     private void DecideToken()
     {
         var type = (Sensing.Type) Mathf.RoundToInt(context.meanType);
@@ -159,6 +189,17 @@ public class VisualiseTouches : MonoBehaviour
                             .OrderBy(token => Math.Abs(token.patternVariableTarget - variable))
                             .FirstOrDefault();
 
+        closest = tokens.OrderBy(token => BestDistance(sensing.feature, token.featureTarget)).FirstOrDefault();
+
         context.token = closest;
+
+        if (closest != null)
+        {
+            Debug.LogFormat("Decided token with feature: {0:0}, {1:0}, {2:0} ({3:0} distance)",
+                            closest.featureTarget.x,
+                            closest.featureTarget.y,
+                            closest.featureTarget.z,
+                            BestDistance(sensing.feature, closest.featureTarget));
+        }
     }
 }

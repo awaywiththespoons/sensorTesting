@@ -67,97 +67,49 @@ public class Sensing : MonoBehaviour
     public float angle;
     public Type type;
     public float variable;
+    public Vector3 feature;
 
-    public Vector2 debugFront;
-
-    public void ProcessFrameImmediately(TouchFrame frame)
+    public Vector3 ExtractSidesFeature(TouchFrame frame)
     {
-        // assume we only get three points
         Vector2 a = frame.touches[0];
         Vector2 b = frame.touches[1];
         Vector2 c = frame.touches[2];
 
-        Vector2 ab = b - a;
-        Vector2 bc = c - b;
-        Vector2 ca = a - c;
+        float ab = (b - a).sqrMagnitude * .001f;
+        float bc = (c - b).sqrMagnitude * .001f;
+        float ca = (a - c).sqrMagnitude * .001f;
 
-        // angle on each point of the triangle formed
-        float cab = AngleOfCorner(a, c, b) * Mathf.Rad2Deg;
-        float bca = AngleOfCorner(c, b, a) * Mathf.Rad2Deg;
-        float abc = AngleOfCorner(b, a, c) * Mathf.Rad2Deg;
-        
-        var points = new List<Vector2> { a, b, c };
-        var angles = new List<float> { cab, bca, abc };
+        // TODO: need to sort by winding!!
 
-        bool line = angles.All(angle => Mathf.Abs(angle - 180) <= lineTolerance
-                                     || Mathf.Abs(angle -   0) <= lineTolerance);
-        
-        bool triangle = angles.All(angle => angle <= triangleAngleMaximum
-                                         && angle >= triangleAngleMinimum);
+        // rotate the sides so the shortest is first (for debugging mostly,
+        // the recognition will also rotate the side lengths anyway)
+        Vector3 sides;
 
-        if (line)
+        if (ab < bc && ab < ca)
         {
-            // determine orientation of line
-
-            // 1. find point closest to the center of all points ("middle")
-            Vector2 center = (a + b + c) / 3f;
-            Vector2 middle = points.OrderBy(point => (center - point).sqrMagnitude).First();
-
-            // 2. "front" is the closest point to "middle" and "back" is the
-            // furthest
-            var furthest = points.OrderByDescending(point => (middle - point).sqrMagnitude).ToList();
-            Vector2 back = furthest[0];
-            Vector2 front = furthest[1];
-
-            // 3. the object points like an arrow to "front" from "back";
-            Vector2 arrow = front - back;
-
-            // 4. determine the angle of that arrow
-            float angle = Mathf.Atan2(arrow.y, arrow.x) * Mathf.Rad2Deg;
-
-            // 5. determine the length of the back line
-            float length = (back - middle).magnitude;
-
-            this.position = center;
-            this.angle = angle;
-            this.type = Type.Line;
-            this.variable = length;
-
-            this.debugFront = front;
+            sides.x = ab;
+            sides.y = bc;
+            sides.z = ca;
+        }
+        else if (bc < ab && bc < ca)
+        {
+            sides.x = bc;
+            sides.y = ca;
+            sides.z = ab;
+        }
+        else
+        {
+            sides.x = ca;
+            sides.y = ab;
+            sides.z = bc;
         }
 
-        if (triangle)
-        {
-            Vector2 center = (points[0] + points[1] + points[2]) / 3;
+        return sides;
+    }
 
-            // 1. sort points in order of sum of squared distance to other 
-            // points, the "front" point is the first 
-            var corners = points.OrderBy(point => (point - center).magnitude).ToList();
-
-            // 2. find angle on "front" corner and use this to determine the
-            // shape type
-            float species = AngleOfCorner(corners[0], corners[1], corners[2]) * Mathf.Rad2Deg;
-
-            // 3. the object points like an arrow from the center of all points
-            // to the "front" point
-            Vector2 arrow = corners[0] - center;
-
-            // 4. determine the angle of that arrow
-            float angle = Mathf.Atan2(arrow.y, arrow.x) * Mathf.Rad2Deg;
-
-            this.position = center;
-            this.angle = angle;
-            this.type = Type.Triangle;
-            this.variable = species;
-
-            this.debugFront = corners[0];
-        }
-
-        if (!line && !triangle)
-        {
-            Debug.Log("???");
-            this.type = Type.None;
-        }
+    public void ProcessFrameImmediately(TouchFrame frame)
+    {
+        feature = ExtractSidesFeature(frame);
     }
 
     /// <summary>
