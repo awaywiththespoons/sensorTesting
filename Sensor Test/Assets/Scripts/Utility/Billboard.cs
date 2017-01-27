@@ -8,10 +8,11 @@ using System.Collections.Generic;
 
 using Random = UnityEngine.Random;
 
+[ExecuteInEditMode]
 public class Billboard : MonoBehaviour 
 {
     private void Update()
     {
-        transform.LookAt(Camera.main.transform.position);
+        transform.rotation = Quaternion.Inverse(Camera.main.transform.rotation);
     }
 }
