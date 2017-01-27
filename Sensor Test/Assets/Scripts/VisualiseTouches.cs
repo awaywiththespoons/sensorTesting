@@ -39,19 +39,88 @@ public class VisualiseTouches : MonoBehaviour
     public IndexedPool<Image> touchIndicators2;
     public IndexedPool<Image> plots;
 
+    public LineRenderer tokenPlotPrefab;
+    public IndexedPool<LineRenderer> tokenPlots;
+
     private void Awake()
     {
         touchIndicators = new IndexedPool<Image>(touchPrefab);
         touchIndicators2 = new IndexedPool<Image>(touchPrefab);
         plots = new IndexedPool<Image>(plotPrefab);
+
+        tokenPlots = new IndexedPool<LineRenderer>(tokenPlotPrefab);
     }
 
     private Context context;
 
     private List<Vector3> values = new List<Vector3>();
 
+    private Vector3 SortVectorComponents(Vector3 vector)
+    {
+        if (vector.y > vector.z)
+        {
+            float swap = vector.y;
+
+            vector.y = vector.z;
+            vector.z = swap;       
+        }
+    
+        if (vector.x > vector.y)
+        {
+            float swap = vector.x;
+
+            vector.x = vector.y;
+            vector.y = swap;       
+        }
+
+        if (vector.y > vector.z)
+        {
+            float swap = vector.y;
+
+            vector.y = vector.z;
+            vector.z = swap;       
+        }
+
+        return vector;
+    }
+
     private void Update()
     {
+        float plotScale = 1 / tokens.Max(token => Mathf.Max(token.featureTarget.x, token.featureTarget.y, token.featureTarget.z));
+
+        Vector3 sortedFeature = SortVectorComponents(context != null ? context.meanFeature : Vector3.zero) * plotScale;
+
+        tokenPlots.SetActive(tokens.Count + 1);
+        tokenPlots.MapActive((i, plot) =>
+        {
+            if (i == tokens.Count)
+            {
+                plot.transform.localPosition = sortedFeature;
+                plot.transform.localEulerAngles = new Vector3(45, 45, 45);
+
+                plot.enabled = false;
+            }
+            else
+            {
+                Vector3 sortedTarget = SortVectorComponents(tokens[i].featureTarget) * plotScale;
+
+                plot.transform.localPosition = sortedTarget;
+                plot.transform.localEulerAngles = new Vector3(0, 0, 0);
+
+                float distance = (sortedTarget - sortedFeature).magnitude;
+                Color color = Color.white * (1 - Mathf.Clamp01(distance));
+                plot.enabled = true;
+                plot.startColor = color;
+                plot.endColor = color;
+            }
+        });
+
+        tokenPlots.MapActive((i, plot) =>
+        {
+            plot.SetPosition(0, plot.transform.position);
+            plot.SetPosition(1, tokenPlots[tokens.Count].transform.position);
+        });
+
         int count = Input.touchCount;
 
         touchIndicators.SetActive(count);
@@ -105,7 +174,7 @@ public class VisualiseTouches : MonoBehaviour
 
             Debug.Log("Token has been removed");
         }
-
+        
         if (context != null && context.token == null)
         {
             if (context.dataFrames > requiredDataFrames)
@@ -117,7 +186,7 @@ public class VisualiseTouches : MonoBehaviour
                 context.dataFrames += 1;
                 context.meanType = Mathf.Lerp(context.meanType, (int) sensing.type, 0.5f);
 
-                context.meanFeature = Vector3.Lerp(context.meanFeature, sensing.feature, 0.5f);
+                context.meanFeature = Vector3.Lerp(context.meanFeature, SortVectorComponents(sensing.feature), 0.25f);
 
                 if (sensing.type == Sensing.Type.Line)
                 {
@@ -128,15 +197,24 @@ public class VisualiseTouches : MonoBehaviour
                     context.meanAngle = Mathf.Lerp(context.meanAngle, sensing.variable, 0.5f);
                 }
 
+                Vector3 sorted = SortVectorComponents(context.meanFeature);
+
                 Debug.LogFormat("feature: {0:0}, {1:0}, {2:0}", 
-                                context.meanFeature.x, 
-                                context.meanFeature.y, 
-                                context.meanFeature.z);
+                                sorted.x, 
+                                sorted.y, 
+                                sorted.z);
             }
         }
 
         if (context != null && context.token != null)
         {
+            context.meanFeature = Vector3.Lerp(context.meanFeature, SortVectorComponents(sensing.feature), 0.25f);
+            Vector3 sorted = SortVectorComponents(context.meanFeature);
+            Debug.LogFormat("feature: {0:0}, {1:0}, {2:0}", 
+                            sorted.x, 
+                            sorted.y, 
+                            sorted.z);
+
             for (int i = 0; i < tokens.Count; ++i)
             {
                 var token = tokens[i];
