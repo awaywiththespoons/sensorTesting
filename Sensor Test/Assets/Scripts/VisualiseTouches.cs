@@ -42,6 +42,9 @@ public class VisualiseTouches : MonoBehaviour
     public LineRenderer tokenPlotPrefab;
     public IndexedPool<LineRenderer> tokenPlots;
 
+    public List<Vector3> testPlotData = new List<Vector3>();
+    public IndexedPool<LineRenderer> testPlots;
+
     private void Awake()
     {
         touchIndicators = new IndexedPool<Image>(touchPrefab);
@@ -49,6 +52,7 @@ public class VisualiseTouches : MonoBehaviour
         plots = new IndexedPool<Image>(plotPrefab);
 
         tokenPlots = new IndexedPool<LineRenderer>(tokenPlotPrefab);
+        testPlots = new IndexedPool<LineRenderer>(tokenPlotPrefab);
     }
 
     private Context context;
@@ -89,6 +93,13 @@ public class VisualiseTouches : MonoBehaviour
         float plotScale = 1 / tokens.Max(token => Mathf.Max(token.featureTarget.x, token.featureTarget.y, token.featureTarget.z));
 
         Vector3 sortedFeature = SortVectorComponents(context != null ? context.meanFeature : Vector3.zero) * plotScale;
+
+        testPlots.SetActive(testPlotData.Count);
+        testPlots.MapActive((i, plot) =>
+        {
+            Vector3 sortedTarget = testPlotData[i] * plotScale;
+            plot.transform.localPosition = sortedTarget;
+        });
 
         tokenPlots.SetActive(tokens.Count + 1);
         tokenPlots.MapActive((i, plot) =>
@@ -173,6 +184,8 @@ public class VisualiseTouches : MonoBehaviour
             context = null;
 
             Debug.Log("Token has been removed");
+
+            testPlotData.Clear();
         }
         
         if (context != null && context.token == null)
@@ -198,6 +211,8 @@ public class VisualiseTouches : MonoBehaviour
                 }
 
                 Vector3 sorted = SortVectorComponents(context.meanFeature);
+                
+                testPlotData.Add(sorted);
 
                 Debug.LogFormat("feature: {0:0}, {1:0}, {2:0}", 
                                 sorted.x, 
@@ -214,6 +229,7 @@ public class VisualiseTouches : MonoBehaviour
                             sorted.x, 
                             sorted.y, 
                             sorted.z);
+            testPlotData.Add(sorted);
 
             for (int i = 0; i < tokens.Count; ++i)
             {
