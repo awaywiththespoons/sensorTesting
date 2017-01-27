@@ -42,7 +42,14 @@ public class VisualiseTouches : MonoBehaviour
     public LineRenderer tokenPlotPrefab;
     public IndexedPool<LineRenderer> tokenPlots;
 
-    public List<Vector3> testPlotData = new List<Vector3>();
+    private struct Data
+    {
+        public Vector3 plot;
+        public Color color;
+    }
+
+    private int testCount;
+    private List<Data> testPlotData = new List<Data>();
     public IndexedPool<LineRenderer> testPlots;
 
     private void Awake()
@@ -90,15 +97,19 @@ public class VisualiseTouches : MonoBehaviour
 
     private void Update()
     {
-        float plotScale = 1 / tokens.Max(token => Mathf.Max(token.featureTarget.x, token.featureTarget.y, token.featureTarget.z));
+        float plotScale = 0;
+
+        if (testPlotData.Count > 0)
+            plotScale = 1 / testPlotData.Select(data => Mathf.Max(data.plot.x, data.plot.y, data.plot.z)).Max();
 
         Vector3 sortedFeature = SortVectorComponents(context != null ? context.meanFeature : Vector3.zero) * plotScale;
 
         testPlots.SetActive(testPlotData.Count);
         testPlots.MapActive((i, plot) =>
         {
-            Vector3 sortedTarget = testPlotData[i] * plotScale;
+            Vector3 sortedTarget = testPlotData[i].plot * plotScale;
             plot.transform.localPosition = sortedTarget;
+            plot.GetComponent<SpriteRenderer>().color = testPlotData[i].color;
         });
 
         tokenPlots.SetActive(tokens.Count + 1);
@@ -185,7 +196,7 @@ public class VisualiseTouches : MonoBehaviour
 
             Debug.Log("Token has been removed");
 
-            testPlotData.Clear();
+            testCount += 1;
         }
         
         if (context != null && context.token == null)
@@ -212,7 +223,7 @@ public class VisualiseTouches : MonoBehaviour
 
                 Vector3 sorted = SortVectorComponents(context.meanFeature);
                 
-                testPlotData.Add(sorted);
+                testPlotData.Add(new Data { plot = sorted, color = Color.HSVToRGB(testCount / 10f, 1, 1) });
 
                 Debug.LogFormat("feature: {0:0}, {1:0}, {2:0}", 
                                 sorted.x, 
@@ -229,7 +240,7 @@ public class VisualiseTouches : MonoBehaviour
                             sorted.x, 
                             sorted.y, 
                             sorted.z);
-            testPlotData.Add(sorted);
+            testPlotData.Add(new Data { plot = sorted, color = Color.HSVToRGB(testCount / 10f, 1, 1) });
 
             for (int i = 0; i < tokens.Count; ++i)
             {
