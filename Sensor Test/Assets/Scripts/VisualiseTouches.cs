@@ -33,6 +33,16 @@ public class VisualiseTouches : MonoBehaviour
     [SerializeField]
     private Image plotPrefab;
 
+	[Header("Desktop Debugging")]
+	public bool debugOn;
+	public Token debugToken;
+	[Range(0, 100)]
+	public float debugX;
+	[Range(0, 100)]
+	public float debugY;
+	[Range(0, 720)]
+	public float debugDirection;
+
     public IndexedPool<Image> touchIndicators;
     public IndexedPool<Image> touchIndicators2;
     public IndexedPool<Image> plots;
@@ -119,6 +129,15 @@ public class VisualiseTouches : MonoBehaviour
                 }
             }
         }
+
+		if (debugOn) {
+			context = new Context {
+				token = debugToken,
+			};
+
+			sensing.position = new Vector2(debugX, debugY) * 10f;
+			sensing.angle = debugDirection;
+		}
 
         if (context != null && context.token != null)
         {

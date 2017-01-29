@@ -10,12 +10,14 @@ using Random = UnityEngine.Random;
 
 public class Hotspot : MonoBehaviour 
 {
+	[Header("Conditions")]
     public RectTransform activeArea;
     [Range(0, 360)]
     public float angleTarget;
     [Range(10, 180)]
     public float angleMargin;
 
+	[Header("Animation")]
     public GameObject graphic;
     public GameObject scene;
 
@@ -24,6 +26,8 @@ public class Hotspot : MonoBehaviour
         bool inActiveArea = activeArea == null 
                          || RectTransformUtility.RectangleContainsScreenPoint(activeArea, position);
         bool inAngleRange = Mathf.Abs(Mathf.DeltaAngle(angle, angleTarget)) <= angleMargin;
+
+		Debug.LogFormat ("{0} - {1}/{2}", name, inActiveArea, inAngleRange);
 
         return inAngleRange && inActiveArea;
     }

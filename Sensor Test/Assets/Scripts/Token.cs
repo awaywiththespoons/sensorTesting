@@ -46,6 +46,8 @@ public class Token : MonoBehaviour
         {
             hotspots[i].Disable();
         }
+
+		defaultHotspot.Disable();
     }
 
     public void Disable()
