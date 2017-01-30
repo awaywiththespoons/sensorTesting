@@ -104,6 +104,15 @@ public class VisualiseTouches : MonoBehaviour
 
         Vector3 sortedFeature = SortVectorComponents(context != null ? context.meanFeature : Vector3.zero) * plotScale;
 
+        // possibility - cycle coords to minimise difference between x & y?
+        /*
+        Vector3 test = new Vector3(Random.value, 0, 0);
+        test.y = Mathf.Clamp(Random.value, test.x, 1);
+        test.z = Mathf.Clamp(Random.value, test.x, 1);
+
+        testPlotData.Add(new Data { plot = test, color = Color.white });
+        */
+
         testPlots.SetActive(testPlotData.Count);
         testPlots.MapActive((i, plot) =>
         {
