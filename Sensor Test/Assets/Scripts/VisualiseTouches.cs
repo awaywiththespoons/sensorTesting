@@ -55,6 +55,10 @@ public class VisualiseTouches : MonoBehaviour
         plots = new IndexedPool<Image>(plotPrefab);
 
         tokens = tokenCollection.GetComponentsInChildren<Token>(true).ToList();
+
+#if UNITY_ANDROID
+        debugOn = false;
+#endif
     }
 
     private Context context;
