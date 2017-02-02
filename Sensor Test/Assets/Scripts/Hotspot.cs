@@ -10,14 +10,14 @@ using Random = UnityEngine.Random;
 
 public class Hotspot : MonoBehaviour 
 {
-	[Header("Conditions")]
+	[Header("Trigger Conditions")]
     public RectTransform activeArea;
     [Range(0, 360)]
     public float angleTarget;
     [Range(10, 180)]
     public float angleMargin;
 
-	[Header("Animation")]
+	[Header("Triggered Content")]
     public GameObject graphic;
     public GameObject scene;
 
