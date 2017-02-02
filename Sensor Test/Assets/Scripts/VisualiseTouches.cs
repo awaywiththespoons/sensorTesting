@@ -22,17 +22,6 @@ public class Context
 
 public class VisualiseTouches : MonoBehaviour 
 {
-    [Range(1, 60)]
-    public int requiredDataFrames;
-
-    public Sensing sensing;
-    public List<Token> tokens = new List<Token>();
-
-    [SerializeField]
-    private Image touchPrefab;
-    [SerializeField]
-    private Image plotPrefab;
-
 	[Header("Simulation Settings")]
 	public bool debugOn;
 	public Token debugToken;
@@ -43,6 +32,18 @@ public class VisualiseTouches : MonoBehaviour
 	[Range(0, 720)]
 	public float debugDirection;
 
+    [Header("Internal Setup")]
+    [SerializeField]
+    private GameObject tokenCollection;
+    public Sensing sensing;
+    [SerializeField]
+    private Image touchPrefab;
+    [SerializeField]
+    private Image plotPrefab;
+    [Range(1, 60)]
+    public int requiredDataFrames;
+    private List<Token> tokens = new List<Token>();
+
     public IndexedPool<Image> touchIndicators;
     public IndexedPool<Image> touchIndicators2;
     public IndexedPool<Image> plots;
@@ -52,6 +53,8 @@ public class VisualiseTouches : MonoBehaviour
         touchIndicators = new IndexedPool<Image>(touchPrefab);
         touchIndicators2 = new IndexedPool<Image>(touchPrefab);
         plots = new IndexedPool<Image>(plotPrefab);
+
+        tokens = tokenCollection.GetComponentsInChildren<Token>(true).ToList();
     }
 
     private Context context;
