@@ -56,7 +56,7 @@ public class VisualiseTouches : MonoBehaviour
 
         tokens = tokenCollection.GetComponentsInChildren<Token>(true).ToList();
 
-#if UNITY_ANDROID
+#if UNITY_ANDROID && !UNITY_EDITOR
         debugOn = false;
 #endif
     }
