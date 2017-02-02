@@ -80,8 +80,6 @@ public class AnimateSpritesSimply : MonoBehaviour
 
     void UpdateSprite()
     {
-        Debug.Log(current);
-
         if (useSpriteRenderer)
             sprites.sprite = frames[current];
         else

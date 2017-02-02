@@ -28,8 +28,6 @@ public class TriggerSettings : MonoBehaviour
                          || RectTransformUtility.RectangleContainsScreenPoint(activeRegion, position);
         bool inAngleRange = Mathf.Abs(Mathf.DeltaAngle(angle, angleDirection)) <= angleRange;
 
-		Debug.LogFormat ("{0} - {1}/{2}", name, inActiveArea, inAngleRange);
-
         return inAngleRange && inActiveArea;
     }
 
