@@ -33,7 +33,7 @@ public class VisualiseTouches : MonoBehaviour
     [SerializeField]
     private Image plotPrefab;
 
-	[Header("Desktop Debugging")]
+	[Header("Simulation Settings")]
 	public bool debugOn;
 	public Token debugToken;
 	[Range(0, 100)]
