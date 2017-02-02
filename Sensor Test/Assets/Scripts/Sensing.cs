@@ -17,7 +17,7 @@ public class Sensing : MonoBehaviour
 
     public static Vector3 SortVectorComponents(Vector3 vector)
     {
-        return MinimiseVectorXYDelta(vector);
+        return MinimiseVectorRank(vector);
 
         if (vector.y > vector.z)
         {
@@ -51,20 +51,22 @@ public class Sensing : MonoBehaviour
         return new Vector3(vector.y, vector.z, vector.x);
     }
 
-    private static float VectorXYDelta(Vector3 vector)
+    private static float Rank(Vector3 vector)
     {
-        return Mathf.Abs(vector.x - vector.y) + vector.x + vector.y;
+        return vector.x * vector.x * vector.x
+             + vector.y * vector.y
+             + vector.z;
     }
 
-    public static Vector3 MinimiseVectorXYDelta(Vector3 vector)
+    public static Vector3 MinimiseVectorRank(Vector3 vector)
     {
         Vector3 a = vector;
         Vector3 b = CycleVectorComponents(a);
         Vector3 c = CycleVectorComponents(b);
 
-        float ad = VectorXYDelta(a);
-        float bd = VectorXYDelta(b);
-        float cd = VectorXYDelta(c);
+        float ad = Rank(a);
+        float bd = Rank(b);
+        float cd = Rank(c);
 
         if (ad <= bd && ad <= cd)
         {
