@@ -10,22 +10,74 @@ using Random = UnityEngine.Random;
 
 public class Sensing : MonoBehaviour 
 {
-    [Tooltip("How many degrees can the angles in a triangle deviate from 180 / 0 and yet still be considered a line?")]
-    public float lineTolerance;
-
-    public float triangleAngleMinimum;
-    public float triangleAngleMaximum;
-    
-    public enum Type
-    {
-        None,
-        Line,
-        Triangle,
-    }
-
     public class TouchFrame
     {
         public List<Vector2> touches;
+    }
+
+    public static Vector3 SortVectorComponents(Vector3 vector)
+    {
+        return MinimiseVectorXYDelta(vector);
+
+        if (vector.y > vector.z)
+        {
+            float swap = vector.y;
+
+            vector.y = vector.z;
+            vector.z = swap;       
+        }
+    
+        if (vector.x > vector.y)
+        {
+            float swap = vector.x;
+
+            vector.x = vector.y;
+            vector.y = swap;       
+        }
+
+        if (vector.y > vector.z)
+        {
+            float swap = vector.y;
+
+            vector.y = vector.z;
+            vector.z = swap;       
+        }
+
+        return vector;
+    }
+
+    public static Vector3 CycleVectorComponents(Vector3 vector)
+    {
+        return new Vector3(vector.y, vector.z, vector.x);
+    }
+
+    private static float VectorXYDelta(Vector3 vector)
+    {
+        return Mathf.Abs(vector.x - vector.y) + vector.x + vector.y;
+    }
+
+    public static Vector3 MinimiseVectorXYDelta(Vector3 vector)
+    {
+        Vector3 a = vector;
+        Vector3 b = CycleVectorComponents(a);
+        Vector3 c = CycleVectorComponents(b);
+
+        float ad = VectorXYDelta(a);
+        float bd = VectorXYDelta(b);
+        float cd = VectorXYDelta(c);
+
+        if (ad <= bd && ad <= cd)
+        {
+            return a;
+        }
+        else if (bd <= ad && bd <= cd)
+        {
+            return b;
+        }
+        else
+        {
+            return c;
+        }
     }
 
     private Vector2 Average(IEnumerable<Vector2> vectors)
@@ -54,6 +106,11 @@ public class Sensing : MonoBehaviour
         if (frame.touches.Count == 3)
         {
             ProcessFrameImmediately(frame);
+            valid = true;
+        }
+        else
+        {
+            valid = false;
         }
 
         // in the future there should be a distinct initial phase in which we
@@ -65,9 +122,8 @@ public class Sensing : MonoBehaviour
     
     public Vector2 position;
     public float angle;
-    public Type type;
-    public float variable;
     public Vector3 feature;
+    public bool valid;
 
     public Vector3 ExtractSidesFeature(TouchFrame frame)
     {
@@ -75,9 +131,9 @@ public class Sensing : MonoBehaviour
         Vector2 b = frame.touches[1];
         Vector2 c = frame.touches[2];
 
-        float ab = (b - a).sqrMagnitude * .001f;
-        float bc = (c - b).sqrMagnitude * .001f;
-        float ca = (a - c).sqrMagnitude * .001f;
+        float ab = (b - a).magnitude / Screen.dpi * 2.54f;
+        float bc = (c - b).magnitude / Screen.dpi * 2.54f;
+        float ca = (a - c).magnitude / Screen.dpi * 2.54f;
 
         // TODO: need to sort by winding!!
 

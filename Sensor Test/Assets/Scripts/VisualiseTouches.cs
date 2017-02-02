@@ -12,11 +12,6 @@ public class Context
 {
     public int dataFrames;
     public float missingTime;
-
-    public float meanType;
-    public float meanAngle;
-    public float meanLength;
-
     public Vector3 meanFeature;
 
     public Token token;
@@ -32,126 +27,21 @@ public class VisualiseTouches : MonoBehaviour
 
     [SerializeField]
     private Image touchPrefab;
-    [SerializeField]
-    private Image plotPrefab;
 
     public IndexedPool<Image> touchIndicators;
     public IndexedPool<Image> touchIndicators2;
     public IndexedPool<Image> plots;
-
-    public LineRenderer tokenPlotPrefab;
-    public IndexedPool<LineRenderer> tokenPlots;
-
-    private struct Data
-    {
-        public Vector3 plot;
-        public Color color;
-    }
-
-    private int testCount;
-    private List<Data> testPlotData = new List<Data>();
-    public IndexedPool<LineRenderer> testPlots;
-
+   
     private void Awake()
     {
         touchIndicators = new IndexedPool<Image>(touchPrefab);
         touchIndicators2 = new IndexedPool<Image>(touchPrefab);
-        plots = new IndexedPool<Image>(plotPrefab);
-
-        tokenPlots = new IndexedPool<LineRenderer>(tokenPlotPrefab);
-        testPlots = new IndexedPool<LineRenderer>(tokenPlotPrefab);
     }
 
     private Context context;
 
-    private List<Vector3> values = new List<Vector3>();
-
-    private Vector3 SortVectorComponents(Vector3 vector)
-    {
-        if (vector.y > vector.z)
-        {
-            float swap = vector.y;
-
-            vector.y = vector.z;
-            vector.z = swap;       
-        }
-    
-        if (vector.x > vector.y)
-        {
-            float swap = vector.x;
-
-            vector.x = vector.y;
-            vector.y = swap;       
-        }
-
-        if (vector.y > vector.z)
-        {
-            float swap = vector.y;
-
-            vector.y = vector.z;
-            vector.z = swap;       
-        }
-
-        return vector;
-    }
-
     private void Update()
     {
-        float plotScale = 0;
-
-        if (testPlotData.Count > 0)
-            plotScale = 1 / testPlotData.Select(data => Mathf.Max(data.plot.x, data.plot.y, data.plot.z)).Max();
-
-        Vector3 sortedFeature = SortVectorComponents(context != null ? context.meanFeature : Vector3.zero) * plotScale;
-
-        // possibility - cycle coords to minimise difference between x & y?
-        /*
-        Vector3 test = new Vector3(Random.value, 0, 0);
-        test.y = Mathf.Clamp(Random.value, test.x, 1);
-        test.z = Mathf.Clamp(Random.value, test.x, 1);
-
-        testPlotData.Add(new Data { plot = test, color = Color.white });
-        */
-
-        testPlots.SetActive(testPlotData.Count);
-        testPlots.MapActive((i, plot) =>
-        {
-            Vector3 sortedTarget = testPlotData[i].plot * plotScale;
-            plot.transform.localPosition = sortedTarget;
-            plot.GetComponent<SpriteRenderer>().color = testPlotData[i].color;
-        });
-
-        tokenPlots.SetActive(tokens.Count + 1);
-        tokenPlots.MapActive((i, plot) =>
-        {
-            if (i == tokens.Count)
-            {
-                plot.transform.localPosition = sortedFeature;
-                plot.transform.localEulerAngles = new Vector3(45, 45, 45);
-
-                plot.enabled = false;
-            }
-            else
-            {
-                Vector3 sortedTarget = SortVectorComponents(tokens[i].featureTarget) * plotScale;
-
-                plot.transform.localPosition = sortedTarget;
-                plot.transform.localEulerAngles = new Vector3(0, 0, 0);
-
-                float distance = (sortedTarget - sortedFeature).magnitude;
-                Color color = Color.white * (1 - Mathf.Clamp01(distance));
-                plot.enabled = true;
-                plot.startColor = color;
-                plot.endColor = color;
-            }
-        });
-
-        tokenPlots.MapActive((i, plot) =>
-        {
-            plot.SetPosition(0, plot.transform.position);
-            plot.SetPosition(1, tokenPlots[tokens.Count].transform.position);
-        });
-
         int count = Input.touchCount;
 
         touchIndicators.SetActive(count);
@@ -176,23 +66,10 @@ public class VisualiseTouches : MonoBehaviour
             touchIndicators2[i].transform.localScale = Vector3.one * 0.2f;
         }
 
-        plots.SetActive(values.Count);
-
-        for (int i = 0; i < values.Count; ++i)
-        {
-            plots[i].transform.position = (Vector2) values[i] + Vector2.up * 200;
-            Color color = Color.HSVToRGB(values[i].z, 1, 1);
-            color.a = 0.1f;
-            plots[i].color = color; 
-        }
-
         if (context == null && count >= 2)
         {
             context = new Context();
-            context.meanType = (int) sensing.type;
-            context.meanAngle = sensing.variable;
-            context.meanLength = sensing.variable;
-            context.meanFeature = sensing.feature;
+            context.meanFeature = Sensing.SortVectorComponents(sensing.feature);
         }
         else if (count < 2 && context != null)
         {
@@ -204,10 +81,18 @@ public class VisualiseTouches : MonoBehaviour
             context = null;
 
             Debug.Log("Token has been removed");
-
-            testCount += 1;
         }
         
+        if (count == 3)
+        {
+            var sorted = Sensing.SortVectorComponents(sensing.feature);
+
+            Debug.LogFormat("feature: {0:0.0}, {1:0.0}, {2:0.0}", 
+                            sorted.x, 
+                            sorted.y, 
+                            sorted.z);
+        }
+
         if (context != null && context.token == null)
         {
             if (context.dataFrames > requiredDataFrames)
@@ -217,39 +102,14 @@ public class VisualiseTouches : MonoBehaviour
             else if (count == 3)
             {
                 context.dataFrames += 1;
-                context.meanType = Mathf.Lerp(context.meanType, (int) sensing.type, 0.5f);
-
-                context.meanFeature = Vector3.Lerp(context.meanFeature, SortVectorComponents(sensing.feature), 0.25f);
-
-                if (sensing.type == Sensing.Type.Line)
-                {
-                    context.meanLength = Mathf.Lerp(context.meanLength, sensing.variable, 0.5f);
-                }
-                else if (sensing.type == Sensing.Type.Triangle)
-                {
-                    context.meanAngle = Mathf.Lerp(context.meanAngle, sensing.variable, 0.5f);
-                }
-
-                Vector3 sorted = SortVectorComponents(context.meanFeature);
-                
-                testPlotData.Add(new Data { plot = sorted, color = Color.HSVToRGB(testCount / 10f, 1, 1) });
-
-                Debug.LogFormat("feature: {0:0}, {1:0}, {2:0}", 
-                                sorted.x, 
-                                sorted.y, 
-                                sorted.z);
+                Vector3 sorted = Sensing.SortVectorComponents(sensing.feature);
             }
         }
 
         if (context != null && context.token != null)
         {
-            context.meanFeature = Vector3.Lerp(context.meanFeature, SortVectorComponents(sensing.feature), 0.25f);
-            Vector3 sorted = SortVectorComponents(context.meanFeature);
-            Debug.LogFormat("feature: {0:0}, {1:0}, {2:0}", 
-                            sorted.x, 
-                            sorted.y, 
-                            sorted.z);
-            testPlotData.Add(new Data { plot = sorted, color = Color.HSVToRGB(testCount / 10f, 1, 1) });
+            context.meanFeature = Vector3.Lerp(context.meanFeature, Sensing.SortVectorComponents(sensing.feature), 1f);
+            Vector3 sorted = Sensing.SortVectorComponents(sensing.feature);
 
             for (int i = 0; i < tokens.Count; ++i)
             {
@@ -293,17 +153,7 @@ public class VisualiseTouches : MonoBehaviour
 
     private void DecideToken()
     {
-        var type = (Sensing.Type) Mathf.RoundToInt(context.meanType);
-
-        float variable = type == Sensing.Type.Line 
-                       ? context.meanLength 
-                       : context.meanAngle;
-
-        var closest = tokens.Where(token => token.patternType == type)
-                            .OrderBy(token => Math.Abs(token.patternVariableTarget - variable))
-                            .FirstOrDefault();
-
-        closest = tokens.OrderBy(token => BestDistance(sensing.feature, token.featureTarget)).FirstOrDefault();
+        Token closest = tokens.OrderBy(token => BestDistance(sensing.feature, token.featureTarget)).FirstOrDefault();
 
         context.token = closest;
 
