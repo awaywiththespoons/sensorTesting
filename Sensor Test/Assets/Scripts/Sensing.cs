@@ -116,7 +116,7 @@ public class Sensing : MonoBehaviour
             float angle = Mathf.Atan2(arrow.y, arrow.x) * Mathf.Rad2Deg;
 
             // 5. determine the length of the back line
-            float length = (back - middle).magnitude;
+            float length = (back - middle).magnitude / Screen.dpi * 2.54f;
 
             this.position = center;
             this.angle = angle;
@@ -125,7 +125,7 @@ public class Sensing : MonoBehaviour
 
             this.debugFront = front;
 
-            Debug.LogFormat("Line, {0:0}", length);
+            Debug.LogFormat("Line, {0:0.0}cm", length);
         }
 
         if (triangle)
