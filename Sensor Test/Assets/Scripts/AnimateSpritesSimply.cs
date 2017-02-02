@@ -3,11 +3,13 @@ using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
-//[ExecuteInEditMode]
+[ExecuteInEditMode]
 public class AnimateSpritesSimply : MonoBehaviour 
 {
-	SpriteRenderer spriteRenderer;
-	Image image;
+    SpriteRenderer sprites;
+    Image images;
+
+    bool useSpriteRenderer = true;
 
     public int current = 0;
     public List<Sprite> frames;
@@ -24,14 +26,17 @@ public class AnimateSpritesSimply : MonoBehaviour
 
     void Awake()
     {
-		spriteRenderer = GetComponent<SpriteRenderer> ();
-		image = GetComponent<Image> ();
+        if (GetComponent<SpriteRenderer>() == null)
+        {
+            images = GetComponent<Image>();
+            useSpriteRenderer = false;
+        }
         
         Sprite _temp;
-		if (spriteRenderer != null)
-			_temp = spriteRenderer.sprite;
+        if (useSpriteRenderer)
+            _temp = GetComponent<SpriteRenderer>().sprite;
         else
-            _temp = image.sprite;
+            _temp = GetComponent<Image>().sprite;
 
         ResetFrames();
         if(frames[0] == null)
@@ -57,7 +62,7 @@ public class AnimateSpritesSimply : MonoBehaviour
         lastFPS = framesPS;
 
         length = 1 / (float)framesPS;
-        spriteRenderer = GetComponent<SpriteRenderer>();
+        sprites = GetComponent<SpriteRenderer>();
 
         if (randomStart)
             count = Random.Range(0, length);
@@ -75,14 +80,16 @@ public class AnimateSpritesSimply : MonoBehaviour
 
     void UpdateSprite()
     {
-		if (spriteRenderer != null)
-            spriteRenderer.sprite = frames[current];
+        Debug.Log(current);
+
+        if (useSpriteRenderer)
+            sprites.sprite = frames[current];
         else
-            image.sprite = frames[current];
+            images.sprite = frames[current];
 
     }
 
-	void Update ()
+	private void Update()
     {
         if (renameToTexture)
             RenameToTexture();
