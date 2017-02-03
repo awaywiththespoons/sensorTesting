@@ -27,6 +27,8 @@ public class VisualiseTouches : MonoBehaviour
 
     [SerializeField]
     private Image touchPrefab;
+    [SerializeField]
+    private Image arrowTest;
 
     public IndexedPool<Image> touchIndicators;
     public IndexedPool<Image> touchIndicators2;
@@ -46,6 +48,11 @@ public class VisualiseTouches : MonoBehaviour
 
         touchIndicators.SetActive(count);
         touchIndicators2.SetActive(count);
+
+        arrowTest.GetComponent<RectTransform>().anchoredPosition = sensing.frame.centroid;
+        arrowTest.transform.eulerAngles = Vector3.forward * sensing.angle;
+
+        Debug.Log(sensing.frame.centroid);
 
         for (int i = 0; i < count; ++i)
         {
@@ -83,16 +90,6 @@ public class VisualiseTouches : MonoBehaviour
             Debug.Log("Token has been removed");
         }
         
-        if (count == 3)
-        {
-            var sorted = Sensing.SortVectorComponents(sensing.feature);
-
-            Debug.LogFormat("feature: {0:0.0}, {1:0.0}, {2:0.0}", 
-                            sorted.x, 
-                            sorted.y, 
-                            sorted.z);
-        }
-
         if (context != null && context.token == null)
         {
             if (context.dataFrames > requiredDataFrames)

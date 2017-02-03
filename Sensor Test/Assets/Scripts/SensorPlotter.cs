@@ -10,6 +10,11 @@ using Random = UnityEngine.Random;
 
 public class SensorPlotter : MonoBehaviour 
 {
+    private class Token
+    {
+        public List<Vector3> training = new List<Vector3>();
+    }
+
     private struct Data
     {
         public int id;
@@ -27,14 +32,21 @@ public class SensorPlotter : MonoBehaviour
     [SerializeField]
     private SpriteRenderer sensorPlot;
 
+    [SerializeField]
+    private Text debugText;
+
     private int count = 0;
     private bool classifyMode;
     private List<int> classifications = new List<int>();
     private Dictionary<int, Vector3> meanSorted = new Dictionary<int, Vector3>();
 
+    private Queue<Vector3> currentData = new Queue<Vector3>();
+    //private int limit = 64;
+
     public void Increment()
     {
         count += 1;
+        currentData.Clear();
     }
 
     public void Reset()
@@ -43,6 +55,8 @@ public class SensorPlotter : MonoBehaviour
         plotData.Clear();
         plots.SetActive(0);
         meanSorted.Clear();
+
+        currentData.Clear();
     }
 
     public void SetClassify(bool classify)
@@ -56,9 +70,9 @@ public class SensorPlotter : MonoBehaviour
         plots = new IndexedPool<SpriteRenderer>(plotTemplate);
     }
 
-    private bool explore = true;
+    private bool explore = false;
 
-    private void Update()
+    private void LateUpdate()
     {
         if (explore)
         {
@@ -78,6 +92,20 @@ public class SensorPlotter : MonoBehaviour
                 color = Color.white,
                 plot = triangle,
             });
+        }
+
+        if (plotData.Count > 0)
+        {
+            Vector3 mean = Vector3.zero;
+
+            foreach (var data in currentData)
+            {
+                mean += data;
+            }
+
+            mean /= currentData.Count;
+
+            debugText.text = string.Format("{0} -> {1}", count, sensor.angle);
         }
 
         sensorPlot.gameObject.SetActive(classifyMode);
@@ -124,6 +152,20 @@ public class SensorPlotter : MonoBehaviour
 
         if (!explore)
         {
+            if (currentData.Count == 0)
+            {
+                currentData.Enqueue(sensor.feature);
+            }
+            else
+            {
+                currentData.Enqueue(Sensing.CycleVectorToMatchOther(sensor.feature, currentData.Last()));
+            }
+            
+            if (currentData.Count > 16)
+            {
+                //currentData.Dequeue();
+            }
+
             plotData.Add(new Data
             {
                 id = count,

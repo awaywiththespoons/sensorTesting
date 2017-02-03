@@ -10,14 +10,49 @@ using Random = UnityEngine.Random;
 
 public class Sensing : MonoBehaviour 
 {
+    public struct Side
+    {
+        public Vector2 pointA, pointB;
+        public float length;
+        public float direction; // triangle=clockwise, line=out
+
+        public Side(Vector2 pointA, Vector2 pointB)
+        {
+            this.pointA = pointA;
+            this.pointB = pointB;
+
+            length = (pointB - pointA).magnitude;
+            direction = 0;
+        }
+    }
+
     public class TouchFrame
     {
         public List<Vector2> touches;
+
+        public Vector2 centroid;
+        public float lineness;
+
+        public List<Side> sides;
     }
 
     public static float Compare(Vector3 a, Vector3 b)
     {
         return Vector3.Dot(b - a, b - a);
+    }
+
+    public static bool IsLine(Vector3 vector)
+    {
+        return Lineness(vector) >= 0.95f;
+    }
+
+    public static float Lineness(Vector3 vector)
+    {
+        float a = Mathf.Abs(1 - vector.x / (vector.y + vector.z));
+        float b = Mathf.Abs(1 - vector.y / (vector.x + vector.z));
+        float c = Mathf.Abs(1 - vector.z / (vector.x + vector.y));
+
+        return 1 - Mathf.Min(a, b, c) * 2;
     }
 
     public static Vector3 CycleVectorToMatchOther(Vector3 vector, Vector3 other)
@@ -121,15 +156,17 @@ public class Sensing : MonoBehaviour
         return sum / vectors.Count();
     }
 
+    public TouchFrame frame;
+
     public void Update()
     {
         // default to position tracking as centroid
-        this.position = Average(Input.touches.Select(touch => touch.position));
+        this.position = Average(Input.touches.Select(touch => touch.position / Screen.dpi * 2.54f));
 
         // collect the current touch data together
-        var frame = new TouchFrame
+        frame = new TouchFrame
         {
-            touches = Input.touches.Select(touch => touch.position).ToList(),
+            touches = Input.touches.Select(touch => touch.position / Screen.dpi * 2.54f).ToList(),
         };
 
         // for now we use frames immediately if they have 3 points, otherwise
@@ -158,61 +195,81 @@ public class Sensing : MonoBehaviour
 
     private static float PolarAngle(Vector2 point)
     {
-        return Mathf.Atan2(point.y, point.x);
+        return Mathf.Atan2(point.y, point.x) * Mathf.Rad2Deg;
     }
 
     public static Vector3 ExtractSidesFeature(TouchFrame frame)
     {
-        Vector2 a = frame.touches[0];
-        Vector2 b = frame.touches[1];
-        Vector2 c = frame.touches[2];
-
-        Vector2 centroid = (a + b + c) / 3f;
-
-        var points = frame.touches.OrderBy(point => PolarAngle(point - centroid)).ToList();
-        a = points[0];
-        b = points[1];
-        c = points[2];
+        var points = frame.touches.OrderBy(point => PolarAngle(point - frame.centroid)).ToList();
+        Vector2 a = points[0];
+        Vector2 b = points[1];
+        Vector2 c = points[2];
 
         float ab = (b - a).magnitude / Screen.dpi * 2.54f;
         float bc = (c - b).magnitude / Screen.dpi * 2.54f;
         float ca = (a - c).magnitude / Screen.dpi * 2.54f;
 
         return new Vector3(ab, bc, ca);
-
-        /*
-        // TODO: need to sort by winding!!
-
-        // rotate the sides so the shortest is first (for debugging mostly,
-        // the recognition will also rotate the side lengths anyway)
-        Vector3 sides;
-
-        if (ab < bc && ab < ca)
-        {
-            sides.x = ab;
-            sides.y = bc;
-            sides.z = ca;
-        }
-        else if (bc < ab && bc < ca)
-        {
-            sides.x = bc;
-            sides.y = ca;
-            sides.z = ab;
-        }
-        else
-        {
-            sides.x = ca;
-            sides.y = ab;
-            sides.z = bc;
-        }
-
-        return sides;
-        */
     }
 
     public void ProcessFrameImmediately(TouchFrame frame)
     {
+        Vector2 a = frame.touches[0];
+        Vector2 b = frame.touches[1];
+        Vector2 c = frame.touches[2];
+
+        frame.centroid = (a + b + c) / 3f;
+
         feature = ExtractSidesFeature(frame);
+
+        var points = frame.touches.OrderBy(point => PolarAngle(point - frame.centroid)).ToList();
+        a = points[0];
+        b = points[1];
+        c = points[2];
+
+        var ab = new Side(a, b);
+        var bc = new Side(b, c);
+        var ca = new Side(c, a);
+
+        frame.lineness = Lineness(new Vector3(ab.length, bc.length, ca.length));
+        frame.sides = new List<Side> { ab, bc, ca };
+
+        if (frame.lineness >= 0.95f)
+        {
+            var mid = frame.sides.OrderBy(side => side.length).ElementAt(1);
+
+            Vector2 da = frame.centroid - mid.pointA;
+            Vector2 db = frame.centroid - mid.pointB;
+
+            if (da.sqrMagnitude > db.sqrMagnitude)
+            {
+                angle = PolarAngle(da);
+            }
+            else
+            {
+                angle = PolarAngle(db);
+            }
+        }
+        else
+        {
+            var best = frame.sides.OrderByDescending(side => side.length).ElementAt(0);
+
+            float ra = PolarAngle(best.pointA);
+            float rb = PolarAngle(best.pointB);
+
+            Vector2 direction;
+
+            //if (Mathf.DeltaAngle(ra, rb) > 0)
+            {
+                direction = best.pointB - best.pointA;
+            }
+            //else
+            {
+                direction = best.pointA - best.pointB;
+            }
+
+            angle = PolarAngle(direction);
+        }
     }
 
     /// <summary>
