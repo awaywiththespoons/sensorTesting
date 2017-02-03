@@ -254,16 +254,16 @@ public class Sensing : MonoBehaviour
         {
             var best = frame.sides.OrderByDescending(side => side.length).ElementAt(0);
 
-            float ra = PolarAngle(best.pointA);
-            float rb = PolarAngle(best.pointB);
+            float ra = PolarAngle(frame.centroid - best.pointA);
+            float rb = PolarAngle(frame.centroid - best.pointB);
 
             Vector2 direction;
 
-            //if (Mathf.DeltaAngle(ra, rb) > 0)
+            if (Mathf.DeltaAngle(ra, rb) > 0)
             {
                 direction = best.pointB - best.pointA;
             }
-            //else
+            else
             {
                 direction = best.pointA - best.pointB;
             }
