@@ -37,7 +37,7 @@ public class SensorPlotter : MonoBehaviour
     [SerializeField]
     private LineRenderer triangleRenderer;
     [SerializeField]
-    private Camera shapeCamera;
+    private RectTransform shapeCanvas;
 
     private int count = 0;
     private bool classifyMode;
@@ -95,10 +95,21 @@ public class SensorPlotter : MonoBehaviour
                                    c - centroid + position };
     }
 
+    private static List<Vector2> CompleteTriangle(Vector2 a, Vector2 b, Vector3 sides)
+    {
+        float offset = Sensing.PolarAngle(b - a) * Mathf.Deg2Rad;
+        float angle = offset - Mathf.Acos((sides.x * sides.x + sides.y * sides.y - sides.z * sides.z) / (2 * sides.x * sides.y));
+
+        b = a + new Vector2(Mathf.Cos(offset) * sides.x,
+                                    Mathf.Sin(offset) * sides.x);
+        Vector2 c = a + new Vector2(Mathf.Cos(angle) * sides.y,
+                                    Mathf.Sin(angle) * sides.y);
+
+        return new List<Vector2> { a, b, c };
+    }
+
     private void LateUpdate()
     {
-        shapeCamera.orthographicSize = Screen.dpi / Screen.width * 2.54f * 2f;
-
         if (explore)
         {
             var triangle = Sensing.ExtractSidesFeature(new Sensing.TouchFrame
@@ -130,15 +141,30 @@ public class SensorPlotter : MonoBehaviour
 
             mean /= currentData.Count;
 
-            debugText.text = string.Format("{0} -> {1}", count, sensor.angle);
+            debugText.text = string.Format("{0} -> {1}", count, mean);
 
+            /*
             var points = SidesToTriangle(Vector2.zero, mean);
             points.Add(points[0]);
             triangleRenderer.SetPositions(points.Select(point => (Vector3) (point / 2.54f * Screen.dpi)).ToArray());
+            */
+
+            if (Input.touchCount == 2)
+            {
+                Vector2 a = Input.touches[0].position / Screen.dpi * 2.54f;
+                Vector2 b = Input.touches[1].position / Screen.dpi * 2.54f;
+
+                var points = CompleteTriangle(a, b, Sensing.CycleToSide(mean, (a - b).magnitude));
+                points.Add(points[0]);
+                triangleRenderer.SetPositions(points.Select(point => (Vector3) (point - shapeCanvas.rect.size * 0.5f)).ToArray());
+            }
         }
         else
         {
-            var points = SidesToTriangle(Vector2.zero, new Vector3(3, 4, 5));
+            Vector2 a = new Vector2(0, 0);
+            Vector2 b = new Vector2(3, 0);
+
+            var points = CompleteTriangle(a, b, new Vector3(3, 4, 5));
             points.Add(points[0]);
             triangleRenderer.SetPositions(points.Select(point => (Vector3) point).ToArray());
         }

@@ -122,6 +122,30 @@ public class Sensing : MonoBehaviour
              + vector.z;
     }
 
+    public static Vector3 CycleToSide(Vector3 vector, float side)
+    {
+        Vector3 a = vector;
+        Vector3 b = CycleVectorComponents(a);
+        Vector3 c = CycleVectorComponents(b);
+
+        float ad = Mathf.Abs(side - a.x);
+        float bd = Mathf.Abs(side - b.x);
+        float cd = Mathf.Abs(side - c.x);
+
+        if (ad <= bd && ad <= cd)
+        {
+            return a;
+        }
+        else if (bd <= ad && bd <= cd)
+        {
+            return b;
+        }
+        else
+        {
+            return c;
+        }
+    }
+
     public static Vector3 MinimiseVectorRank(Vector3 vector)
     {
         Vector3 a = vector;
@@ -194,7 +218,7 @@ public class Sensing : MonoBehaviour
     public Vector3 feature;
     public bool valid;
 
-    private static float PolarAngle(Vector2 point)
+    public static float PolarAngle(Vector2 point)
     {
         return Mathf.Atan2(point.y, point.x) * Mathf.Rad2Deg;
     }
@@ -206,9 +230,9 @@ public class Sensing : MonoBehaviour
         Vector2 b = points[1];
         Vector2 c = points[2];
 
-        float ab = (b - a).magnitude / Screen.dpi * 2.54f;
-        float bc = (c - b).magnitude / Screen.dpi * 2.54f;
-        float ca = (a - c).magnitude / Screen.dpi * 2.54f;
+        float ab = (b - a).magnitude;
+        float bc = (c - b).magnitude;
+        float ca = (a - c).magnitude;
 
         return new Vector3(ab, bc, ca);
     }
