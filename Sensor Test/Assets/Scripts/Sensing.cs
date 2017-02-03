@@ -167,6 +167,7 @@ public class Sensing : MonoBehaviour
         frame = new TouchFrame
         {
             touches = Input.touches.Select(touch => touch.position / Screen.dpi * 2.54f).ToList(),
+            centroid = position,
         };
 
         // for now we use frames immediately if they have 3 points, otherwise
@@ -234,6 +235,8 @@ public class Sensing : MonoBehaviour
         frame.lineness = Lineness(new Vector3(ab.length, bc.length, ca.length));
         frame.sides = new List<Side> { ab, bc, ca };
 
+        float angle;
+
         if (frame.lineness >= 0.95f)
         {
             var mid = frame.sides.OrderBy(side => side.length).ElementAt(1);
@@ -269,6 +272,11 @@ public class Sensing : MonoBehaviour
             }
 
             angle = PolarAngle(direction);
+        }
+
+        if (Mathf.DeltaAngle(this.angle, angle) < 120)
+        {
+            this.angle = angle;
         }
     }
 

@@ -34,6 +34,8 @@ public class SensorPlotter : MonoBehaviour
 
     [SerializeField]
     private Text debugText;
+    [SerializeField]
+    private LineRenderer triangleRenderer;
 
     private int count = 0;
     private bool classifyMode;
@@ -72,6 +74,23 @@ public class SensorPlotter : MonoBehaviour
 
     private bool explore = false;
 
+    private static List<Vector2> SidesToTriangle(Vector2 position, Vector3 sides)
+    {
+        Vector2 a = Vector2.zero;
+        Vector2 b = a + Vector2.right * sides.x;
+
+        float angle = Mathf.Acos((sides.x * sides.x + sides.y * sides.y - sides.z * sides.z) / (2 * sides.x * sides.y));
+
+        Vector2 c = a + new Vector2(Mathf.Cos(angle) * sides.y,
+                                    Mathf.Sin(angle) * sides.y);
+
+        Vector2 centroid = (a + b + c) / 3f;
+
+        return new List<Vector2> { a - centroid + position,
+                                   b - centroid + position,
+                                   c - centroid + position };
+    }
+
     private void LateUpdate()
     {
         if (explore)
@@ -106,6 +125,16 @@ public class SensorPlotter : MonoBehaviour
             mean /= currentData.Count;
 
             debugText.text = string.Format("{0} -> {1}", count, sensor.angle);
+
+            var points = SidesToTriangle(Vector2.zero, mean * 10f);
+            points.Add(points[0]);
+            triangleRenderer.SetPositions(points.Select(point => (Vector3) point).ToArray());
+        }
+        else
+        {
+            var points = SidesToTriangle(Vector2.zero, new Vector3(3, 4, 5) * 0.1f);
+            points.Add(points[0]);
+            triangleRenderer.SetPositions(points.Select(point => (Vector3) point).ToArray());
         }
 
         sensorPlot.gameObject.SetActive(classifyMode);

@@ -52,8 +52,6 @@ public class VisualiseTouches : MonoBehaviour
         arrowTest.GetComponent<RectTransform>().anchoredPosition = sensing.frame.centroid;
         arrowTest.transform.eulerAngles = Vector3.forward * sensing.angle;
 
-        Debug.Log(sensing.frame.centroid);
-
         for (int i = 0; i < count; ++i)
         {
             var touch = Input.GetTouch(i);
