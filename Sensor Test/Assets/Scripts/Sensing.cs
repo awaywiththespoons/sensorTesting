@@ -15,10 +15,37 @@ public class Sensing : MonoBehaviour
         public List<Vector2> touches;
     }
 
+    public static float Compare(Vector3 a, Vector3 b)
+    {
+        return Vector3.Dot(b - a, b - a);
+    }
+
+    public static Vector3 CycleVectorToMatchOther(Vector3 vector, Vector3 other)
+    {
+        Vector3 a = vector;
+        Vector3 b = CycleVectorComponents(a);
+        Vector3 c = CycleVectorComponents(b);
+
+        float ad = Compare(a, other);
+        float bd = Compare(b, other);
+        float cd = Compare(c, other);
+
+        if (ad <= bd && ad <= cd)
+        {
+            return a;
+        }
+        else if (bd <= ad && bd <= cd)
+        {
+            return b;
+        }
+        else
+        {
+            return c;
+        }
+    }
+
     public static Vector3 SortVectorComponents(Vector3 vector)
     {
-        return MinimiseVectorRank(vector);
-
         if (vector.y > vector.z)
         {
             float swap = vector.y;
@@ -53,6 +80,8 @@ public class Sensing : MonoBehaviour
 
     private static float Rank(Vector3 vector)
     {
+        return vector.x;
+
         return vector.x * vector.x * vector.x
              + vector.y * vector.y
              + vector.z;
@@ -127,16 +156,31 @@ public class Sensing : MonoBehaviour
     public Vector3 feature;
     public bool valid;
 
-    public Vector3 ExtractSidesFeature(TouchFrame frame)
+    private static float PolarAngle(Vector2 point)
+    {
+        return Mathf.Atan2(point.y, point.x);
+    }
+
+    public static Vector3 ExtractSidesFeature(TouchFrame frame)
     {
         Vector2 a = frame.touches[0];
         Vector2 b = frame.touches[1];
         Vector2 c = frame.touches[2];
 
+        Vector2 centroid = (a + b + c) / 3f;
+
+        var points = frame.touches.OrderBy(point => PolarAngle(point - centroid)).ToList();
+        a = points[0];
+        b = points[1];
+        c = points[2];
+
         float ab = (b - a).magnitude / Screen.dpi * 2.54f;
         float bc = (c - b).magnitude / Screen.dpi * 2.54f;
         float ca = (a - c).magnitude / Screen.dpi * 2.54f;
 
+        return new Vector3(ab, bc, ca);
+
+        /*
         // TODO: need to sort by winding!!
 
         // rotate the sides so the shortest is first (for debugging mostly,
@@ -163,6 +207,7 @@ public class Sensing : MonoBehaviour
         }
 
         return sides;
+        */
     }
 
     public void ProcessFrameImmediately(TouchFrame frame)
