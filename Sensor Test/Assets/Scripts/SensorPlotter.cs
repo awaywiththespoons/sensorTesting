@@ -12,6 +12,7 @@ public class SensorPlotter : MonoBehaviour
 {
     private class Token
     {
+        public Vector3 mean;
         public List<Vector3> training = new List<Vector3>();
     }
 
@@ -39,6 +40,8 @@ public class SensorPlotter : MonoBehaviour
     [SerializeField]
     private RectTransform shapeCanvas;
 
+    private List<Token> tokens = new List<Token>();
+
     private int count = 0;
     private bool classifyMode;
     private List<int> classifications = new List<int>();
@@ -49,6 +52,21 @@ public class SensorPlotter : MonoBehaviour
 
     public void Increment()
     {
+        Vector3 mean = Vector3.zero;
+
+        foreach (var data in currentData)
+        {
+            mean += data;
+        }
+
+        mean /= currentData.Count;
+
+        tokens.Add(new Token
+        {
+            mean = mean,
+            training = currentData.ToList(),
+        });
+
         count += 1;
         currentData.Clear();
     }
@@ -61,12 +79,14 @@ public class SensorPlotter : MonoBehaviour
         meanSorted.Clear();
 
         currentData.Clear();
+        tokens.Clear();
     }
 
     public void SetClassify(bool classify)
     {
         classifyMode = classify;
         classifications.Clear();
+        currentData.Clear();
     }
 
     private void Awake()
@@ -157,6 +177,8 @@ public class SensorPlotter : MonoBehaviour
                 var points = CompleteTriangle(a, b, Sensing.CycleToSide(mean, (a - b).magnitude));
                 points.Add(points[0]);
                 triangleRenderer.SetPositions(points.Select(point => (Vector3) (point - shapeCanvas.rect.size * 0.5f)).ToArray());
+
+                sensor.frame.centroid = (points[0] + points[1] + points[2]) / 3f;
             }
         }
         else
@@ -189,8 +211,40 @@ public class SensorPlotter : MonoBehaviour
         }
         else if (classifyMode)
         {
-            Vector3 feature = Sensing.MinimiseVectorRank(sensor.feature);
+            /*
+            if (currentData.Count == 0)
+            {
+                currentData.Enqueue(sensor.feature);
+            }
+            else
+            {
+                currentData.Enqueue(Sensing.CycleVectorToMatchOther(sensor.feature, currentData.Last()));
+            }
 
+            Vector3 mean = Vector3.zero;
+
+            foreach (var data in currentData)
+            {
+                mean += data;
+            }
+
+            mean /= currentData.Count;
+
+            Vector3 a = mean;
+            Vector3 b = Sensing.CycleVectorComponents(a);
+            Vector3 c = Sensing.CycleVectorComponents(a);
+
+            var cycles = new List<Vector3> { a, b, c };
+
+            var best = tokens.OrderBy(token => cycles.Select(cycle => Sensing.Compare(token.mean, cycle)).Min()).First();
+
+            int bestid = tokens.IndexOf(best);
+
+            Debug.LogFormat("{0} - {1}", sensor.feature, bestid);
+            */
+
+            ///*
+            Vector3 feature = sensor.feature;
             var ordered = plotData.OrderBy(plot => (feature - plot.plot).magnitude).ToList();
             var closest = ordered.Take(16).ToList();
             var best = Enumerable.Range(0, 10)
@@ -207,6 +261,7 @@ public class SensorPlotter : MonoBehaviour
 
             sensorPlot.transform.localPosition = feature * plotScale;
             sensorPlot.color = Color.HSVToRGB(best / 10f, 1, 1);
+            //*/
 
             return;
         }

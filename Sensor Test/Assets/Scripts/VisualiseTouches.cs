@@ -42,7 +42,7 @@ public class VisualiseTouches : MonoBehaviour
 
     private Context context;
 
-    private void Update()
+    private void LateUpdate()
     {
         int count = Input.touchCount;
 
