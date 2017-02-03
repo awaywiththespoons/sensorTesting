@@ -36,6 +36,8 @@ public class SensorPlotter : MonoBehaviour
     private Text debugText;
     [SerializeField]
     private LineRenderer triangleRenderer;
+    [SerializeField]
+    private Camera shapeCamera;
 
     private int count = 0;
     private bool classifyMode;
@@ -76,10 +78,12 @@ public class SensorPlotter : MonoBehaviour
 
     private static List<Vector2> SidesToTriangle(Vector2 position, Vector3 sides)
     {
+        sides = -Sensing.MinimiseVectorRank(-sides);
+
         Vector2 a = Vector2.zero;
         Vector2 b = a + Vector2.right * sides.x;
 
-        float angle = Mathf.Acos((sides.x * sides.x + sides.y * sides.y - sides.z * sides.z) / (2 * sides.x * sides.y));
+        float angle = -Mathf.Acos((sides.x * sides.x + sides.y * sides.y - sides.z * sides.z) / (2 * sides.x * sides.y));
 
         Vector2 c = a + new Vector2(Mathf.Cos(angle) * sides.y,
                                     Mathf.Sin(angle) * sides.y);
@@ -93,6 +97,8 @@ public class SensorPlotter : MonoBehaviour
 
     private void LateUpdate()
     {
+        shapeCamera.orthographicSize = Screen.dpi / Screen.width * 2.54f * 2f;
+
         if (explore)
         {
             var triangle = Sensing.ExtractSidesFeature(new Sensing.TouchFrame
@@ -126,13 +132,13 @@ public class SensorPlotter : MonoBehaviour
 
             debugText.text = string.Format("{0} -> {1}", count, sensor.angle);
 
-            var points = SidesToTriangle(Vector2.zero, mean * 10f);
+            var points = SidesToTriangle(Vector2.zero, mean);
             points.Add(points[0]);
-            triangleRenderer.SetPositions(points.Select(point => (Vector3) point).ToArray());
+            triangleRenderer.SetPositions(points.Select(point => (Vector3) (point / 2.54f * Screen.dpi)).ToArray());
         }
         else
         {
-            var points = SidesToTriangle(Vector2.zero, new Vector3(3, 4, 5) * 0.1f);
+            var points = SidesToTriangle(Vector2.zero, new Vector3(3, 4, 5));
             points.Add(points[0]);
             triangleRenderer.SetPositions(points.Select(point => (Vector3) point).ToArray());
         }
