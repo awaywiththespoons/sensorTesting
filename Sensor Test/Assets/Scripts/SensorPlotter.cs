@@ -85,7 +85,8 @@ public class SensorPlotter : MonoBehaviour
 
     private static List<Vector2> CompleteTriangle(Vector2 a, Vector2 b, Vector3 sides)
     {
-        float offset = Sensing.PolarAngle(b - a) * Mathf.Deg2Rad;
+        float offset = Sensor.PolarAngle(b - a) * Mathf.Deg2Rad;
+
         float angle = offset - Mathf.Acos((sides.x * sides.x + sides.y * sides.y - sides.z * sides.z) / (2 * sides.x * sides.y));
 
         b = a + new Vector2(Mathf.Cos(offset) * sides.x,

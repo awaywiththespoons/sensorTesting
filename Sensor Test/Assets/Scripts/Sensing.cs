@@ -10,59 +10,22 @@ using Random = UnityEngine.Random;
 
 public class Sensing : MonoBehaviour 
 {
-    public struct Side
+    [Tooltip("How many degrees can the angles in a triangle deviate from 180 / 0 and yet still be considered a line?")]
+    public float lineTolerance;
+
+    public float triangleAngleMinimum;
+    public float triangleAngleMaximum;
+    
+    public enum Type
     {
-        public Vector2 pointA, pointB;
-        public float length;
-        public float direction; // triangle=clockwise, line=out
-
-        public Side(Vector2 pointA, Vector2 pointB)
-        {
-            this.pointA = pointA;
-            this.pointB = pointB;
-
-            length = (pointB - pointA).magnitude;
-            direction = 0;
-        }
+        None,
+        Line,
+        Triangle,
     }
 
     public class TouchFrame
     {
         public List<Vector2> touches;
-
-        public Vector2 centroid;
-        public float lineness;
-
-        public List<Side> sides;
-    }
-
-    public static Vector3 SortVectorComponents(Vector3 vector)
-    {
-        if (vector.y > vector.z)
-        {
-            float swap = vector.y;
-
-            vector.y = vector.z;
-            vector.z = swap;       
-        }
-    
-        if (vector.x > vector.y)
-        {
-            float swap = vector.x;
-
-            vector.x = vector.y;
-            vector.y = swap;       
-        }
-
-        if (vector.y > vector.z)
-        {
-            float swap = vector.y;
-
-            vector.y = vector.z;
-            vector.z = swap;       
-        }
-
-        return vector;
     }
 
     private Vector2 Average(IEnumerable<Vector2> vectors)
@@ -75,18 +38,15 @@ public class Sensing : MonoBehaviour
         return sum / vectors.Count();
     }
 
-    public TouchFrame frame;
-
     public void Update()
     {
         // default to position tracking as centroid
-        this.position = Average(Input.touches.Select(touch => touch.position / Screen.dpi * 2.54f));
+        this.position = Average(Input.touches.Select(touch => touch.position));
 
         // collect the current touch data together
-        frame = new TouchFrame
+        var frame = new TouchFrame
         {
-            touches = Input.touches.Select(touch => touch.position / Screen.dpi * 2.54f).ToList(),
-            centroid = position,
+            touches = Input.touches.Select(touch => touch.position).ToList(),
         };
 
         // for now we use frames immediately if they have 3 points, otherwise
@@ -94,11 +54,6 @@ public class Sensing : MonoBehaviour
         if (frame.touches.Count == 3)
         {
             ProcessFrameImmediately(frame);
-            valid = true;
-        }
-        else
-        {
-            valid = false;
         }
 
         // in the future there should be a distinct initial phase in which we
@@ -110,92 +65,102 @@ public class Sensing : MonoBehaviour
     
     public Vector2 position;
     public float angle;
-    public Vector3 feature;
-    public bool valid;
+    public Type type;
+    public float variable;
 
-    public static float PolarAngle(Vector2 point)
-    {
-        return Mathf.Atan2(point.y, point.x) * Mathf.Rad2Deg;
-    }
-
-    public static Vector3 ExtractSidesFeature(TouchFrame frame)
-    {
-        var points = frame.touches.OrderBy(point => PolarAngle(point - frame.centroid)).ToList();
-        Vector2 a = points[0];
-        Vector2 b = points[1];
-        Vector2 c = points[2];
-
-        float ab = (b - a).magnitude;
-        float bc = (c - b).magnitude;
-        float ca = (a - c).magnitude;
-
-        return new Vector3(ab, bc, ca);
-    }
+    public Vector2 debugFront;
 
     public void ProcessFrameImmediately(TouchFrame frame)
     {
+        // assume we only get three points
         Vector2 a = frame.touches[0];
         Vector2 b = frame.touches[1];
         Vector2 c = frame.touches[2];
 
-        frame.centroid = (a + b + c) / 3f;
+        Vector2 ab = b - a;
+        Vector2 bc = c - b;
+        Vector2 ca = a - c;
 
-        feature = ExtractSidesFeature(frame);
+        // angle on each point of the triangle formed
+        float cab = AngleOfCorner(a, c, b) * Mathf.Rad2Deg;
+        float bca = AngleOfCorner(c, b, a) * Mathf.Rad2Deg;
+        float abc = AngleOfCorner(b, a, c) * Mathf.Rad2Deg;
+        
+        var points = new List<Vector2> { a, b, c };
+        var angles = new List<float> { cab, bca, abc };
 
-        var points = frame.touches.OrderBy(point => PolarAngle(point - frame.centroid)).ToList();
-        a = points[0];
-        b = points[1];
-        c = points[2];
+        bool line = angles.All(angle => Mathf.Abs(angle - 180) <= lineTolerance
+                                     || Mathf.Abs(angle -   0) <= lineTolerance);
+        
+        bool triangle = angles.All(angle => angle <= triangleAngleMaximum
+                                         && angle >= triangleAngleMinimum);
 
-        var ab = new Side(a, b);
-        var bc = new Side(b, c);
-        var ca = new Side(c, a);
-
-        frame.lineness = Triangle.Lineness(new Vector3(ab.length, bc.length, ca.length));
-        frame.sides = new List<Side> { ab, bc, ca };
-
-        float angle;
-
-        if (frame.lineness >= 0.95f)
+        if (line)
         {
-            var mid = frame.sides.OrderBy(side => side.length).ElementAt(1);
+            // determine orientation of line
 
-            Vector2 da = frame.centroid - mid.pointA;
-            Vector2 db = frame.centroid - mid.pointB;
+            // 1. find point closest to the center of all points ("middle")
+            Vector2 center = (a + b + c) / 3f;
+            Vector2 middle = points.OrderBy(point => (center - point).sqrMagnitude).First();
 
-            if (da.sqrMagnitude > db.sqrMagnitude)
-            {
-                angle = PolarAngle(da);
-            }
-            else
-            {
-                angle = PolarAngle(db);
-            }
-        }
-        else
-        {
-            var best = frame.sides.OrderByDescending(side => side.length).ElementAt(0);
+            // 2. "front" is the closest point to "middle" and "back" is the
+            // furthest
+            var furthest = points.OrderByDescending(point => (middle - point).sqrMagnitude).ToList();
+            Vector2 back = furthest[0];
+            Vector2 front = furthest[1];
 
-            float ra = PolarAngle(frame.centroid - best.pointA);
-            float rb = PolarAngle(frame.centroid - best.pointB);
+            // 3. the object points like an arrow to "front" from "back";
+            Vector2 arrow = front - back;
 
-            Vector2 direction;
+            // 4. determine the angle of that arrow
+            float angle = Mathf.Atan2(arrow.y, arrow.x) * Mathf.Rad2Deg;
 
-            if (Mathf.DeltaAngle(ra, rb) > 0)
-            {
-                direction = best.pointB - best.pointA;
-            }
-            else
-            {
-                direction = best.pointA - best.pointB;
-            }
+            // 5. determine the length of the back line
+            float length = (back - middle).magnitude / Screen.dpi * 2.54f;
 
-            angle = PolarAngle(direction);
-        }
-
-        if (Mathf.DeltaAngle(this.angle, angle) < 120)
-        {
+            this.position = center;
             this.angle = angle;
+            this.type = Type.Line;
+            this.variable = length;
+
+            this.debugFront = front;
+
+            Debug.LogFormat("Line, {0:0.0}cm", length);
+        }
+
+        if (triangle)
+        {
+            Vector2 center = (points[0] + points[1] + points[2]) / 3;
+
+            // 1. sort points in order of sum of squared distance to other 
+            // points, the "front" point is the first 
+            var corners = points.OrderBy(point => (point - center).magnitude).ToList();
+
+            // 2. find angle on "front" corner and use this to determine the
+            // shape type
+            float species = AngleOfCorner(corners[0], corners[1], corners[2]) * Mathf.Rad2Deg;
+
+            // 3. the object points like an arrow from the center of all points
+            // to the "front" point
+            Vector2 arrow = corners[0] - center;
+
+            // 4. determine the angle of that arrow
+            float angle = Mathf.Atan2(arrow.y, arrow.x) * Mathf.Rad2Deg;
+
+            this.position = center;
+            this.angle = angle;
+            this.type = Type.Triangle;
+            this.variable = species;
+
+            this.debugFront = corners[0];
+
+            Debug.LogFormat("Triangle, {0:0}", species);
+        }
+
+        if (!line && !triangle)
+        {
+            Debug.Log("???");
+            this.type = Type.None;
         }
     }
 
