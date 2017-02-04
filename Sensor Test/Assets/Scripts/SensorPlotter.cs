@@ -57,8 +57,6 @@ public class SensorPlotter : MonoBehaviour
     private void Awake()
     {
         plots = new IndexedPool<SpriteRenderer>(plotTemplate);
-
-        Reset();
     }
 
     private static List<Vector2> SidesToTriangle(Vector2 position, Vector3 sides)

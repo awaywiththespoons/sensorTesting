@@ -66,6 +66,9 @@ public class Sensor : MonoBehaviour
     public Queue<Frame> history = new Queue<Frame>();
     public List<Data> allTraining = new List<Data>();
 
+    [SerializeField]
+    private GameObject debug;
+
     public void SetTraining(Token token)
     {
         knowledge.tokens.Add(token);
@@ -143,6 +146,11 @@ public class Sensor : MonoBehaviour
             // TODO: reset classification too
 
             OnTokenLifted();
+        }
+
+        if (pattern.count >= 5)
+        {
+            debug.SetActive(true);
         }
     }
 
