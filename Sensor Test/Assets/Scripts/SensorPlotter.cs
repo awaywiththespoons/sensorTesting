@@ -94,11 +94,15 @@ public class SensorPlotter : MonoBehaviour
         classifyMode = classify;
         classifications.Clear();
         currentData.Clear();
+
+        sensor2.SetTraining(null);
     }
 
     private void Awake()
     {
         plots = new IndexedPool<SpriteRenderer>(plotTemplate);
+
+        Reset();
     }
 
     private bool explore = false;
@@ -137,8 +141,17 @@ public class SensorPlotter : MonoBehaviour
 
     private void LateUpdate()
     {
-        plotData.Clear();
+        /*
+        sensor2.IntegrateTouchData(new List<Vector2>
+        {
+            new Vector2(Random.value * Screen.width, Random.value * Screen.height),
+            new Vector2(Random.value * Screen.width, Random.value * Screen.height),
+            new Vector2(Random.value * Screen.width, Random.value * Screen.height),
+        });
+        */
         
+        plotData.Clear();
+
         foreach (var token in sensor2.knownTokens)
         {
             foreach (var data in token.training)
@@ -168,6 +181,25 @@ public class SensorPlotter : MonoBehaviour
             }
         }
 
+        float plotScale = 1;
+
+        if (plotData.Count > 0)
+        {
+            float max = plotData.Select(data => Mathf.Max(data.plot.x, data.plot.y, data.plot.z)).Max();
+            
+            if (max > 0)
+            {
+                plotScale = 1 / max;
+            }
+        }
+
+        plots.SetActive(plotData.Count);
+        plots.MapActive((i, plot) =>
+        {
+            plot.transform.localPosition = plotData[i].plot * plotScale;
+            plot.GetComponent<SpriteRenderer>().color = plotData[i].color;
+        });
+
         if (explore)
         {
             var triangle = Sensing.ExtractSidesFeature(new Sensing.TouchFrame
@@ -187,6 +219,8 @@ public class SensorPlotter : MonoBehaviour
                 plot = triangle,
             });
         }
+
+
 
         if (plotData.Count > 0)
         {
@@ -230,18 +264,6 @@ public class SensorPlotter : MonoBehaviour
         }
 
         sensorPlot.gameObject.SetActive(classifyMode);
-
-        float plotScale = 1;
-
-        if (plotData.Count > 0)
-        {
-            float max = plotData.Select(data => Mathf.Max(data.plot.x, data.plot.y, data.plot.z)).Max();
-            
-            if (max > 0)
-            {
-                plotScale = 1 / max;
-            }
-        }
 
         if (!explore && !sensor.valid)
         {
@@ -363,12 +385,5 @@ public class SensorPlotter : MonoBehaviour
         sensorPlot.gameObject.SetActive(true);
         sensorPlot.transform.localPosition = Sensing.MinimiseVectorRank(meanSorted[count]) * plotScale;
         */
-
-        plots.SetActive(plotData.Count);
-        plots.MapActive((i, plot) =>
-        {
-            plot.transform.localPosition = plotData[i].plot * plotScale;
-            plot.GetComponent<SpriteRenderer>().color = plotData[i].color;
-        });
     }
 }

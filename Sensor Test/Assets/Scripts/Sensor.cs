@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 using Random = UnityEngine.Random;
 
-public class Sensor : MonoBehaviour 
+public class Sensor : MonoBehaviour
 {
     public class Token
     {
@@ -29,7 +29,7 @@ public class Sensor : MonoBehaviour
         public Vector2 position;
         public float direction;
 
-        public List<TouchPattern> touches;
+        public TouchPattern pattern;
     }
 
     public event Action OnTokenPlaced = delegate { };
@@ -43,15 +43,22 @@ public class Sensor : MonoBehaviour
     }
 
     private Token training;
+    private Token detected;
 
-    public TouchPattern touchPattern;
+    private float tokenTime;
+    private float tokenTimeout;
+    private List<Token> classifications = new List<Token>();
 
     public List<Token> knownTokens = new List<Token>();
     private Queue<Frame> history = new Queue<Frame>();
 
     public void SetTraining(Token token)
     {
-        knownTokens.Add(token);
+        if (token != null)
+        {
+            knownTokens.Add(token);
+        }
+
         training = token;
     }
 
@@ -65,24 +72,98 @@ public class Sensor : MonoBehaviour
     private void Update()
     {
         // get touches, scale to centimetres and sort clockwise
-        touchPattern.count = Input.touchCount;
-        touchPattern.a = touchPattern.count >= 1 ? Input.GetTouch(0).position / Screen.dpi * 2.54f : default(Vector2);
-        touchPattern.b = touchPattern.count >= 2 ? Input.GetTouch(1).position / Screen.dpi * 2.54f : default(Vector2);
-        touchPattern.c = touchPattern.count >= 3 ? Input.GetTouch(2).position / Screen.dpi * 2.54f : default(Vector2);
+        TouchPattern pattern;
+        pattern.count = Input.touchCount;
+        pattern.a = pattern.count >= 1 ? Input.GetTouch(0).position / Screen.dpi * 2.54f : default(Vector2);
+        pattern.b = pattern.count >= 2 ? Input.GetTouch(1).position / Screen.dpi * 2.54f : default(Vector2);
+        pattern.c = pattern.count >= 3 ? Input.GetTouch(2).position / Screen.dpi * 2.54f : default(Vector2);
 
-        SortPatternClockwise(ref touchPattern);
+        IntegrateTouchPattern(pattern);
+        
+        if (pattern.count < 2 || pattern.count > 3)
+        {
+            tokenTimeout += Time.deltaTime;
+        }
+        else
+        {
+            tokenTimeout = 0;
+        }
+
+        if (tokenTimeout > .25f)
+        {
+            detected = null;
+            // TODO: reset classification too
+
+            OnTokenLifted();
+        }
+    }
+
+    public void IntegrateTouchData(IList<Vector2> touches)
+    {
+        TouchPattern pattern;
+        pattern.count = touches.Count;
+        pattern.a = pattern.count >= 1 ? touches[0] / Screen.dpi * 2.54f : default(Vector2);
+        pattern.b = pattern.count >= 2 ? touches[1] / Screen.dpi * 2.54f : default(Vector2);
+        pattern.c = pattern.count >= 3 ? touches[2] / Screen.dpi * 2.54f : default(Vector2);
+
+        IntegrateTouchPattern(pattern);
+    }
+
+    public void IntegrateTouchPattern(TouchPattern pattern)
+    {
+        SortPatternClockwise(ref pattern);
 
         if (training != null)
         {
             // if we're training and have exactly three touches, add this
             // pattern as an example of the token we're training
-            if (touchPattern.count == 3)
+            if (pattern.count == 3)
             {
-                TrainToken(training, touchPattern);
+                TrainToken(training, pattern);
             }
+        }
+        else if (detected != null)
+        {
+            // if we have already detected a token, we can try to reconstruct
+            // the missing touch from the known points and expected shape
+            if (pattern.count == 2)
+            {
+                // TODO: reconstruct the missing touch - use history to 
+                // determine which possible reconstruction is most likely
+            }
+
+            // limit history size
+            // TODO: actually use history to assist orientation
+            while (history.Count >= 16)
+            {
+                history.Dequeue();
+            }
+            
+            history.Enqueue(OrientToken(detected, pattern));
+
+            OnTokenTracked(history.Last());
         }
         else
         {
+            Token classification = ClassifyPattern(pattern);
+
+            if (classification != null)
+            {
+                classifications.Add(classification);
+
+                Debug.Log(classification.id);
+            }
+            else
+            {
+                Debug.Log("???");
+            }
+
+            if (classifications.Count >= 16)
+            {
+                // TODO: choose most popular classification
+                //detected = ...
+                //OnTokenClassified(history.Last());
+            }
         }
     }
 
@@ -93,7 +174,7 @@ public class Sensor : MonoBehaviour
     public void TrainToken(Token token, TouchPattern pattern)
     {
         Vector3 feature = ExtractSidesFeature(pattern);
-
+        
         if (token.training.Count == 0)
         {
             token.training.Add(feature);
@@ -144,9 +225,42 @@ public class Sensor : MonoBehaviour
     /// <summary>
     /// TODO: annihilate training points that are too close to each other but
     /// representing different tokens
+    /// 
+    /// also kill training points that don't have any friends nearby?
+    /// 
+    /// maybe we can assume a single cluster - kill anything too far from the
+    /// mean?
     /// </summary>
     public void ReduceNoise()
     {
 
+    }
+
+    /// <summary>
+    /// Return a frame containing the token type, touch pattern, estimated 
+    /// direction and estimated position
+    /// </summary>
+    public Frame OrientToken(Token token, TouchPattern pattern)
+    {
+        // TODO: determine direction from pattern/token
+        return new Frame
+        {
+            token = token,
+            position = (pattern.a + pattern.b + pattern.c) / 3f,
+            direction = 0,
+
+            pattern = pattern,
+        };
+    }
+
+    /// <summary>
+    /// Return the known token most likely to be responsible for this touch 
+    /// pattern. If none are close, return null
+    /// </summary>
+    public Token ClassifyPattern(TouchPattern pattern)
+    {
+        Vector3 feature = ExtractSidesFeature(pattern);
+
+        return null;
     }
 }
