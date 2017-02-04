@@ -95,7 +95,7 @@ public class SensorPlotter : MonoBehaviour
         classifications.Clear();
         currentData.Clear();
 
-        sensor2.SetTraining(null);
+        sensor2.SetClassify();
     }
 
     private void Awake()

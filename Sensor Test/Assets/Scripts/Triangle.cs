@@ -127,4 +127,16 @@ public static class Triangle
 
         return copy;
     }
+
+    public static Vector3 Mean(IList<Vector3> triangles)
+    {
+        Vector3 sum = Vector3.zero;
+
+        for (int i = 0; i < triangles.Count; ++i)
+        {
+            sum += triangles[i];
+        }
+
+        return sum / triangles.Count;
+    }
 }

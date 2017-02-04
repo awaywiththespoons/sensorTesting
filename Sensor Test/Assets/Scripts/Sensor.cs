@@ -32,6 +32,12 @@ public class Sensor : MonoBehaviour
         public TouchPattern pattern;
     }
 
+    private struct Data
+    {
+        public Token token;
+        public Vector3 feature;
+    }
+
     public event Action OnTokenPlaced = delegate { };
     public event Action OnTokenLifted = delegate { };
     public event Action<Frame> OnTokenClassified = delegate { };
@@ -51,15 +57,18 @@ public class Sensor : MonoBehaviour
 
     public List<Token> knownTokens = new List<Token>();
     private Queue<Frame> history = new Queue<Frame>();
+    private List<Data> allTraining = new List<Data>();
 
     public void SetTraining(Token token)
     {
-        if (token != null)
-        {
-            knownTokens.Add(token);
-        }
-
+        knownTokens.Add(token);
         training = token;
+    }
+
+    public void SetClassify()
+    {
+        training = null;
+        classifications.Clear();
     }
 
     public void Reset()
@@ -143,7 +152,7 @@ public class Sensor : MonoBehaviour
 
             OnTokenTracked(history.Last());
         }
-        else
+        else if (pattern.count == 3)
         {
             Token classification = ClassifyPattern(pattern);
 
@@ -160,8 +169,13 @@ public class Sensor : MonoBehaviour
 
             if (classifications.Count >= 16)
             {
-                // TODO: choose most popular classification
-                //detected = ...
+                var best = knownTokens.OrderByDescending(token => classifications.Count(data => data == token))
+                                      .First();
+
+                detected = best;
+
+                Debug.Log("BEST IS " + best.id);
+
                 //OnTokenClassified(history.Last());
             }
         }
@@ -183,6 +197,8 @@ public class Sensor : MonoBehaviour
         {
             token.training.Add(Triangle.CycleToMatch(feature, token.training.Last()));
         }
+
+        allTraining.Add(new Data { token = token, feature = feature });
     }
 
     /// <summary>
@@ -261,6 +277,13 @@ public class Sensor : MonoBehaviour
     {
         Vector3 feature = ExtractSidesFeature(pattern);
 
-        return null;
+        var closest = allTraining.OrderBy(data => Triangle.CompareBestCycle(data.feature, feature))
+                                 .Take(16)
+                                 .ToList();
+        
+        var best = knownTokens.OrderByDescending(token => closest.Count(data => data.token == token))
+                              .First();
+
+        return best;
     }
 }
