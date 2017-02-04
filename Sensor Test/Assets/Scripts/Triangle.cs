@@ -106,4 +106,25 @@ public static class Triangle
             return c;
         }
     }
+
+    private static void Sort(ref float a, ref float b)
+    {
+        if (a > b)
+        {
+            float c = a;
+            a = b;
+            b = c;
+        }
+    }
+
+    public static Vector3 SortSides(Vector3 vector)
+    {
+        Vector3 copy = vector;
+
+        Sort(ref copy.x, ref copy.y);
+        Sort(ref copy.y, ref copy.z);
+        Sort(ref copy.x, ref copy.y);
+
+        return copy;
+    }
 }

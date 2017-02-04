@@ -94,8 +94,6 @@ public class Sensor : MonoBehaviour
     {
         Vector3 feature = ExtractSidesFeature(pattern);
 
-        Debug.Log(feature);
-
         if (token.training.Count == 0)
         {
             token.training.Add(feature);
@@ -128,8 +126,26 @@ public class Sensor : MonoBehaviour
     /// </summary>
     public Vector3 ExtractSidesFeature(TouchPattern pattern)
     {
-        return new Vector3((pattern.b - pattern.a).magnitude,
-                           (pattern.c - pattern.b).magnitude,
-                           (pattern.a - pattern.c).magnitude);
+        // TODO: if result is a line, sort by side length?
+
+        var triangle = new Vector3((pattern.b - pattern.a).magnitude,
+                                   (pattern.c - pattern.b).magnitude,
+                                   (pattern.a - pattern.c).magnitude);
+
+        if (Triangle.IsLine(triangle))
+        {
+            triangle = Triangle.SortSides(triangle);
+        }
+
+        return triangle;
+    }
+
+    /// <summary>
+    /// TODO: annihilate training points that are too close to each other but
+    /// representing different tokens
+    /// </summary>
+    public void ReduceNoise()
+    {
+
     }
 }
