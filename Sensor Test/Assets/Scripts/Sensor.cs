@@ -10,6 +10,13 @@ using Random = UnityEngine.Random;
 
 public class Sensor : MonoBehaviour
 {
+    [Serializable]
+    public class Knowledge
+    {
+        public List<Token> tokens = new List<Token>();
+    }
+
+    [Serializable]
     public class Token
     {
         public int id;
@@ -40,7 +47,7 @@ public class Sensor : MonoBehaviour
 
     public event Action OnTokenPlaced = delegate { };
     public event Action OnTokenLifted = delegate { };
-    public event Action<Frame> OnTokenClassified = delegate { };
+    public event Action<Token> OnTokenClassified = delegate { };
     public event Action<Frame> OnTokenTracked = delegate { };
 
     public static float PolarAngle(Vector2 point)
@@ -55,27 +62,57 @@ public class Sensor : MonoBehaviour
     private float tokenTimeout;
     private List<Token> classifications = new List<Token>();
 
-    public List<Token> knownTokens = new List<Token>();
+    public Knowledge knowledge = new Knowledge();
     private Queue<Frame> history = new Queue<Frame>();
     private List<Data> allTraining = new List<Data>();
 
     public void SetTraining(Token token)
     {
-        knownTokens.Add(token);
+        knowledge.tokens.Add(token);
         training = token;
     }
 
     public void SetClassify()
     {
         training = null;
+        detected = null;
         classifications.Clear();
+    }
+
+    public void SaveTraining()
+    {
+        System.IO.File.WriteAllText(Application.persistentDataPath + "/training.json", JsonUtility.ToJson(knowledge));
+    }
+
+    public void LoadTraining()
+    {
+        Reset();
+
+        string data = System.IO.File.ReadAllText(Application.persistentDataPath + "/training.json");
+
+        knowledge = JsonUtility.FromJson<Knowledge>(data);
+
+        foreach (var token in knowledge.tokens)
+        {
+            foreach (var point in token.training)
+            {
+                allTraining.Add(new Data { token = token, feature = point });
+            }
+        }
     }
 
     public void Reset()
     {
-        training = null;
-        knownTokens.Clear();
+        SetClassify();
+
+        knowledge.tokens.Clear();
         history.Clear();
+        allTraining.Clear();
+    }
+
+    private void Start()
+    {
+        LoadTraining();
     }
 
     private void Update()
@@ -89,7 +126,8 @@ public class Sensor : MonoBehaviour
 
         IntegrateTouchPattern(pattern);
         
-        if (pattern.count < 2 || pattern.count > 3)
+        if (detected != null 
+         && (pattern.count < 2 || pattern.count > 3))
         {
             tokenTimeout += Time.deltaTime;
         }
@@ -100,7 +138,9 @@ public class Sensor : MonoBehaviour
 
         if (tokenTimeout > .25f)
         {
+            tokenTimeout = 0;
             detected = null;
+            classifications.Clear();
             // TODO: reset classification too
 
             OnTokenLifted();
@@ -131,7 +171,28 @@ public class Sensor : MonoBehaviour
                 TrainToken(training, pattern);
             }
         }
-        else if (detected != null)
+        else if (detected == null && pattern.count == 3)
+        {
+            Token classification = ClassifyPattern(pattern);
+
+            if (classification != null)
+            {
+                classifications.Add(classification);
+            }
+
+            if (classifications.Count >= 16)
+            {
+                var best = knowledge.tokens.OrderByDescending(token => classifications.Count(data => data == token))
+                                           .First();
+
+                detected = best;
+                classifications.Clear();
+
+                OnTokenClassified(detected);
+            }
+        }
+
+        if (training == null && detected != null)
         {
             // if we have already detected a token, we can try to reconstruct
             // the missing touch from the known points and expected shape
@@ -151,33 +212,6 @@ public class Sensor : MonoBehaviour
             history.Enqueue(OrientToken(detected, pattern));
 
             OnTokenTracked(history.Last());
-        }
-        else if (pattern.count == 3)
-        {
-            Token classification = ClassifyPattern(pattern);
-
-            if (classification != null)
-            {
-                classifications.Add(classification);
-
-                Debug.Log(classification.id);
-            }
-            else
-            {
-                Debug.Log("???");
-            }
-
-            if (classifications.Count >= 16)
-            {
-                var best = knownTokens.OrderByDescending(token => classifications.Count(data => data == token))
-                                      .First();
-
-                detected = best;
-
-                Debug.Log("BEST IS " + best.id);
-
-                //OnTokenClassified(history.Last());
-            }
         }
     }
 
@@ -281,8 +315,8 @@ public class Sensor : MonoBehaviour
                                  .Take(16)
                                  .ToList();
         
-        var best = knownTokens.OrderByDescending(token => closest.Count(data => data.token == token))
-                              .First();
+        var best = knowledge.tokens.OrderByDescending(token => closest.Count(data => data.token == token))
+                                   .First();
 
         return best;
     }

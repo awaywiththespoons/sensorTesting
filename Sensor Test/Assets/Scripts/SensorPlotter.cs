@@ -152,7 +152,7 @@ public class SensorPlotter : MonoBehaviour
         
         plotData.Clear();
 
-        foreach (var token in sensor2.knownTokens)
+        foreach (var token in sensor2.knowledge.tokens)
         {
             foreach (var data in token.training)
             {

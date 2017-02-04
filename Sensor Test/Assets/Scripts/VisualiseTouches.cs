@@ -40,6 +40,10 @@ public class VisualiseTouches : MonoBehaviour
     {
         touchIndicators = new IndexedPool<Image>(touchPrefab);
         touchIndicators2 = new IndexedPool<Image>(touchPrefab);
+
+        sensor.OnTokenPlaced += () => Debug.Log("PLACED");
+        sensor.OnTokenLifted += () => Debug.Log("REMOVED");
+        sensor.OnTokenClassified += token => Debug.Log("TOKEN IS " + token.id);
     }
 
     private Context context;
