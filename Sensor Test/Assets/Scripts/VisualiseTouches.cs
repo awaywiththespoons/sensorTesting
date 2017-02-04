@@ -29,6 +29,8 @@ public class VisualiseTouches : MonoBehaviour
     private Image touchPrefab;
     [SerializeField]
     private Image arrowTest;
+    [SerializeField]
+    private Sensor sensor;
 
     public IndexedPool<Image> touchIndicators;
     public IndexedPool<Image> touchIndicators2;
@@ -54,20 +56,10 @@ public class VisualiseTouches : MonoBehaviour
 
         for (int i = 0; i < count; ++i)
         {
-            var touch = Input.GetTouch(i);
+            Vector2 position = Input.GetTouch(i).position;
 
-            touchIndicators[i].transform.position = touch.position;
-
-            if ((touch.position - sensing.position).magnitude < .1f)
-            {
-                touchIndicators[i].color = Color.red;
-            }
-            else
-            {
-                touchIndicators[i].color = Color.white;
-            }
-
-            touchIndicators2[i].transform.position = touch.position * 0.2f;
+            touchIndicators[i].transform.position = position;
+            touchIndicators2[i].transform.position = position * 0.2f;
             touchIndicators2[i].transform.localScale = Vector3.one * 0.2f;
         }
 
@@ -85,7 +77,7 @@ public class VisualiseTouches : MonoBehaviour
         {
             context = null;
 
-            Debug.Log("Token has been removed");
+            //Debug.Log("Token has been removed");
         }
         
         if (context != null && context.token == null)

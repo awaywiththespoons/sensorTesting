@@ -17,13 +17,19 @@ public class Sensor : MonoBehaviour
         public List<Vector3> training = new List<Vector3>();
     }
 
+    public struct TouchPattern
+    {
+        public int count;
+        public Vector2 a, b, c;
+    }
+
     public struct Frame
     {
         public Token token;
         public Vector2 position;
         public float direction;
 
-        public List<Vector2> touches;
+        public List<TouchPattern> touches;
     }
 
     public event Action OnTokenPlaced = delegate { };
@@ -31,26 +37,95 @@ public class Sensor : MonoBehaviour
     public event Action<Frame> OnTokenClassified = delegate { };
     public event Action<Frame> OnTokenTracked = delegate { };
 
+    public static float PolarAngle(Vector2 point)
+    {
+        return Mathf.Atan2(point.y, point.x) * Mathf.Rad2Deg;
+    }
+
     private Token training;
 
-    private List<Token> knownTokens = new List<Token>();
+    public TouchPattern touchPattern;
+
+    public List<Token> knownTokens = new List<Token>();
     private Queue<Frame> history = new Queue<Frame>();
+
+    public void SetTraining(Token token)
+    {
+        knownTokens.Add(token);
+        training = token;
+    }
 
     public void Reset()
     {
+        training = null;
         knownTokens.Clear();
         history.Clear();
     }
 
     private void Update()
     {
+        touchPattern.count = Input.touchCount;
+        touchPattern.a = touchPattern.count >= 1 ? Input.GetTouch(0).position / Screen.dpi * 2.54f : default(Vector2);
+        touchPattern.b = touchPattern.count >= 2 ? Input.GetTouch(1).position / Screen.dpi * 2.54f : default(Vector2);
+        touchPattern.c = touchPattern.count >= 3 ? Input.GetTouch(2).position / Screen.dpi * 2.54f : default(Vector2);
+
+        SortPatternClockwise(ref touchPattern);
+
         if (training != null)
         {
-
+            if (touchPattern.count == 3)
+            {
+                TrainToken(training, touchPattern);
+            }
         }
         else
         {
-
         }
+    }
+
+    public void TrainToken(Token token, TouchPattern pattern)
+    {
+        Vector3 feature = ExtractSidesFeature(pattern);
+
+        Debug.Log(feature);
+
+        if (token.training.Count == 0)
+        {
+            token.training.Add(feature);
+        }
+        else
+        {
+            token.training.Add(Triangle.CycleToMatch(feature, token.training.Last()));
+        }
+    }
+
+    private static void Swap<T>(ref T a, ref T b)
+    {
+        T c = a;
+        a = b;
+        b = c;
+    } 
+
+    /// <summary>
+    /// sort the position in the touch pattern so the corners of the triangle
+    /// occur in a clockwise order
+    /// </summary>
+    public static void SortPatternClockwise(ref TouchPattern pattern)
+    {
+        Vector2 centroid = (pattern.a + pattern.b + pattern.c) / 3f;
+
+        var touches = new List<Vector2> { pattern.a, pattern.b, pattern.c };
+        var sorted = touches.OrderBy(touch => -PolarAngle(touch - centroid)).ToList();
+
+        pattern.a = sorted[0];
+        pattern.b = sorted[1];
+        pattern.c = sorted[2];
+    }
+
+    public Vector3 ExtractSidesFeature(TouchPattern pattern)
+    {
+        return new Vector3((pattern.b - pattern.a).magnitude,
+                           (pattern.c - pattern.b).magnitude,
+                           (pattern.a - pattern.c).magnitude);
     }
 }

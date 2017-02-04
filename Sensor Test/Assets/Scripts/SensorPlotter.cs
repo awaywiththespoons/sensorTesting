@@ -26,6 +26,8 @@ public class SensorPlotter : MonoBehaviour
     [SerializeField]
     private Sensing sensor;
     [SerializeField]
+    private Sensor sensor2;
+    [SerializeField]
     private SpriteRenderer plotTemplate;
     private IndexedPool<SpriteRenderer> plots;
     private List<Data> plotData = new List<Data>();
@@ -69,6 +71,8 @@ public class SensorPlotter : MonoBehaviour
 
         count += 1;
         currentData.Clear();
+
+        sensor2.SetTraining(new Sensor.Token { id = count });
     }
 
     public void Reset()
@@ -80,6 +84,9 @@ public class SensorPlotter : MonoBehaviour
 
         currentData.Clear();
         tokens.Clear();
+
+        sensor2.Reset();
+        sensor2.SetTraining(new Sensor.Token { id = count });
     }
 
     public void SetClassify(bool classify)
@@ -130,6 +137,37 @@ public class SensorPlotter : MonoBehaviour
 
     private void LateUpdate()
     {
+        plotData.Clear();
+        
+        foreach (var token in sensor2.knownTokens)
+        {
+            foreach (var data in token.training)
+            {
+                Color color = Color.HSVToRGB(token.id / 10f, 1, 1);
+
+                plotData.Add(new Data
+                {
+                    id = token.id,
+                    color = color,
+                    plot = data,
+                });
+
+                plotData.Add(new Data
+                {
+                    id = token.id,
+                    color = color,
+                    plot = Triangle.Cycle(data),
+                });
+
+                plotData.Add(new Data
+                {
+                    id = token.id,
+                    color = color,
+                    plot = Triangle.Cycle(Triangle.Cycle(data)),
+                });
+            }
+        }
+
         if (explore)
         {
             var triangle = Sensing.ExtractSidesFeature(new Sensing.TouchFrame
@@ -161,7 +199,7 @@ public class SensorPlotter : MonoBehaviour
 
             mean /= currentData.Count;
 
-            debugText.text = string.Format("{0} -> {1}", count, mean);
+            //debugText.text = string.Format("{0} -> {1}", count, mean);
 
             /*
             var points = SidesToTriangle(Vector2.zero, mean);
@@ -198,7 +236,7 @@ public class SensorPlotter : MonoBehaviour
         if (plotData.Count > 0)
         {
             float max = plotData.Select(data => Mathf.Max(data.plot.x, data.plot.y, data.plot.z)).Max();
-
+            
             if (max > 0)
             {
                 plotScale = 1 / max;
@@ -257,7 +295,7 @@ public class SensorPlotter : MonoBehaviour
                              .OrderByDescending(id => classifications.Count(c => c == id))
                              .First();
 
-            Debug.LogFormat("{0} - {1}", feature, best);
+            //Debug.LogFormat("{0} - {1}", feature, best);
 
             sensorPlot.transform.localPosition = feature * plotScale;
             sensorPlot.color = Color.HSVToRGB(best / 10f, 1, 1);
@@ -281,7 +319,8 @@ public class SensorPlotter : MonoBehaviour
             {
                 //currentData.Dequeue();
             }
-
+            
+            /*
             plotData.Add(new Data
             {
                 id = count,
@@ -302,6 +341,7 @@ public class SensorPlotter : MonoBehaviour
                 color = Color.HSVToRGB(count / 10f, 1, 1),
                 plot = Triangle.Cycle(Triangle.Cycle(sensor.feature)),
             });
+            */
         }
 
         /*
