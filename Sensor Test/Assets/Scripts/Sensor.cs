@@ -126,12 +126,13 @@ public class Sensor : MonoBehaviour
     /// </summary>
     public Vector3 ExtractSidesFeature(TouchPattern pattern)
     {
-        // TODO: if result is a line, sort by side length?
-
         var triangle = new Vector3((pattern.b - pattern.a).magnitude,
                                    (pattern.c - pattern.b).magnitude,
                                    (pattern.a - pattern.c).magnitude);
 
+        // line-like triangles don't have a reliable concept of clockwise
+        // winding, so instead we sort the sides by length to normalise the
+        // feature
         if (Triangle.IsLine(triangle))
         {
             triangle = Triangle.SortSides(triangle);
