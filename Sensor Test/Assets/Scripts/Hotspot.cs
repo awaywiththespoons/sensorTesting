@@ -34,7 +34,7 @@ public class Hotspot : MonoBehaviour
         scene.SetActive(true);
 
         graphic.transform.eulerAngles = Vector3.forward * angle;
-        graphic.transform.position = position;
+        graphic.GetComponent<RectTransform>().anchoredPosition = position;
     }
 
     public void Disable()

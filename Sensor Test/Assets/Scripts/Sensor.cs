@@ -56,14 +56,14 @@ public class Sensor : MonoBehaviour
     }
 
     private Token training;
-    private Token detected;
+    public Token detected { get; private set; }
 
     private float tokenTime;
     private float tokenTimeout;
     private List<Token> classifications = new List<Token>();
 
     public Knowledge knowledge = new Knowledge();
-    private Queue<Frame> history = new Queue<Frame>();
+    public Queue<Frame> history = new Queue<Frame>();
     private List<Data> allTraining = new List<Data>();
 
     public void SetTraining(Token token)

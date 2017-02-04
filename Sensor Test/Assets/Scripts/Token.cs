@@ -10,7 +10,6 @@ using Random = UnityEngine.Random;
 
 public class Token : MonoBehaviour 
 {
-    public Vector3 featureTarget;
     public List<Hotspot> hotspots = new List<Hotspot>();
     public Hotspot defaultHotspot;
 
