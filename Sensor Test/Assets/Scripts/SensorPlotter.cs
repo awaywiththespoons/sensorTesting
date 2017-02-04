@@ -19,13 +19,9 @@ public class SensorPlotter : MonoBehaviour
 
     [SerializeField]
     private Sensor sensor;
-    [SerializeField]
-    private SpriteRenderer plotTemplate;
-    private IndexedPool<SpriteRenderer> plots;
-    private List<Data> plotData = new List<Data>();
 
     [SerializeField]
-    private SpriteRenderer sensorPlot;
+    private ParticleSystem plotSystem;
 
     [SerializeField]
     private Text debugText;
@@ -42,8 +38,6 @@ public class SensorPlotter : MonoBehaviour
     public void Reset()
     {
         count = 0;
-        plotData.Clear();
-        plots.SetActive(0);
 
         sensor.Reset();
         sensor.SetTraining(new Sensor.Token { id = count });
@@ -52,11 +46,6 @@ public class SensorPlotter : MonoBehaviour
     public void SetClassify(bool classify)
     {
         sensor.SetClassify();
-    }
-
-    private void Awake()
-    {
-        plots = new IndexedPool<SpriteRenderer>(plotTemplate);
     }
 
     private static List<Vector2> SidesToTriangle(Vector2 position, Vector3 sides)
@@ -92,43 +81,40 @@ public class SensorPlotter : MonoBehaviour
         return new List<Vector2> { a, b, c };
     }
 
+    private ParticleSystem.Particle[] particles = new ParticleSystem.Particle[4096];
+
     private void LateUpdate()
     {
-        plotData.Clear();
+        int count = sensor.allTraining.Count * 3;
 
-        foreach (var data in sensor.allTraining)
+        for (int i = 0; i < sensor.allTraining.Count; ++i)
         {
-            var token = data.token;
+            Sensor.Data data = sensor.allTraining[i];
 
-            Color color = Color.HSVToRGB(token.id / 10f, 1, 1);
+            Color color = Color.HSVToRGB(data.token.id / 10f, 1, 1);
 
-            plotData.Add(new Data
-            {
-                id = token.id,
-                color = color,
-                plot = data.feature,
-            });
+            Vector3 a = data.feature;
+            Vector3 b = Triangle.Cycle(a);
+            Vector3 c = Triangle.Cycle(b);
 
-            plotData.Add(new Data
-            {
-                id = token.id,
-                color = color,
-                plot = Triangle.Cycle(data.feature),
-            });
+            particles[i * 3 + 0].position = a;
+            particles[i * 3 + 1].position = b;
+            particles[i * 3 + 2].position = c;
 
-            plotData.Add(new Data
-            {
-                id = token.id,
-                color = color,
-                plot = Triangle.Cycle(Triangle.Cycle(data.feature)),
-            });
+            particles[i * 3 + 0].startColor = color;
+            particles[i * 3 + 1].startColor = color;
+            particles[i * 3 + 2].startColor = color;
+
+            particles[i * 3 + 0].startSize = 0.05f;
+            particles[i * 3 + 1].startSize = 0.05f;
+            particles[i * 3 + 2].startSize = 0.05f;
         }
 
         float plotScale = 1;
 
-        if (plotData.Count > 0)
+        if (sensor.allTraining.Count > 0)
         {
-            float max = plotData.Select(data => Mathf.Max(data.plot.x, data.plot.y, data.plot.z)).Max();
+            float max = sensor.allTraining.Select(data => Mathf.Max(data.feature.x, data.feature.y, data.feature.z)).Max();
             
             if (max > 0)
             {
@@ -136,11 +122,11 @@ public class SensorPlotter : MonoBehaviour
             }
         }
 
-        plots.SetActive(plotData.Count);
-        plots.MapActive((i, plot) =>
+        for (int i = 0; i < count; ++i)
         {
-            plot.transform.localPosition = plotData[i].plot * plotScale;
-            plot.GetComponent<SpriteRenderer>().color = plotData[i].color;
-        });
+            particles[i].position *= plotScale;
+        }
+
+        plotSystem.SetParticles(particles, count);
     }
 }
