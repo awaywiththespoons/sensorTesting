@@ -98,7 +98,7 @@ public class SensorPlotter : MonoBehaviour
 
     private static List<Vector2> SidesToTriangle(Vector2 position, Vector3 sides)
     {
-        sides = -Sensing.MinimiseVectorRank(-sides);
+        sides = -Triangle.CycleMinimiseX(-sides);
 
         Vector2 a = Vector2.zero;
         Vector2 b = a + Vector2.right * sides.x;
@@ -174,7 +174,7 @@ public class SensorPlotter : MonoBehaviour
                 Vector2 a = Input.touches[0].position / Screen.dpi * 2.54f;
                 Vector2 b = Input.touches[1].position / Screen.dpi * 2.54f;
 
-                var points = CompleteTriangle(a, b, Sensing.CycleToSide(mean, (a - b).magnitude));
+                var points = CompleteTriangle(a, b, Triangle.CycleToSide(mean, (a - b).magnitude));
                 points.Add(points[0]);
                 triangleRenderer.SetPositions(points.Select(point => (Vector3) (point - shapeCanvas.rect.size * 0.5f)).ToArray());
 
@@ -274,7 +274,7 @@ public class SensorPlotter : MonoBehaviour
             }
             else
             {
-                currentData.Enqueue(Sensing.CycleVectorToMatchOther(sensor.feature, currentData.Last()));
+                currentData.Enqueue(Triangle.CycleToMatch(sensor.feature, currentData.Last()));
             }
             
             if (currentData.Count > 16)
@@ -293,14 +293,14 @@ public class SensorPlotter : MonoBehaviour
             {
                 id = count,
                 color = Color.HSVToRGB(count / 10f, 1, 1),
-                plot = Sensing.CycleVectorComponents(sensor.feature),
+                plot = Triangle.Cycle(sensor.feature),
             });
 
             plotData.Add(new Data
             {
                 id = count,
                 color = Color.HSVToRGB(count / 10f, 1, 1),
-                plot = Sensing.CycleVectorComponents(Sensing.CycleVectorComponents(sensor.feature)),
+                plot = Triangle.Cycle(Triangle.Cycle(sensor.feature)),
             });
         }
 

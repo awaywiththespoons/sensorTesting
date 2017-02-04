@@ -36,49 +36,6 @@ public class Sensing : MonoBehaviour
         public List<Side> sides;
     }
 
-    public static float Compare(Vector3 a, Vector3 b)
-    {
-        return Vector3.Dot(b - a, b - a);
-    }
-
-    public static bool IsLine(Vector3 vector)
-    {
-        return Lineness(vector) >= 0.95f;
-    }
-
-    public static float Lineness(Vector3 vector)
-    {
-        float a = Mathf.Abs(1 - vector.x / (vector.y + vector.z));
-        float b = Mathf.Abs(1 - vector.y / (vector.x + vector.z));
-        float c = Mathf.Abs(1 - vector.z / (vector.x + vector.y));
-
-        return 1 - Mathf.Min(a, b, c) * 2;
-    }
-
-    public static Vector3 CycleVectorToMatchOther(Vector3 vector, Vector3 other)
-    {
-        Vector3 a = vector;
-        Vector3 b = CycleVectorComponents(a);
-        Vector3 c = CycleVectorComponents(b);
-
-        float ad = Compare(a, other);
-        float bd = Compare(b, other);
-        float cd = Compare(c, other);
-
-        if (ad <= bd && ad <= cd)
-        {
-            return a;
-        }
-        else if (bd <= ad && bd <= cd)
-        {
-            return b;
-        }
-        else
-        {
-            return c;
-        }
-    }
-
     public static Vector3 SortVectorComponents(Vector3 vector)
     {
         if (vector.y > vector.z)
@@ -106,68 +63,6 @@ public class Sensing : MonoBehaviour
         }
 
         return vector;
-    }
-
-    public static Vector3 CycleVectorComponents(Vector3 vector)
-    {
-        return new Vector3(vector.y, vector.z, vector.x);
-    }
-
-    private static float Rank(Vector3 vector)
-    {
-        return vector.x;
-
-        return vector.x * vector.x * vector.x
-             + vector.y * vector.y
-             + vector.z;
-    }
-
-    public static Vector3 CycleToSide(Vector3 vector, float side)
-    {
-        Vector3 a = vector;
-        Vector3 b = CycleVectorComponents(a);
-        Vector3 c = CycleVectorComponents(b);
-
-        float ad = Mathf.Abs(side - a.x);
-        float bd = Mathf.Abs(side - b.x);
-        float cd = Mathf.Abs(side - c.x);
-
-        if (ad <= bd && ad <= cd)
-        {
-            return a;
-        }
-        else if (bd <= ad && bd <= cd)
-        {
-            return b;
-        }
-        else
-        {
-            return c;
-        }
-    }
-
-    public static Vector3 MinimiseVectorRank(Vector3 vector)
-    {
-        Vector3 a = vector;
-        Vector3 b = CycleVectorComponents(a);
-        Vector3 c = CycleVectorComponents(b);
-
-        float ad = Rank(a);
-        float bd = Rank(b);
-        float cd = Rank(c);
-
-        if (ad <= bd && ad <= cd)
-        {
-            return a;
-        }
-        else if (bd <= ad && bd <= cd)
-        {
-            return b;
-        }
-        else
-        {
-            return c;
-        }
     }
 
     private Vector2 Average(IEnumerable<Vector2> vectors)
@@ -256,7 +151,7 @@ public class Sensing : MonoBehaviour
         var bc = new Side(b, c);
         var ca = new Side(c, a);
 
-        frame.lineness = Lineness(new Vector3(ab.length, bc.length, ca.length));
+        frame.lineness = Triangle.Lineness(new Vector3(ab.length, bc.length, ca.length));
         frame.sides = new List<Side> { ab, bc, ca };
 
         float angle;
