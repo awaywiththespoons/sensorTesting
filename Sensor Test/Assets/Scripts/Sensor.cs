@@ -64,6 +64,7 @@ public class Sensor : MonoBehaviour
 
     private void Update()
     {
+        // get touches, scale to centimetres and sort clockwise
         touchPattern.count = Input.touchCount;
         touchPattern.a = touchPattern.count >= 1 ? Input.GetTouch(0).position / Screen.dpi * 2.54f : default(Vector2);
         touchPattern.b = touchPattern.count >= 2 ? Input.GetTouch(1).position / Screen.dpi * 2.54f : default(Vector2);
@@ -73,6 +74,8 @@ public class Sensor : MonoBehaviour
 
         if (training != null)
         {
+            // if we're training and have exactly three touches, add this
+            // pattern as an example of the token we're training
             if (touchPattern.count == 3)
             {
                 TrainToken(training, touchPattern);
@@ -83,6 +86,10 @@ public class Sensor : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Add an example of touch pattern that is seen when the given token is
+    /// on screen
+    /// </summary>
     public void TrainToken(Token token, TouchPattern pattern)
     {
         Vector3 feature = ExtractSidesFeature(pattern);
@@ -98,13 +105,6 @@ public class Sensor : MonoBehaviour
             token.training.Add(Triangle.CycleToMatch(feature, token.training.Last()));
         }
     }
-
-    private static void Swap<T>(ref T a, ref T b)
-    {
-        T c = a;
-        a = b;
-        b = c;
-    } 
 
     /// <summary>
     /// sort the position in the touch pattern so the corners of the triangle
@@ -122,6 +122,10 @@ public class Sensor : MonoBehaviour
         pattern.c = sorted[2];
     }
 
+    /// <summary>
+    /// Convert a pattern of three touches into a Vector3 of side lengths of a
+    /// triangle
+    /// </summary>
     public Vector3 ExtractSidesFeature(TouchPattern pattern)
     {
         return new Vector3((pattern.b - pattern.a).magnitude,
