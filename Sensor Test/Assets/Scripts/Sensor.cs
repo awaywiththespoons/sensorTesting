@@ -39,7 +39,7 @@ public class Sensor : MonoBehaviour
         public TouchPattern pattern;
     }
 
-    private struct Data
+    public struct Data
     {
         public Token token;
         public Vector3 feature;
@@ -64,7 +64,7 @@ public class Sensor : MonoBehaviour
 
     public Knowledge knowledge = new Knowledge();
     public Queue<Frame> history = new Queue<Frame>();
-    private List<Data> allTraining = new List<Data>();
+    public List<Data> allTraining = new List<Data>();
 
     public void SetTraining(Token token)
     {
@@ -126,8 +126,7 @@ public class Sensor : MonoBehaviour
 
         IntegrateTouchPattern(pattern);
         
-        if (detected != null 
-         && (pattern.count < 2 || pattern.count > 3))
+        if (detected != null && pattern.count < 2)
         {
             tokenTimeout += Time.deltaTime;
         }

@@ -17,6 +17,7 @@ public class SensorPlotter : MonoBehaviour
         public Color color;
     }
 
+    [SerializeField]
     private Sensor sensor;
     [SerializeField]
     private SpriteRenderer plotTemplate;
@@ -28,10 +29,6 @@ public class SensorPlotter : MonoBehaviour
 
     [SerializeField]
     private Text debugText;
-    [SerializeField]
-    private LineRenderer triangleRenderer;
-    [SerializeField]
-    private RectTransform shapeCanvas;
 
     private int count;
 
@@ -101,33 +98,32 @@ public class SensorPlotter : MonoBehaviour
     {
         plotData.Clear();
 
-        foreach (var token in sensor.knowledge.tokens)
+        foreach (var data in sensor.allTraining)
         {
-            foreach (var data in token.training)
+            var token = data.token;
+
+            Color color = Color.HSVToRGB(token.id / 10f, 1, 1);
+
+            plotData.Add(new Data
             {
-                Color color = Color.HSVToRGB(token.id / 10f, 1, 1);
+                id = token.id,
+                color = color,
+                plot = data.feature,
+            });
 
-                plotData.Add(new Data
-                {
-                    id = token.id,
-                    color = color,
-                    plot = data,
-                });
+            plotData.Add(new Data
+            {
+                id = token.id,
+                color = color,
+                plot = Triangle.Cycle(data.feature),
+            });
 
-                plotData.Add(new Data
-                {
-                    id = token.id,
-                    color = color,
-                    plot = Triangle.Cycle(data),
-                });
-
-                plotData.Add(new Data
-                {
-                    id = token.id,
-                    color = color,
-                    plot = Triangle.Cycle(Triangle.Cycle(data)),
-                });
-            }
+            plotData.Add(new Data
+            {
+                id = token.id,
+                color = color,
+                plot = Triangle.Cycle(Triangle.Cycle(data.feature)),
+            });
         }
 
         float plotScale = 1;

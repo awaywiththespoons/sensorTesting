@@ -125,7 +125,6 @@ public class Sensing : MonoBehaviour
 
             this.debugFront = front;
 
-            Debug.LogFormat("Line, {0:0.0}cm", length);
         }
 
         if (triangle)
@@ -154,12 +153,10 @@ public class Sensing : MonoBehaviour
 
             this.debugFront = corners[0];
 
-            Debug.LogFormat("Triangle, {0:0}", species);
         }
 
         if (!line && !triangle)
         {
-            Debug.Log("???");
             this.type = Type.None;
         }
     }

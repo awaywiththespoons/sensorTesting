@@ -36,6 +36,7 @@ public class VisualiseTouches : MonoBehaviour
     [SerializeField]
     private GameObject tokenCollection;
     public Sensing sensing;
+    public Sensor sensor;
     [SerializeField]
     private Image touchPrefab;
     [SerializeField]
@@ -55,6 +56,9 @@ public class VisualiseTouches : MonoBehaviour
         plots = new IndexedPool<Image>(plotPrefab);
 
         tokens = tokenCollection.GetComponentsInChildren<Token>(true).ToList();
+
+        sensor.OnTokenClassified += token => Debug.LogFormat("TOKEN IS {0} ({1})", token.id, tokens[token.id]);
+        sensor.OnTokenLifted += () => Debug.Log("REMOVED");
 
 #if UNITY_ANDROID && !UNITY_EDITOR
         debugOn = false;
@@ -77,64 +81,8 @@ public class VisualiseTouches : MonoBehaviour
             var touch = Input.GetTouch(i);
 
             touchIndicators[i].transform.position = touch.position;
-
-            if ((touch.position - sensing.position).magnitude < .1f)
-            {
-                touchIndicators[i].color = Color.red;
-            }
-            else
-            {
-                touchIndicators[i].color = Color.white;
-            }
-
             touchIndicators2[i].transform.position = touch.position * 0.2f;
             touchIndicators2[i].transform.localScale = Vector3.one * 0.2f;
-        }
-
-        plots.SetActive(values.Count);
-
-        for (int i = 0; i < values.Count; ++i)
-        {
-            plots[i].transform.position = (Vector2) values[i] + Vector2.up * 200;
-            Color color = Color.HSVToRGB(values[i].z, 1, 1);
-            color.a = 0.1f;
-            plots[i].color = color; 
-        }
-
-        if (context == null && count >= 2)
-        {
-            context = new Context();
-        }
-        else if (count < 2 && context != null)
-        {
-            context.missingTime += Time.deltaTime;
-        }
-
-        if (context != null && context.missingTime > .5f)
-        {
-            context = null;
-        }
-
-        if (context != null && context.token == null)
-        {
-            if (context.dataFrames > requiredDataFrames)
-            {
-                DecideToken();
-            }
-            else if (count == 3)
-            {
-                context.dataFrames += 1;
-                context.meanType = Mathf.Lerp(context.meanType, (int) sensing.type, 0.5f);
-                
-                if (sensing.type == Sensing.Type.Line)
-                {
-                    context.meanLength = Mathf.Lerp(context.meanLength, sensing.variable, 0.5f);
-                }
-                else if (sensing.type == Sensing.Type.Triangle)
-                {
-                    context.meanAngle = Mathf.Lerp(context.meanAngle, sensing.variable, 0.5f);
-                }
-            }
         }
 
 		if (debugOn) {
@@ -146,15 +94,15 @@ public class VisualiseTouches : MonoBehaviour
 			sensing.angle = debugDirection;
 		}
 
-        if (context != null && context.token != null)
+        if (sensor.detected != null)
         {
             for (int i = 0; i < tokens.Count; ++i)
             {
                 var token = tokens[i];
 
-                if (token == context.token)
+                if (i == sensor.detected.id)
                 {
-                    token.Refresh(sensing.position, sensing.angle);
+                    token.Refresh(sensor.history.Last().position, sensing.angle);
                 }
                 else
                 {
@@ -171,20 +119,5 @@ public class VisualiseTouches : MonoBehaviour
                 token.Disable();
             }
         }
-    }
-
-    private void DecideToken()
-    {
-        var type = (Sensing.Type) Mathf.RoundToInt(context.meanType);
-
-        float variable = type == Sensing.Type.Line 
-                       ? context.meanLength 
-                       : context.meanAngle;
-
-        var closest = tokens.Where(token => token.patternType == type)
-                            .OrderBy(token => Math.Abs(token.patternVariableTarget - variable))
-                            .FirstOrDefault();
-
-        context.token = closest;
     }
 }

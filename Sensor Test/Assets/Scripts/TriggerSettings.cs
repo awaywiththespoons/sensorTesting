@@ -24,8 +24,10 @@ public class TriggerSettings : MonoBehaviour
 
     public bool IsValid(Vector2 position, float angle)
     {
+        moving.GetComponent<RectTransform>().anchoredPosition = position;
+
         bool inActiveArea = activeRegion == null 
-                         || RectTransformUtility.RectangleContainsScreenPoint(activeRegion, position);
+                         || RectTransformUtility.RectangleContainsScreenPoint(activeRegion, moving.transform.position);
         bool inAngleRange = Mathf.Abs(Mathf.DeltaAngle(angle, angleDirection)) <= angleRange;
 
         return inAngleRange && inActiveArea;
@@ -37,7 +39,7 @@ public class TriggerSettings : MonoBehaviour
         @static.SetActive(true);
 
         moving.transform.eulerAngles = Vector3.forward * angle;
-        moving.transform.position = position;
+        moving.GetComponent<RectTransform>().anchoredPosition = position;
     }
 
     public void Disable()

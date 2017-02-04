@@ -26,7 +26,7 @@ public class Token : MonoBehaviour
         {
             ghostObject.SetActive(true);
             ghostObject.transform.eulerAngles = Vector3.forward * angle;
-            ghostObject.transform.position = position;
+            ghostObject.GetComponent<RectTransform>().anchoredPosition = position;
         }
 
         var hotspot = FindHotspot(position, angle);
