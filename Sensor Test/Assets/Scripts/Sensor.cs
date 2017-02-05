@@ -95,6 +95,8 @@ public class Sensor : MonoBehaviour
 
         knowledge = JsonUtility.FromJson<Knowledge>(data);
 
+        ReduceNoise();
+
         foreach (var token in knowledge.tokens)
         {
             foreach (var point in token.training)
@@ -279,6 +281,17 @@ public class Sensor : MonoBehaviour
         return triangle;
     }
 
+    private Vector3 Round(Vector3 feature)
+    {
+        float factor = 10f;
+
+        feature.x = Mathf.Round(feature.x * factor) / factor;
+        feature.y = Mathf.Round(feature.y * factor) / factor;
+        feature.z = Mathf.Round(feature.z * factor) / factor;
+
+        return feature;
+    }
+
     /// <summary>
     /// TODO: annihilate training points that are too close to each other but
     /// representing different tokens
@@ -290,7 +303,11 @@ public class Sensor : MonoBehaviour
     /// </summary>
     public void ReduceNoise()
     {
-
+        foreach (Token token in knowledge.tokens)
+        {
+            //token.training.Sort((a, b) => a.x.CompareTo(b.x));
+            token.training = token.training.Select(f => Round(f)).Distinct().ToList();
+        }
     }
 
     /// <summary>
