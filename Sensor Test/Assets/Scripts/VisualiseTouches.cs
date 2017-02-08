@@ -8,18 +8,6 @@ using System.Collections.Generic;
 
 using Random = UnityEngine.Random;
 
-public class Context
-{
-    public int dataFrames;
-    public float missingTime;
-
-    public float meanType;
-    public float meanAngle;
-    public float meanLength;
-
-    public Token token;
-}
-
 public class VisualiseTouches : MonoBehaviour 
 {
 	[Header("Simulation Settings")]
@@ -38,36 +26,26 @@ public class VisualiseTouches : MonoBehaviour
     public Sensor sensor;
     [SerializeField]
     private Image touchPrefab;
-    [SerializeField]
-    private Image plotPrefab;
-    [Range(1, 60)]
-    public int requiredDataFrames;
     private List<Token> tokens = new List<Token>();
 
     public IndexedPool<Image> touchIndicators;
     public IndexedPool<Image> touchIndicators2;
-    public IndexedPool<Image> plots;
-
-    public RectTransform arrow;
 
     private void Awake()
     {
         touchIndicators = new IndexedPool<Image>(touchPrefab);
         touchIndicators2 = new IndexedPool<Image>(touchPrefab);
-        plots = new IndexedPool<Image>(plotPrefab);
 
         tokens = tokenCollection.GetComponentsInChildren<Token>(true).ToList();
 
         sensor.OnTokenClassified += token => Debug.LogFormat("TOKEN IS {0} ({1})", token.id, tokens[token.id]);
         sensor.OnTokenLifted += () => Debug.Log("REMOVED");
-        sensor.OnTokenTracked += frame => { arrow.anchoredPosition = frame.position; arrow.localEulerAngles = Vector3.forward * frame.direction; };
+        //sensor.OnTokenTracked += frame => { arrow.anchoredPosition = frame.position; arrow.localEulerAngles = Vector3.forward * frame.direction; };
 
 #if UNITY_ANDROID && !UNITY_EDITOR
         debugOn = false;
 #endif
     }
-
-    private Context context;
 
     private List<Vector3> values = new List<Vector3>();
 
@@ -90,11 +68,11 @@ public class VisualiseTouches : MonoBehaviour
         if (sensor.detected != null || debugOn)
         {
             int id = debugOn ? tokens.IndexOf(debugToken) : sensor.detected.id;
-            var frame = sensor.history.Last();
+            var frame = debugOn ? new Sensor.Frame() : sensor.history.Last();
 
             if (debugOn)
             {
-                frame.position = new Vector2(debugX, debugY) * 10f;
+                frame.position = new Vector2(debugX, debugY);
                 frame.direction = debugDirection;
             }
 
@@ -102,7 +80,7 @@ public class VisualiseTouches : MonoBehaviour
             {
                 var token = tokens[i];
 
-                if (i == sensor.detected.id)
+                if (i == id)
                 {
                     token.Refresh(frame.position, frame.direction);
                 }

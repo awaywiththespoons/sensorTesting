@@ -10,13 +10,6 @@ using Random = UnityEngine.Random;
 
 public class SensorPlotter : MonoBehaviour 
 {
-    private struct Data
-    {
-        public int id;
-        public Vector3 plot;
-        public Color color;
-    }
-
     [SerializeField]
     private Sensor sensor;
 
@@ -24,23 +17,34 @@ public class SensorPlotter : MonoBehaviour
     private ParticleSystem plotSystem;
 
     [SerializeField]
-    private Text debugText;
+    private Text activeIDText;
+    [SerializeField]
+    private Toggle trainToggle;
 
-    private int count;
+    private int highlight;
 
-    public void Increment()
+    public void Prev()
     {
-        count += 1;
-
-        sensor.SetTraining(new Sensor.Token { id = count });
+        highlight = Mathf.Max(highlight - 1, 0);
+        sensor.SetClassify();
     }
 
-    public void Reset()
+    public void Next()
     {
-        count = 0;
+        highlight = Math.Min(highlight + 1, 8);
+        sensor.SetClassify();
+    }
 
-        sensor.Reset();
-        sensor.SetTraining(new Sensor.Token { id = count });
+    public void Clear()
+    {
+        sensor.knowledge.tokens[highlight].training.Clear();
+        sensor.allTraining.RemoveAll(data => data.token.id == highlight);
+        sensor.SetClassify();
+    }
+
+    public void Train()
+    {
+        sensor.SetTraining(sensor.knowledge.tokens[highlight]);
     }
 
     public void SetClassify(bool classify)
@@ -83,8 +87,38 @@ public class SensorPlotter : MonoBehaviour
 
     private ParticleSystem.Particle[] particles = new ParticleSystem.Particle[4096];
 
+    private void Awake()
+    {
+        trainToggle.onValueChanged.AddListener(active =>
+        {
+            if (active)
+            {
+                sensor.SetTraining(sensor.knowledge.tokens[highlight]);
+            }
+            else
+            {
+                sensor.SetClassify();
+            }
+        });
+    }
+
     private void LateUpdate()
     {
+        for (int i = sensor.knowledge.tokens.Count; i < 9; ++i)
+        {
+            sensor.knowledge.tokens.Add(new Sensor.Token
+            {
+                id = i,
+            });
+        }
+
+        if (trainToggle.isOn && sensor.training == null)
+        {
+            trainToggle.isOn = false;
+        }
+
+        activeIDText.text = highlight.ToString();
+
         int count = sensor.allTraining.Count * 3;
 
         for (int i = 0; i < sensor.allTraining.Count; ++i)
@@ -92,6 +126,11 @@ public class SensorPlotter : MonoBehaviour
             Sensor.Data data = sensor.allTraining[i];
 
             Color color = Color.HSVToRGB(data.token.id / 10f, 1, 1);
+
+            if (data.token.id == highlight)
+            {
+                color = Color.HSVToRGB(data.token.id / 10f, 1, (Mathf.Sin(Time.realtimeSinceStartup * 10f) * 0.5f + 0.5f));
+            }
 
             Vector3 a = data.feature;
             Vector3 b = Triangle.Cycle(a);

@@ -53,13 +53,12 @@ public class Sensor : MonoBehaviour
 
     public static float PolarAngle(Vector2 point)
     {
-        return Mathf.Atan2(point.y, point.x) * Mathf.Rad2Deg;
+        return (Mathf.Atan2(point.y, point.x) * Mathf.Rad2Deg + 360) % 360;
     }
 
-    private Token training;
+    public Token training { get; private set; }
     public Token detected { get; private set; }
 
-    private float tokenTime;
     private float tokenTimeout;
     private List<Token> classifications = new List<Token>();
 
@@ -210,6 +209,8 @@ public class Sensor : MonoBehaviour
             {
                 // TODO: reconstruct the missing touch - use history to 
                 // determine which possible reconstruction is most likely
+                pattern.c = pattern.b;
+                pattern.count = 3;
             }
 
             // limit history size
@@ -319,38 +320,77 @@ public class Sensor : MonoBehaviour
     /// </summary>
     public Frame OrientToken(Token token, TouchPattern pattern)
     {
-        // direction is the normal vector from the first side of the feature
-
+        Vector2 centroid = (pattern.a + pattern.b + pattern.c) / 3f;
         Vector3 feature = ExtractSidesFeature(pattern);
-        int cycles = Triangle.CountCycleToMatch(feature, token.feature);
-        
-        Vector2 ab = pattern.b - pattern.a;
-        Vector2 bc = pattern.c - pattern.b;
-        Vector2 ca = pattern.a - pattern.c;
 
-        Vector2 abN = new Vector2(-ab.y, ab.x);
-        Vector2 bcN = new Vector2(-bc.y, bc.x);
-        Vector2 caN = new Vector2(-ca.y, ca.x);
-
-        Vector2 normal = Vector3.up;
-        
-        if (cycles == 0) normal = abN;
-        if (cycles == 1) normal = bcN;
-        if (cycles == 2) normal = caN;
-
+        float nextAngle;
+          
+        // direction is from 2nd longest side to shortest side
         if (Triangle.IsLine(token.feature))
         {
-            // normal = from 2nd longest side to shortest side
+            var points = new List<Vector2> { pattern.a, pattern.b, pattern.c }
+                        .OrderBy(point => (centroid - point).magnitude)
+                        .ToList();
+
+            nextAngle = PolarAngle(points[2] - points[1]);
+        }
+        // direction is the normal vector from the first side of the feature
+        else
+        {
+            int cycles = Triangle.CountCycleToMatch(feature, token.feature);
+        
+            Vector2 ab = pattern.b - pattern.a;
+            Vector2 bc = pattern.c - pattern.b;
+            Vector2 ca = pattern.a - pattern.c;
+
+            Vector2 abN = new Vector2(-ab.y, ab.x);
+            Vector2 bcN = new Vector2(-bc.y, bc.x);
+            Vector2 caN = new Vector2(-ca.y, ca.x);
+
+            Vector2 normal = Vector2.up;
+
+            if (cycles == 0) normal = abN;
+            if (cycles == 1) normal = bcN;
+            if (cycles == 2) normal = caN;
+
+            nextAngle = PolarAngle(normal);
+
+            float prevAngle = history.Count > 0 ? history.Last().direction : nextAngle;
+            float delta = Mathf.DeltaAngle(prevAngle, nextAngle);
+
+            // if we have a sharp rotation, just fall back to minimising delta
+            // angle from previous frame
+            if (Mathf.Abs(delta) > 60)
+            {
+                float abD = Mathf.DeltaAngle(prevAngle, PolarAngle(abN));
+                float bcD = Mathf.DeltaAngle(prevAngle, PolarAngle(bcN));
+                float caD = Mathf.DeltaAngle(prevAngle, PolarAngle(caN));
+
+                if (Mathf.Abs(abD) < Mathf.Abs(delta))
+                {
+                    delta = abD;
+                    nextAngle = PolarAngle(abN);
+                }
+
+                if (Mathf.Abs(bcD) < Mathf.Abs(delta))
+                {
+                    delta = bcD;
+                    nextAngle = PolarAngle(bcN);
+                }
+
+                if (Mathf.Abs(caD) < Mathf.Abs(delta))
+                {
+                    delta = caD;
+                    nextAngle = PolarAngle(caN);
+                }
+            }
         }
 
-        Debug.Log(token.id + " / " + feature + "/" + token.feature + "/" + cycles);
-
-        // TODO: determine direction from pattern/token
         return new Frame
         {
             token = token,
-            position = (pattern.a + pattern.b + pattern.c) / 3f,
-            direction = PolarAngle(normal),
+            position = centroid,
+            direction = nextAngle,
 
             pattern = pattern,
         };
