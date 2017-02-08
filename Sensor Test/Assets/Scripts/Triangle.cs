@@ -39,15 +39,15 @@ public static class Triangle
         return new Vector3(vector.y, vector.z, vector.x);
     }
 
-    public static Vector3 CycleToMatch(Vector3 vector, Vector3 other)
+    public static Vector3 CycleToMatch(Vector3 vector, Vector3 target)
     {
         Vector3 a = vector;
         Vector3 b = Cycle(a);
         Vector3 c = Cycle(b);
 
-        float ad = Compare(a, other);
-        float bd = Compare(b, other);
-        float cd = Compare(c, other);
+        float ad = Compare(a, target);
+        float bd = Compare(b, target);
+        float cd = Compare(c, target);
 
         if (ad <= bd && ad <= cd)
         {
@@ -60,6 +60,30 @@ public static class Triangle
         else
         {
             return c;
+        }
+    }
+
+    public static int CountCycleToMatch(Vector3 vector, Vector3 target)
+    {
+        Vector3 a = vector;
+        Vector3 b = Cycle(a);
+        Vector3 c = Cycle(b);
+
+        float ad = Compare(a, target);
+        float bd = Compare(b, target);
+        float cd = Compare(c, target);
+
+        if (ad <= bd && ad <= cd)
+        {
+            return 0;
+        }
+        else if (bd <= ad && bd <= cd)
+        {
+            return 1;
+        }
+        else
+        {
+            return 2;
         }
     }
 

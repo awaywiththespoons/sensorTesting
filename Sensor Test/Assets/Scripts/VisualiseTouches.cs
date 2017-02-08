@@ -35,7 +35,6 @@ public class VisualiseTouches : MonoBehaviour
     [Header("Internal Setup")]
     [SerializeField]
     private GameObject tokenCollection;
-    public Sensing sensing;
     public Sensor sensor;
     [SerializeField]
     private Image touchPrefab;
@@ -49,6 +48,8 @@ public class VisualiseTouches : MonoBehaviour
     public IndexedPool<Image> touchIndicators2;
     public IndexedPool<Image> plots;
 
+    public RectTransform arrow;
+
     private void Awake()
     {
         touchIndicators = new IndexedPool<Image>(touchPrefab);
@@ -59,6 +60,7 @@ public class VisualiseTouches : MonoBehaviour
 
         sensor.OnTokenClassified += token => Debug.LogFormat("TOKEN IS {0} ({1})", token.id, tokens[token.id]);
         sensor.OnTokenLifted += () => Debug.Log("REMOVED");
+        sensor.OnTokenTracked += frame => { arrow.anchoredPosition = frame.position; arrow.localEulerAngles = Vector3.forward * frame.direction; };
 
 #if UNITY_ANDROID && !UNITY_EDITOR
         debugOn = false;
@@ -85,24 +87,24 @@ public class VisualiseTouches : MonoBehaviour
             touchIndicators2[i].transform.localScale = Vector3.one * 0.2f;
         }
 
-		if (debugOn) {
-			context = new Context {
-				token = debugToken,
-			};
-
-			sensing.position = new Vector2(debugX, debugY) * 10f;
-			sensing.angle = debugDirection;
-		}
-
-        if (sensor.detected != null)
+        if (sensor.detected != null || debugOn)
         {
+            int id = debugOn ? tokens.IndexOf(debugToken) : sensor.detected.id;
+            var frame = sensor.history.Last();
+
+            if (debugOn)
+            {
+                frame.position = new Vector2(debugX, debugY) * 10f;
+                frame.direction = debugDirection;
+            }
+
             for (int i = 0; i < tokens.Count; ++i)
             {
                 var token = tokens[i];
 
                 if (i == sensor.detected.id)
                 {
-                    token.Refresh(sensor.history.Last().position, sensing.angle);
+                    token.Refresh(frame.position, frame.direction);
                 }
                 else
                 {

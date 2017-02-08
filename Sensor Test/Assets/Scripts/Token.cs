@@ -10,9 +10,6 @@ using Random = UnityEngine.Random;
 
 public class Token : MonoBehaviour 
 {
-    public Sensing.Type patternType;
-    [Tooltip("Triangle: angle of front corner\nLine: length of longest section")]
-    public float patternVariableTarget;
     public List<TriggerSettings> triggers = new List<TriggerSettings>();
     //public TriggerSettings defaultHotspot;
 

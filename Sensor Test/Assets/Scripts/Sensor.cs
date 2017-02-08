@@ -20,6 +20,7 @@ public class Sensor : MonoBehaviour
     public class Token
     {
         public int id;
+        public Vector3 feature; // mean triangle from training
 
         public List<Vector3> training = new List<Vector3>();
     }
@@ -231,17 +232,21 @@ public class Sensor : MonoBehaviour
     public void TrainToken(Token token, TouchPattern pattern)
     {
         Vector3 feature = ExtractSidesFeature(pattern);
-        
-        if (token.training.Count == 0)
+
+        // if this isn't the first data-point, cycle the triangle side order
+        // to best match the existing feature
+        if (token.training.Count > 0)
         {
-            token.training.Add(feature);
-        }
-        else
-        {
-            token.training.Add(Triangle.CycleToMatch(feature, token.training.Last()));
+            feature = Triangle.CycleToMatch(feature, token.feature);
         }
 
+        token.training.Add(feature);
+
         allTraining.Add(new Data { token = token, feature = feature });
+
+        // update token's average observed feature (side lengths)
+        int count = token.training.Count;
+        token.feature = (token.feature * (count - 1) + feature) / count;
     }
 
     /// <summary>
@@ -281,10 +286,8 @@ public class Sensor : MonoBehaviour
         return triangle;
     }
 
-    private Vector3 Round(Vector3 feature)
+    private Vector3 Quantize(Vector3 feature, float factor = 10f)
     {
-        float factor = 10f;
-
         feature.x = Mathf.Round(feature.x * factor) / factor;
         feature.y = Mathf.Round(feature.y * factor) / factor;
         feature.z = Mathf.Round(feature.z * factor) / factor;
@@ -305,8 +308,8 @@ public class Sensor : MonoBehaviour
     {
         foreach (Token token in knowledge.tokens)
         {
-            //token.training.Sort((a, b) => a.x.CompareTo(b.x));
-            token.training = token.training.Select(f => Round(f)).Distinct().ToList();
+            token.training = token.training.Select(f => Quantize(f)).Distinct().ToList();
+            token.feature = token.training.Aggregate((a, b) => a + b) / token.training.Count;
         }
     }
 
@@ -316,12 +319,38 @@ public class Sensor : MonoBehaviour
     /// </summary>
     public Frame OrientToken(Token token, TouchPattern pattern)
     {
+        // direction is the normal vector from the first side of the feature
+
+        Vector3 feature = ExtractSidesFeature(pattern);
+        int cycles = Triangle.CountCycleToMatch(feature, token.feature);
+        
+        Vector2 ab = pattern.b - pattern.a;
+        Vector2 bc = pattern.c - pattern.b;
+        Vector2 ca = pattern.a - pattern.c;
+
+        Vector2 abN = new Vector2(-ab.y, ab.x);
+        Vector2 bcN = new Vector2(-bc.y, bc.x);
+        Vector2 caN = new Vector2(-ca.y, ca.x);
+
+        Vector2 normal = Vector3.up;
+        
+        if (cycles == 0) normal = abN;
+        if (cycles == 1) normal = bcN;
+        if (cycles == 2) normal = caN;
+
+        if (Triangle.IsLine(token.feature))
+        {
+            // normal = from 2nd longest side to shortest side
+        }
+
+        Debug.Log(token.id + " / " + feature + "/" + token.feature + "/" + cycles);
+
         // TODO: determine direction from pattern/token
         return new Frame
         {
             token = token,
             position = (pattern.a + pattern.b + pattern.c) / 3f,
-            direction = 0,
+            direction = PolarAngle(normal),
 
             pattern = pattern,
         };
