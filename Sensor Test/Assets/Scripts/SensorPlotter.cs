@@ -121,6 +121,11 @@ public class SensorPlotter : MonoBehaviour
 
         int count = sensor.allTraining.Count * 3;
 
+        while (count > particles.Length)
+        {
+            particles = new ParticleSystem.Particle[particles.Length * 2];
+        }
+
         for (int i = 0; i < sensor.allTraining.Count; ++i)
         {
             Sensor.Data data = sensor.allTraining[i];

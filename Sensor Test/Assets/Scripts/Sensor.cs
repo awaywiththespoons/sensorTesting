@@ -309,6 +309,11 @@ public class Sensor : MonoBehaviour
     {
         foreach (Token token in knowledge.tokens)
         {
+            if (token.training.Count == 0)
+            {
+                continue;
+            }
+
             token.training = token.training.Select(f => Quantize(f)).Distinct().ToList();
             token.feature = token.training.Aggregate((a, b) => a + b) / token.training.Count;
         }
