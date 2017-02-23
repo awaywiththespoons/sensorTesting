@@ -10,6 +10,9 @@ using Random = UnityEngine.Random;
 
 public class VisualiseTouches : MonoBehaviour 
 {
+    [Header("Settings")]
+    public bool stickyTokens;
+
 	[Header("Simulation Settings")]
 	public bool debugOn;
 	public Token debugToken;
@@ -90,7 +93,7 @@ public class VisualiseTouches : MonoBehaviour
                 }
             }
         }
-        else
+        else if (!stickyTokens)
         {
             for (int i = 0; i < tokens.Count; ++i)
             {
