@@ -148,6 +148,8 @@ public class Sensor : MonoBehaviour
             // TODO: reset classification too
 
             OnTokenLifted();
+
+			history.Clear ();
         }
 
         if (pattern.count >= 5)
