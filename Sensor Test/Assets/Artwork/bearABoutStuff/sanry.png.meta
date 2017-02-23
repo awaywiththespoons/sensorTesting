@@ -1,0 +1,1836 @@
+fileFormatVersion: 2
+guid: 2c735a7c23215434cb27af135a41ad85
+timeCreated: 1487782205
+licenseType: Free
+TextureImporter:
+  fileIDToRecycleName:
+    21300000: sanry_0
+    21300002: sanry_1
+    21300004: sanry_2
+    21300006: sanry_3
+    21300008: sanry_4
+    21300010: sanry_5
+    21300012: sanry_6
+    21300014: sanry_7
+    21300016: sanry_8
+    21300018: sanry_9
+    21300020: sanry_10
+    21300022: sanry_11
+    21300024: sanry_12
+    21300026: sanry_13
+    21300028: sanry_14
+    21300030: sanry_15
+    21300032: sanry_16
+    21300034: sanry_17
+    21300036: sanry_18
+    21300038: sanry_19
+    21300040: sanry_20
+    21300042: sanry_21
+    21300044: sanry_22
+    21300046: sanry_23
+    21300048: sanry_24
+    21300050: sanry_25
+    21300052: sanry_26
+    21300054: sanry_27
+    21300056: sanry_28
+    21300058: sanry_29
+    21300060: sanry_30
+    21300062: sanry_31
+    21300064: sanry_32
+    21300066: sanry_33
+    21300068: sanry_34
+    21300070: sanry_35
+    21300072: sanry_36
+    21300074: sanry_37
+    21300076: sanry_38
+    21300078: sanry_39
+    21300080: sanry_40
+    21300082: sanry_41
+    21300084: sanry_42
+    21300086: sanry_43
+    21300088: sanry_44
+    21300090: sanry_45
+    21300092: sanry_46
+    21300094: sanry_47
+    21300096: sanry_48
+    21300098: sanry_49
+    21300100: sanry_50
+    21300102: sanry_51
+    21300104: sanry_52
+    21300106: sanry_53
+    21300108: sanry_54
+    21300110: sanry_55
+    21300112: sanry_56
+    21300114: sanry_57
+    21300116: sanry_58
+    21300118: sanry_59
+    21300120: sanry_60
+    21300122: sanry_61
+    21300124: sanry_62
+    21300126: sanry_63
+    21300128: sanry_64
+    21300130: sanry_65
+    21300132: sanry_66
+    21300134: sanry_67
+    21300136: sanry_68
+    21300138: sanry_69
+    21300140: sanry_70
+    21300142: sanry_71
+    21300144: sanry_72
+    21300146: sanry_73
+    21300148: sanry_74
+    21300150: sanry_75
+    21300152: sanry_76
+    21300154: sanry_77
+    21300156: sanry_78
+    21300158: sanry_79
+    21300160: sanry_80
+    21300162: sanry_81
+    21300164: sanry_82
+    21300166: sanry_83
+    21300168: sanry_84
+    21300170: sanry_85
+    21300172: sanry_86
+    21300174: sanry_87
+    21300176: sanry_88
+    21300178: sanry_89
+    21300180: sanry_90
+    21300182: sanry_91
+    21300184: sanry_92
+    21300186: sanry_93
+    21300188: cheese
+    21300190: sanry_95
+    21300192: sanry_96
+    21300194: sanry_97
+    21300196: sanry_98
+    21300198: sanry_99
+    21300200: sanry_100
+    21300202: sanry_101
+    21300204: sanry_102
+    21300206: sanry_103
+    21300208: sanry_104
+    21300210: sanry_105
+    21300212: sanry_106
+    21300214: sanry_107
+    21300216: sanry_108
+    21300218: sanry_109
+    21300220: sanry_110
+    21300222: sanry_111
+    21300224: sanry_112
+    21300226: sanry_113
+    21300228: sanry_114
+    21300230: sanry_115
+    21300232: sanry_116
+    21300234: sanry_117
+    21300236: sanry_118
+    21300238: sanry_119
+    21300240: bread
+    21300242: sanry_121
+    21300244: sanry_122
+    21300246: lettuce
+  serializedVersion: 4
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+  isReadable: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    filterMode: -1
+    aniso: -1
+    mipBias: -1
+    wrapMode: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spritePixelsToUnits: 1000
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  platformSettings:
+  - buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+  - buildTarget: Standalone
+    maxTextureSize: 2048
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+  - buildTarget: iPhone
+    maxTextureSize: 2048
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+  - buildTarget: Android
+    maxTextureSize: 2048
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+  - buildTarget: WebGL
+    maxTextureSize: 2048
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: sanry_0
+      rect:
+        serializedVersion: 2
+        x: 95
+        y: 4794
+        width: 4290
+        height: 3474
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_1
+      rect:
+        serializedVersion: 2
+        x: 4448
+        y: 7249
+        width: 13
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_2
+      rect:
+        serializedVersion: 2
+        x: 4454
+        y: 7124
+        width: 12
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_3
+      rect:
+        serializedVersion: 2
+        x: 4488
+        y: 7089
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_4
+      rect:
+        serializedVersion: 2
+        x: 4531
+        y: 7060
+        width: 7
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_5
+      rect:
+        serializedVersion: 2
+        x: 4378
+        y: 6991
+        width: 11
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_6
+      rect:
+        serializedVersion: 2
+        x: 4391
+        y: 6972
+        width: 4
+        height: 4
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_7
+      rect:
+        serializedVersion: 2
+        x: 4394
+        y: 6951
+        width: 13
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_8
+      rect:
+        serializedVersion: 2
+        x: 4440
+        y: 6928
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_9
+      rect:
+        serializedVersion: 2
+        x: 4434
+        y: 6902
+        width: 7
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_10
+      rect:
+        serializedVersion: 2
+        x: 4390
+        y: 6879
+        width: 15
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_11
+      rect:
+        serializedVersion: 2
+        x: 4407
+        y: 6831
+        width: 17
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_12
+      rect:
+        serializedVersion: 2
+        x: 4366
+        y: 6809
+        width: 25
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_13
+      rect:
+        serializedVersion: 2
+        x: 4390
+        y: 6770
+        width: 13
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_14
+      rect:
+        serializedVersion: 2
+        x: 4403
+        y: 6766
+        width: 21
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_15
+      rect:
+        serializedVersion: 2
+        x: 4357
+        y: 6728
+        width: 34
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_16
+      rect:
+        serializedVersion: 2
+        x: 4375
+        y: 6685
+        width: 16
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_17
+      rect:
+        serializedVersion: 2
+        x: 4402
+        y: 6694
+        width: 7
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_18
+      rect:
+        serializedVersion: 2
+        x: 4503
+        y: 6700
+        width: 11
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_19
+      rect:
+        serializedVersion: 2
+        x: 4414
+        y: 6672
+        width: 11
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_20
+      rect:
+        serializedVersion: 2
+        x: 4426
+        y: 6660
+        width: 30
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_21
+      rect:
+        serializedVersion: 2
+        x: 4391
+        y: 6653
+        width: 26
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_22
+      rect:
+        serializedVersion: 2
+        x: 4502
+        y: 6641
+        width: 12
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_23
+      rect:
+        serializedVersion: 2
+        x: 4402
+        y: 6572
+        width: 22
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_24
+      rect:
+        serializedVersion: 2
+        x: 4410
+        y: 6607
+        width: 14
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_25
+      rect:
+        serializedVersion: 2
+        x: 4440
+        y: 6589
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_26
+      rect:
+        serializedVersion: 2
+        x: 4341
+        y: 6438
+        width: 67
+        height: 134
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_27
+      rect:
+        serializedVersion: 2
+        x: 4454
+        y: 6539
+        width: 11
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_28
+      rect:
+        serializedVersion: 2
+        x: 4515
+        y: 6547
+        width: 7
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_29
+      rect:
+        serializedVersion: 2
+        x: 4439
+        y: 6454
+        width: 11
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_30
+      rect:
+        serializedVersion: 2
+        x: 4472
+        y: 6459
+        width: 16
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_31
+      rect:
+        serializedVersion: 2
+        x: 4447
+        y: 6446
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_32
+      rect:
+        serializedVersion: 2
+        x: 4361
+        y: 6411
+        width: 46
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_33
+      rect:
+        serializedVersion: 2
+        x: 4423
+        y: 6389
+        width: 33
+        height: 54
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_34
+      rect:
+        serializedVersion: 2
+        x: 4390
+        y: 6385
+        width: 27
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_35
+      rect:
+        serializedVersion: 2
+        x: 4418
+        y: 6365
+        width: 19
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_36
+      rect:
+        serializedVersion: 2
+        x: 4389
+        y: 6365
+        width: 15
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_37
+      rect:
+        serializedVersion: 2
+        x: 4432
+        y: 6362
+        width: 8
+        height: 5
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_38
+      rect:
+        serializedVersion: 2
+        x: 4476
+        y: 6363
+        width: 12
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_39
+      rect:
+        serializedVersion: 2
+        x: 4358
+        y: 6314
+        width: 63
+        height: 42
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_40
+      rect:
+        serializedVersion: 2
+        x: 4422
+        y: 6345
+        width: 19
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_41
+      rect:
+        serializedVersion: 2
+        x: 4407
+        y: 6282
+        width: 17
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_42
+      rect:
+        serializedVersion: 2
+        x: 4382
+        y: 6232
+        width: 11
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_43
+      rect:
+        serializedVersion: 2
+        x: 1471
+        y: 4786
+        width: 24
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_44
+      rect:
+        serializedVersion: 2
+        x: 1524
+        y: 4780
+        width: 18
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_45
+      rect:
+        serializedVersion: 2
+        x: 1554
+        y: 4786
+        width: 37
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_46
+      rect:
+        serializedVersion: 2
+        x: 1593
+        y: 4780
+        width: 19
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_47
+      rect:
+        serializedVersion: 2
+        x: 1681
+        y: 4778
+        width: 32
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_48
+      rect:
+        serializedVersion: 2
+        x: 1807
+        y: 4786
+        width: 9
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_49
+      rect:
+        serializedVersion: 2
+        x: 2106
+        y: 4788
+        width: 21
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_50
+      rect:
+        serializedVersion: 2
+        x: 2145
+        y: 4784
+        width: 68
+        height: 61
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_51
+      rect:
+        serializedVersion: 2
+        x: 2188
+        y: 4754
+        width: 56
+        height: 42
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_52
+      rect:
+        serializedVersion: 2
+        x: 2388
+        y: 4742
+        width: 55
+        height: 66
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_53
+      rect:
+        serializedVersion: 2
+        x: 2460
+        y: 4790
+        width: 28
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_54
+      rect:
+        serializedVersion: 2
+        x: 2493
+        y: 4783
+        width: 19
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_55
+      rect:
+        serializedVersion: 2
+        x: 3180
+        y: 4780
+        width: 17
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_56
+      rect:
+        serializedVersion: 2
+        x: 3231
+        y: 4778
+        width: 12
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_57
+      rect:
+        serializedVersion: 2
+        x: 1548
+        y: 4774
+        width: 10
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_58
+      rect:
+        serializedVersion: 2
+        x: 1657
+        y: 4767
+        width: 12
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_59
+      rect:
+        serializedVersion: 2
+        x: 2065
+        y: 4780
+        width: 7
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_60
+      rect:
+        serializedVersion: 2
+        x: 2166
+        y: 4766
+        width: 13
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_61
+      rect:
+        serializedVersion: 2
+        x: 2319
+        y: 4766
+        width: 23
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_62
+      rect:
+        serializedVersion: 2
+        x: 2557
+        y: 4758
+        width: 20
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_63
+      rect:
+        serializedVersion: 2
+        x: 2743
+        y: 4766
+        width: 11
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_64
+      rect:
+        serializedVersion: 2
+        x: 3134
+        y: 4746
+        width: 48
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_65
+      rect:
+        serializedVersion: 2
+        x: 1637
+        y: 4754
+        width: 23
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_66
+      rect:
+        serializedVersion: 2
+        x: 2002
+        y: 4764
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_67
+      rect:
+        serializedVersion: 2
+        x: 2093
+        y: 4762
+        width: 7
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_68
+      rect:
+        serializedVersion: 2
+        x: 3697
+        y: 4764
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_69
+      rect:
+        serializedVersion: 2
+        x: 3914
+        y: 4766
+        width: 23
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_70
+      rect:
+        serializedVersion: 2
+        x: 1598
+        y: 4760
+        width: 4
+        height: 4
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_71
+      rect:
+        serializedVersion: 2
+        x: 2049
+        y: 4754
+        width: 11
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_72
+      rect:
+        serializedVersion: 2
+        x: 2250
+        y: 4746
+        width: 20
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_73
+      rect:
+        serializedVersion: 2
+        x: 2299
+        y: 4750
+        width: 22
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_74
+      rect:
+        serializedVersion: 2
+        x: 3114
+        y: 4751
+        width: 15
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_75
+      rect:
+        serializedVersion: 2
+        x: 1601
+        y: 4742
+        width: 11
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_76
+      rect:
+        serializedVersion: 2
+        x: 1670
+        y: 4742
+        width: 11
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_77
+      rect:
+        serializedVersion: 2
+        x: 2351
+        y: 4750
+        width: 8
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_78
+      rect:
+        serializedVersion: 2
+        x: 2438
+        y: 4752
+        width: 8
+        height: 4
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_79
+      rect:
+        serializedVersion: 2
+        x: 2448
+        y: 4746
+        width: 12
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_80
+      rect:
+        serializedVersion: 2
+        x: 2521
+        y: 4742
+        width: 15
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_81
+      rect:
+        serializedVersion: 2
+        x: 2989
+        y: 4746
+        width: 16
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_82
+      rect:
+        serializedVersion: 2
+        x: 4285
+        y: 4746
+        width: 11
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_83
+      rect:
+        serializedVersion: 2
+        x: 2242
+        y: 4738
+        width: 11
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_84
+      rect:
+        serializedVersion: 2
+        x: 2275
+        y: 4731
+        width: 9
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_85
+      rect:
+        serializedVersion: 2
+        x: 2553
+        y: 4721
+        width: 27
+        height: 25
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_86
+      rect:
+        serializedVersion: 2
+        x: 2251
+        y: 4726
+        width: 11
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_87
+      rect:
+        serializedVersion: 2
+        x: 2292
+        y: 4715
+        width: 17
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_88
+      rect:
+        serializedVersion: 2
+        x: 2531
+        y: 4730
+        width: 9
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_89
+      rect:
+        serializedVersion: 2
+        x: 3084
+        y: 4715
+        width: 34
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_90
+      rect:
+        serializedVersion: 2
+        x: 2061
+        y: 4706
+        width: 7
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_91
+      rect:
+        serializedVersion: 2
+        x: 2384
+        y: 4714
+        width: 7
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_92
+      rect:
+        serializedVersion: 2
+        x: 2448
+        y: 4716
+        width: 16
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_93
+      rect:
+        serializedVersion: 2
+        x: 2763
+        y: 4713
+        width: 11
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: cheese
+      rect:
+        serializedVersion: 2
+        x: 564
+        y: 2093
+        width: 3813
+        height: 2688
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_95
+      rect:
+        serializedVersion: 2
+        x: 2486
+        y: 4699
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_96
+      rect:
+        serializedVersion: 2
+        x: 4434
+        y: 4536
+        width: 7
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_97
+      rect:
+        serializedVersion: 2
+        x: 629
+        y: 3975
+        width: 10
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_98
+      rect:
+        serializedVersion: 2
+        x: 4466
+        y: 3895
+        width: 15
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_99
+      rect:
+        serializedVersion: 2
+        x: 4466
+        y: 3789
+        width: 24
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_100
+      rect:
+        serializedVersion: 2
+        x: 555
+        y: 3753
+        width: 12
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_101
+      rect:
+        serializedVersion: 2
+        x: 600
+        y: 3749
+        width: 11
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_102
+      rect:
+        serializedVersion: 2
+        x: 579
+        y: 3668
+        width: 15
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_103
+      rect:
+        serializedVersion: 2
+        x: 499
+        y: 3551
+        width: 11
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_104
+      rect:
+        serializedVersion: 2
+        x: 544
+        y: 3358
+        width: 6
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_105
+      rect:
+        serializedVersion: 2
+        x: 575
+        y: 3270
+        width: 16
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_106
+      rect:
+        serializedVersion: 2
+        x: 583
+        y: 3224
+        width: 44
+        height: 40
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_107
+      rect:
+        serializedVersion: 2
+        x: 628
+        y: 3228
+        width: 11
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_108
+      rect:
+        serializedVersion: 2
+        x: 438
+        y: 3171
+        width: 24
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_109
+      rect:
+        serializedVersion: 2
+        x: 455
+        y: 2703
+        width: 7
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_110
+      rect:
+        serializedVersion: 2
+        x: 475
+        y: 2687
+        width: 10
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_111
+      rect:
+        serializedVersion: 2
+        x: 1548
+        y: 2126
+        width: 28
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_112
+      rect:
+        serializedVersion: 2
+        x: 1605
+        y: 2126
+        width: 19
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_113
+      rect:
+        serializedVersion: 2
+        x: 1629
+        y: 2130
+        width: 24
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_114
+      rect:
+        serializedVersion: 2
+        x: 1655
+        y: 2136
+        width: 4
+        height: 4
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_115
+      rect:
+        serializedVersion: 2
+        x: 1682
+        y: 2130
+        width: 7
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_116
+      rect:
+        serializedVersion: 2
+        x: 1746
+        y: 2134
+        width: 14
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_117
+      rect:
+        serializedVersion: 2
+        x: 1937
+        y: 2132
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_118
+      rect:
+        serializedVersion: 2
+        x: 2194
+        y: 2134
+        width: 11
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_119
+      rect:
+        serializedVersion: 2
+        x: 2453
+        y: 2126
+        width: 18
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: bread
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 246
+        width: 4796
+        height: 1914
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_121
+      rect:
+        serializedVersion: 2
+        x: 1848
+        y: 2122
+        width: 10
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: sanry_122
+      rect:
+        serializedVersion: 2
+        x: 2519
+        y: 2115
+        width: 16
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: lettuce
+      rect:
+        serializedVersion: 2
+        x: 77
+        y: 4848
+        width: 4316
+        height: 3409
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    outline: []
+  spritePackingTag: 
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
