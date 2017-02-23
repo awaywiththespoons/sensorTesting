@@ -21,6 +21,7 @@ public class Sensor : MonoBehaviour
     {
         public int id;
         public Vector3 feature; // mean triangle from training
+        public float directionOffset;
 
         public List<Vector3> training = new List<Vector3>();
     }
@@ -209,7 +210,7 @@ public class Sensor : MonoBehaviour
             {
                 // TODO: reconstruct the missing touch - use history to 
                 // determine which possible reconstruction is most likely
-                pattern.c = pattern.b;
+                pattern.c = (pattern.b + pattern.a) * 0.5f;
                 pattern.count = 3;
             }
 

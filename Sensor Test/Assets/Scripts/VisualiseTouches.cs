@@ -82,7 +82,7 @@ public class VisualiseTouches : MonoBehaviour
 
                 if (i == id)
                 {
-                    token.Refresh(frame.position, frame.direction);
+                    token.Refresh(frame.position, frame.direction + sensor.detected.directionOffset);
                 }
                 else
                 {

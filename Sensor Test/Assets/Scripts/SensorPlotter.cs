@@ -20,6 +20,8 @@ public class SensorPlotter : MonoBehaviour
     private Text activeIDText;
     [SerializeField]
     private Toggle trainToggle;
+    [SerializeField]
+    private Slider directionOffsetSlider;
 
     private int highlight;
 
@@ -27,12 +29,14 @@ public class SensorPlotter : MonoBehaviour
     {
         highlight = Mathf.Max(highlight - 1, 0);
         sensor.SetClassify();
+        directionOffsetSlider.value = sensor.knowledge.tokens[highlight].directionOffset;
     }
 
     public void Next()
     {
         highlight = Math.Min(highlight + 1, 8);
         sensor.SetClassify();
+        directionOffsetSlider.value = sensor.knowledge.tokens[highlight].directionOffset;
     }
 
     public void Clear()
@@ -111,6 +115,8 @@ public class SensorPlotter : MonoBehaviour
                 id = i,
             });
         }
+
+        sensor.knowledge.tokens[highlight].directionOffset = directionOffsetSlider.value * 180;
 
         if (trainToggle.isOn && sensor.training == null)
         {
