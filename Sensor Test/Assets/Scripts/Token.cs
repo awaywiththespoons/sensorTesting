@@ -44,6 +44,13 @@ public class Token : MonoBehaviour
         {
             var hotspot = triggers[i];
 
+            if (hotspot == null)
+            {
+                Debug.LogWarningFormat("null trigger on {0}", name);
+
+                continue;
+            }
+
             if (hotspot.IsValid(position, angle))
             {
                 return hotspot;
