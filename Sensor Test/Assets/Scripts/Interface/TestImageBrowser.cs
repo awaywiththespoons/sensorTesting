@@ -39,16 +39,28 @@ public class TestImageBrowser : MonoBehaviour
         {
             var texture = new Texture2D(1, 1);
 
-            texture.LoadImage(System.IO.File.ReadAllBytes(file), true);
+            string name = System.IO.Path.GetFileNameWithoutExtension(file);
 
-            resources.Add(new ImageResource
+            ThreadedJob.Run<ThreadedReadBytes>(read => read.path = file,
+                                               read =>
             {
-                name = System.IO.Path.GetFileNameWithoutExtension(file),
-                texture = texture,
-                sprite = Sprite.Create(texture, Rect.MinMaxRect(0, 0, texture.width, texture.height), Vector2.one * 0.5f),
+                texture.LoadImage(read.data, true);
+
+                resources.Add(new ImageResource
+                {
+                    name = name,
+                    texture = texture,
+                    sprite = Sprite.Create(texture, 
+                                           Rect.MinMaxRect(0, 0, texture.width, texture.height), 
+                                           Vector2.one * 0.5f,
+                                           100,
+                                           0,
+                                           SpriteMeshType.FullRect),
+                });
+
+                images.SetActive(resources);
             });
 
-            images.SetActive(resources);
             yield return null;
         }
 
