@@ -10,6 +10,9 @@ using Random = UnityEngine.Random;
 
 public class VisualiseTouches : MonoBehaviour 
 {
+    [SerializeField]
+    private GameObject debug;
+
     [Header("Settings")]
     public bool stickyTokens;
 
@@ -67,6 +70,8 @@ public class VisualiseTouches : MonoBehaviour
             touchIndicators2[i].transform.position = touch.position * 0.2f;
             touchIndicators2[i].transform.localScale = Vector3.one * 0.2f;
         }
+
+        tokenCollection.SetActive(!debug.activeInHierarchy);
 
         if (sensor.detected != null || debugOn)
         {
