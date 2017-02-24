@@ -10,6 +10,8 @@ using Random = UnityEngine.Random;
 
 public class Token : MonoBehaviour 
 {
+    public bool useGhost;
+
     public List<TriggerSettings> triggers = new List<TriggerSettings>();
     //public TriggerSettings defaultHotspot;
 
@@ -21,7 +23,7 @@ public class Token : MonoBehaviour
 
         if (ghostObject != null)
         {
-            ghostObject.SetActive(true);
+            ghostObject.SetActive(useGhost);
             ghostObject.transform.eulerAngles = Vector3.forward * angle;
             ghostObject.GetComponent<RectTransform>().anchoredPosition = position;
         }
@@ -43,6 +45,13 @@ public class Token : MonoBehaviour
         for (int i = 0; i < triggers.Count; ++i)
         {
             var hotspot = triggers[i];
+
+            if (hotspot == null)
+            {
+                Debug.LogWarningFormat("null trigger on {0}", name);
+
+                continue;
+            }
 
             if (hotspot.IsValid(position, angle))
             {

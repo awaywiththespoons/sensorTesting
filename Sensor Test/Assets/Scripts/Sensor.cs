@@ -10,6 +10,9 @@ using Random = UnityEngine.Random;
 
 public class Sensor : MonoBehaviour
 {
+	[SerializeField]
+	private bool debugging;
+
     [Serializable]
     public class Knowledge
     {
@@ -152,7 +155,7 @@ public class Sensor : MonoBehaviour
 			history.Clear ();
         }
 
-        if (pattern.count >= 5)
+		if (pattern.count >= 5 && debugging)
         {
             debug.SetActive(true);
         }
@@ -203,7 +206,7 @@ public class Sensor : MonoBehaviour
             }
         }
 
-        if (training == null && detected != null)
+        if (training == null && detected != null && pattern.count == 3)
         {
             // if we have already detected a token, we can try to reconstruct
             // the missing touch from the known points and expected shape
