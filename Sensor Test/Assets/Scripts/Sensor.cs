@@ -10,6 +10,9 @@ using Random = UnityEngine.Random;
 
 public class Sensor : MonoBehaviour
 {
+	[SerializeField]
+	private bool debugging;
+
     [Serializable]
     public class Knowledge
     {
@@ -153,7 +156,7 @@ public class Sensor : MonoBehaviour
 			history.Clear ();
         }
 
-        if (pattern.count >= 5)
+		if (pattern.count >= 5 && debugging)
         {
             debug.SetActive(true);
         }

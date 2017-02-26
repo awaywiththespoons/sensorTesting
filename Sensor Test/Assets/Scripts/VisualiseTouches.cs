@@ -15,6 +15,10 @@ public class VisualiseTouches : MonoBehaviour
 
     [Header("Settings")]
     public bool stickyTokens;
+    public float inactivityThreshold;
+    public float inactivityFadeInSpeed;
+    public float inactivityFadeOutSpeed;
+    public float triggerFadeTime;
 
 	[Header("Simulation Settings")]
 	public bool debugOn;
@@ -27,12 +31,17 @@ public class VisualiseTouches : MonoBehaviour
 	public float debugDirection;
 
     [Header("Internal Setup")]
+    public RectTransform regionMatchingObject;
     [SerializeField]
     private GameObject tokenCollection;
     public Sensor sensor;
     [SerializeField]
     private Image touchPrefab;
     private List<Token> tokens = new List<Token>();
+    [SerializeField]
+    private CanvasGroup inactivitySplash;
+    private float inactivityTime;
+    private float inactivityFadeVelocity;
 
     public IndexedPool<Image> touchIndicators;
     public IndexedPool<Image> touchIndicators2;
@@ -44,6 +53,11 @@ public class VisualiseTouches : MonoBehaviour
 
         tokens = tokenCollection.GetComponentsInChildren<Token>(true).ToList();
 
+        foreach (var token in tokens)
+        {
+            token.gameObject.SetActive(true);
+        }
+
         sensor.OnTokenClassified += token => Debug.LogFormat("TOKEN IS {0} ({1})", token.id, tokens[token.id]);
         sensor.OnTokenLifted += () => Debug.Log("REMOVED");
         //sensor.OnTokenTracked += frame => { arrow.anchoredPosition = frame.position; arrow.localEulerAngles = Vector3.forward * frame.direction; };
@@ -53,11 +67,35 @@ public class VisualiseTouches : MonoBehaviour
 #endif
     }
 
+    private void Start()
+    {
+        foreach (var token in tokens)
+        {
+            token.gameObject.SetActive(false);
+        }
+    }
+
     private List<Vector3> values = new List<Vector3>();
 
     private void Update()
     {
         int count = Input.touchCount;
+
+        if (count == 0 && !debugOn)
+        {
+            inactivityTime += Time.deltaTime;
+        }
+        else
+        {
+            inactivityTime = 0;
+        }
+
+        bool inactive = inactivityTime >= inactivityThreshold;
+
+        inactivitySplash.alpha = Mathf.SmoothDamp(inactivitySplash.alpha, 
+                                                  inactive ? 1 : 0, 
+                                                  ref inactivityFadeVelocity, 
+                                                  inactive ? inactivityFadeInSpeed : inactivityFadeOutSpeed);
 
         touchIndicators.SetActive(count);
         touchIndicators2.SetActive(count);
