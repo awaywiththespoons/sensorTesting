@@ -15,6 +15,9 @@ public class VisualiseTouches : MonoBehaviour
 
     [Header("Settings")]
     public bool stickyTokens;
+    public float inactivityThreshold;
+    public float inactivityFadeInSpeed;
+    public float inactivityFadeOutSpeed;
 
 	[Header("Simulation Settings")]
 	public bool debugOn;
@@ -33,6 +36,10 @@ public class VisualiseTouches : MonoBehaviour
     [SerializeField]
     private Image touchPrefab;
     private List<Token> tokens = new List<Token>();
+    [SerializeField]
+    private CanvasGroup inactivitySplash;
+    private float inactivityTime;
+    private float inactivityFadeVelocity;
 
     public IndexedPool<Image> touchIndicators;
     public IndexedPool<Image> touchIndicators2;
@@ -58,6 +65,22 @@ public class VisualiseTouches : MonoBehaviour
     private void Update()
     {
         int count = Input.touchCount;
+
+        if (count == 0 && !debugOn)
+        {
+            inactivityTime += Time.deltaTime;
+        }
+        else
+        {
+            inactivityTime = 0;
+        }
+
+        bool inactive = inactivityTime >= inactivityThreshold;
+
+        inactivitySplash.alpha = Mathf.SmoothDamp(inactivitySplash.alpha, 
+                                                  inactive ? 1 : 0, 
+                                                  ref inactivityFadeVelocity, 
+                                                  inactive ? inactivityFadeInSpeed : inactivityFadeOutSpeed);
 
         touchIndicators.SetActive(count);
         touchIndicators2.SetActive(count);
