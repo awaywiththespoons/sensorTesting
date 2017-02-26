@@ -18,6 +18,7 @@ public class VisualiseTouches : MonoBehaviour
     public float inactivityThreshold;
     public float inactivityFadeInSpeed;
     public float inactivityFadeOutSpeed;
+    public float triggerFadeTime;
 
 	[Header("Simulation Settings")]
 	public bool debugOn;
@@ -30,6 +31,7 @@ public class VisualiseTouches : MonoBehaviour
 	public float debugDirection;
 
     [Header("Internal Setup")]
+    public RectTransform regionMatchingObject;
     [SerializeField]
     private GameObject tokenCollection;
     public Sensor sensor;
@@ -50,6 +52,11 @@ public class VisualiseTouches : MonoBehaviour
         touchIndicators2 = new IndexedPool<Image>(touchPrefab);
 
         tokens = tokenCollection.GetComponentsInChildren<Token>(true).ToList();
+
+        foreach (var token in tokens)
+        {
+            token.gameObject.SetActive(true);
+        }
 
         sensor.OnTokenClassified += token => Debug.LogFormat("TOKEN IS {0} ({1})", token.id, tokens[token.id]);
         sensor.OnTokenLifted += () => Debug.Log("REMOVED");
