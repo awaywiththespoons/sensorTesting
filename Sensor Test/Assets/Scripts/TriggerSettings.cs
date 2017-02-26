@@ -33,6 +33,7 @@ public class TriggerSettings : MonoBehaviour
     public bool IsValid(Vector2 position, float angle)
     {
         control.regionMatchingObject.anchoredPosition = position;
+        moving.transform.position = control.regionMatchingObject.position;
 
         bool inActiveArea = activeRegion == null
                          || RectTransformUtility.RectangleContainsScreenPoint(activeRegion, control.regionMatchingObject.position);
