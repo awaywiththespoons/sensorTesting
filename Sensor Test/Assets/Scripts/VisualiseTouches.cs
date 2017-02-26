@@ -67,6 +67,14 @@ public class VisualiseTouches : MonoBehaviour
 #endif
     }
 
+    private void Start()
+    {
+        foreach (var token in tokens)
+        {
+            token.gameObject.SetActive(false);
+        }
+    }
+
     private List<Vector3> values = new List<Vector3>();
 
     private void Update()
