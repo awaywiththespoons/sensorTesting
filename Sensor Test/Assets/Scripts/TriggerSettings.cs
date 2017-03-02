@@ -32,6 +32,9 @@ public class TriggerSettings : MonoBehaviour
 
     public bool IsValid(Vector2 position, float angle)
     {
+        if (control == null)
+            control = GameObject.FindWithTag("Control").GetComponent<VisualiseTouches>();
+
         control.regionMatchingObject.anchoredPosition = position;
         moving.transform.position = control.regionMatchingObject.position;
 
