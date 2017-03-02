@@ -11,21 +11,24 @@ using Random = UnityEngine.Random;
 public class SceneView : InstanceView<Model.Scene>
 {
     [SerializeField]
-    private InstancePoolSetup imagesSetup;
-    private InstancePool<Model.Image> images;
+    private ImageView imageTemplate;
+    private IndexedPool<ImageView> images;
 
     private void Awake()
     {
-        images = imagesSetup.Finalise<Model.Image>();
+        images = new IndexedPool<ImageView>(imageTemplate);
     }
 
     protected override void Configure()
     {
+        images.SetActive(config.images.Count);
+        images.MapActive((i, image) => image.SetConfig(config.images[i]));
     }
 
     public override void Refresh()
     {
-        images.SetActive(config.images);
-        images.Refresh();
+        float frame = Time.timeSinceLevelLoad;
+
+        images.MapActive((i, image) => image.SetFrame(frame));
     }
 }
