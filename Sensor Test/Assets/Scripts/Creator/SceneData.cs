@@ -11,7 +11,7 @@ using Random = UnityEngine.Random;
 namespace Model
 {
     [Serializable]
-    public class Image
+    public partial class Image
     {
         public bool ghost;
         public string name;
@@ -20,23 +20,64 @@ namespace Model
         //[NonSerialized]
         public Sprite sprite;
 
+        public int frameCount;
         public List<Vector2> positions = new List<Vector2> { Vector2.zero };
         public List<float> directions = new List<float> { 0 };
         public List<float> scales = new List<float> { 1 };
+    }
 
-        public int frames
+    public partial class Image
+    {
+        public void SetFrameCount(int frames)
         {
-            get
+            frameCount = frames;
+            positions.SetLength(frames);
+            directions.SetLength(frames);
+            scales.SetLength(frames);
+        }
+    }
+
+    public static partial class Extensions
+    {
+        public static void SetLength<T>(this IList<T> list, int length)
+        {
+            T value = default(T);
+
+            if (list.Count > 0)
             {
-                return Mathf.Min(positions.Count, directions.Count, scales.Count);
+                value = list[list.Count - 1];
+            }
+
+            while (list.Count > length)
+            {
+                list.RemoveAt(list.Count - 1);
+            }
+
+            while (list.Count < length)
+            {
+                list.Add(value);
             }
         }
     }
 
     [Serializable]
-    public class Scene
+    public partial class Scene
     {
+        public int frameCount = 5;
         public List<Image> images;
+    }
+
+    public partial class Scene
+    {
+        public void SetFrameCount(int frames)
+        {
+            frameCount = frames;
+
+            for (int i = 0; i < images.Count; ++i)
+            {
+                images[i].SetFrameCount(frames);
+            }
+        }
     }
 
     [Serializable]

@@ -11,6 +11,9 @@ using Random = UnityEngine.Random;
 public class SceneView : InstanceView<Model.Scene>
 {
     [SerializeField]
+    private CanvasGroup canvasGroup;
+
+    [SerializeField]
     private ImageView imageTemplate;
     private IndexedPool<ImageView> images;
 
@@ -25,10 +28,65 @@ public class SceneView : InstanceView<Model.Scene>
         images.MapActive((i, image) => image.SetConfig(config.images[i]));
     }
 
-    public override void Refresh()
+    public void SetFrame(float frame)
     {
-        float frame = Time.timeSinceLevelLoad;
+        frame %= config.frameCount;
 
         images.MapActive((i, image) => image.SetFrame(frame));
+    }
+
+    private float fadeTime = .25f;
+    private float fadeVelocity;
+
+    [ContextMenu("Fade In")]
+    public void FadeIn()
+    {
+        gameObject.SetActive(true);
+
+        StopAllCoroutines();
+        StartCoroutine(FadeInCO());
+    }
+
+    [ContextMenu("Fade Out")]
+    public void FadeOut()
+    {
+        StopAllCoroutines();
+        StartCoroutine(FadeOutCO());
+    }
+
+    private IEnumerator FadeInCO()
+    {
+        fadeVelocity = 0;
+
+        while (canvasGroup.alpha < 0.99f)
+        {
+            canvasGroup.alpha = Mathf.SmoothDamp(canvasGroup.alpha,
+                                                 1f,
+                                                 ref fadeVelocity,
+                                                 fadeTime);
+
+            yield return null;
+        }
+
+        canvasGroup.alpha = 1;
+    }
+
+    private IEnumerator FadeOutCO()
+    {
+        fadeVelocity = 0;
+
+        while (canvasGroup.alpha > 0.01f)
+        {
+            canvasGroup.alpha = Mathf.SmoothDamp(canvasGroup.alpha,
+                                                 0f,
+                                                 ref fadeVelocity,
+                                                 fadeTime);
+
+            yield return null;
+        }
+
+        canvasGroup.alpha = 0;
+
+        gameObject.SetActive(false);
     }
 }

@@ -28,8 +28,8 @@ public class ImageView : InstanceView<Model.Image>
     {
         var rtrans = transform as RectTransform;
 
-        int next = Mathf.CeilToInt(frame) % config.frames;
-        int prev = Mathf.FloorToInt(frame) % config.frames;
+        int next = Mathf.CeilToInt(frame) % config.frameCount;
+        int prev = Mathf.FloorToInt(frame) % config.frameCount;
         float u = frame % 1;
 
         rtrans.anchoredPosition = Vector2.Lerp(config.positions[prev],
