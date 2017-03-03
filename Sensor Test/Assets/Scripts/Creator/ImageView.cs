@@ -32,9 +32,9 @@ public class ImageView : InstanceView<Model.Image>
         int prev = Mathf.FloorToInt(frame) % config.frameCount;
         float u = frame % 1;
 
-        rtrans.anchoredPosition = Vector2.Lerp(config.positions[prev],
-                                               config.positions[next],
-                                               u);
+        rtrans.position = Vector2.Lerp(config.positions[prev],
+                                       config.positions[next],
+                                       u);
         rtrans.eulerAngles = Mathf.LerpAngle(config.directions[prev],
                                              config.directions[next],
                                              u)
