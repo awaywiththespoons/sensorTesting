@@ -56,32 +56,32 @@ public class Test : MonoBehaviour
         if (play)
         {
             timelineSlider.value = (timelineSlider.value + Time.deltaTime * fps * playbackSpeed) % data.frameCount;
+        }
 
-            int frame = Mathf.CeilToInt(timelineSlider.value);
+        int frame = Mathf.CeilToInt(timelineSlider.value);
 
-            frame %= data.images[0].frameCount;
+        frame %= data.images[0].frameCount;
 
-            if (Input.GetMouseButton(0))
+        if (Input.GetMouseButton(0))
+        {
+            if (angle)
             {
-                if (angle)
-                {
-                    var center = new Vector2(Camera.main.pixelWidth / 2,
-                                             Camera.main.pixelHeight / 2);
+                var center = new Vector2(Camera.main.pixelWidth / 2,
+                                            Camera.main.pixelHeight / 2);
 
-                    float max = Mathf.Min(center.x, center.y);
+                float max = Mathf.Min(center.x, center.y);
 
-                    Vector2 direction = (Vector2) Input.mousePosition - center;
+                Vector2 direction = (Vector2) Input.mousePosition - center;
 
-                    float scale = Mathf.Min(direction.magnitude, max);
-                    float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+                float scale = Mathf.Min(direction.magnitude, max);
+                float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
 
-                    data.images[0].directions[frame] = angle;
-                    data.images[0].scales[frame] = scale / max;
-                }
-                else
-                {
-                    data.images[0].positions[frame] = Input.mousePosition;
-                }
+                data.images[0].directions[frame] = angle;
+                data.images[0].scales[frame] = scale / max;
+            }
+            else
+            {
+                data.images[0].positions[frame] = Input.mousePosition;
             }
         }
 
