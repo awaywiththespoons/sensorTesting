@@ -41,6 +41,16 @@ public class Test : MonoBehaviour
 
     private int fps = 10;
 
+    public void StepBack()
+    {
+        timelineSlider.value = Mathf.CeilToInt(timelineSlider.value + data.frameCount - 1) % data.frameCount;
+    }
+
+    public void StepForward()
+    {
+        timelineSlider.value = Mathf.FloorToInt(timelineSlider.value + 1) % data.frameCount;
+    }
+
     private void Update()
     {
         if (play)
