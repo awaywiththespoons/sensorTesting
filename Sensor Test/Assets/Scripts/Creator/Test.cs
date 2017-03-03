@@ -58,11 +58,15 @@ public class Test : MonoBehaviour
                     var center = new Vector2(Camera.main.pixelWidth / 2,
                                              Camera.main.pixelHeight / 2);
 
+                    float max = Mathf.Min(center.x, center.y);
+
                     Vector2 direction = (Vector2) Input.mousePosition - center;
 
+                    float scale = Mathf.Min(direction.magnitude, max);
                     float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
 
                     data.images[0].directions[frame] = angle;
+                    data.images[0].scales[frame] = scale / max;
                 }
                 else
                 {
