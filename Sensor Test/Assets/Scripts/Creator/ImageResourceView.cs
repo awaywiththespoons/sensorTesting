@@ -8,12 +8,21 @@ using System.Collections.Generic;
 
 using Random = UnityEngine.Random;
 
-public class ImageResourceView : InstanceView<TestImageBrowser.ImageResource> 
+public class ImageResourceView : InstanceView<Test.ImageResource> 
 {
+    [SerializeField]
+    private Test test;
+    [SerializeField]
+    private Button selectButton;
     [SerializeField]
     private Text nameText;
     [SerializeField]
     private Image image;
+
+    private void Start()
+    {
+        selectButton.onClick.AddListener(() => test.AddImageResource(config));
+    }
 
     protected override void Configure()
     {

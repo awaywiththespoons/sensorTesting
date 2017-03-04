@@ -13,6 +13,22 @@ using UnityEngine.EventSystems;
 public class Test : MonoBehaviour 
 {
     [SerializeField]
+    private InstancePoolSetup imagesSetup;
+    private InstancePool<ImageResource> images;
+
+    public class ImageResource
+    {
+        public string name;
+        public Texture2D texture;
+        public Sprite sprite;
+    }
+
+    [SerializeField]
+    private GameObject loadingScreen;
+    [SerializeField]
+    private Slider loadingSlider;
+
+    [SerializeField]
     private DragListener positionDrag;
     [SerializeField]
     private DragListener rotationDrag;
@@ -40,19 +56,88 @@ public class Test : MonoBehaviour
     private Model.Scene data;
 
     [SerializeField]
-    private bool play;
-    [SerializeField]
-    private bool angle;
-
-    [SerializeField]
     private GameObject toolbarObject;
 
-    [SerializeField]
-    [Range(0, 1)]
-    private float playbackSpeed = 1;
+    private List<ImageResource> imageResources = new List<ImageResource>();
 
-    private void Start()
+    public void AddImageResource(ImageResource resource)
     {
+        var graphic = new Model.Image
+        {
+            path = resource.name,
+            sprite = resource.sprite,
+            name = resource.name,
+        };
+
+        data.images.Add(graphic);
+
+        graphic.positions[0] = new Vector2(Camera.main.pixelWidth, Camera.main.pixelHeight) * 0.5f;
+        graphic.SetFrameCount(data.frameCount);
+
+        selected = data.images.Count - 1;
+
+        scene.Refresh();
+    }
+
+    private IEnumerator Start()
+    {
+        images = imagesSetup.Finalise<ImageResource>();
+
+        loadingScreen.SetActive(true);
+
+        string root = "/storage/emulated/0/Download/Creator Images";
+
+#if UNITY_EDITOR
+        root = @"C:\Users\mark\Documents\BUILDS\flipology-uploader\files to upload\mark";
+#endif
+
+        System.IO.Directory.CreateDirectory(root);
+
+        loadingSlider.value = 0;
+        loadingSlider.maxValue = 0;
+
+        foreach (string file in System.IO.Directory.GetFiles(root))
+        {
+            var texture = new Texture2D(1, 1);
+
+            string name = System.IO.Path.GetFileNameWithoutExtension(file);
+
+            loadingSlider.maxValue += 1;
+
+            //ThreadedJob.Run<ThreadedReadBytes>(read => read.path = file,
+                                               //read =>
+            {
+                //texture.LoadImage(read.data, true);
+                texture.LoadImage(System.IO.File.ReadAllBytes(file), true);
+
+                imageResources.Add(new ImageResource
+                {
+                    name = name,
+                    texture = texture,
+                    sprite = Sprite.Create(texture, 
+                                           Rect.MinMaxRect(0, 0, texture.width, texture.height), 
+                                           Vector2.one * 0.5f,
+                                           100,
+                                           0,
+                                           SpriteMeshType.FullRect),
+                });
+
+                loadingSlider.value += 1;
+            }//);
+
+            yield return null;
+        }
+
+        loadingScreen.SetActive(false);
+        images.SetActive(imageResources);
+
+        yield return null;
+
+        foreach (var image in data.images)
+        {
+            image.sprite = imageResources[Random.Range(0, imageResources.Count)].sprite;
+        }
+
         data.SetFrameCount(30);
         scene.SetConfig(data);
 
@@ -148,7 +233,7 @@ public class Test : MonoBehaviour
     {
         int frame = GetFrame();
 
-        data.images[selected].scales[frame] = initialScaling + displacement.y * 0.001f;
+        data.images[selected].scales[frame] = initialScaling * Mathf.Pow(4, displacement.y * 0.001f);
     }
 
     private void OnScalingDragEnd()
@@ -199,6 +284,9 @@ public class Test : MonoBehaviour
 
     private void Update()
     {
+        if (scene.config == null)
+            return;
+
         if (positionDrag.dragging || rotationDrag.dragging || scalingDrag.dragging)
         {
             fadeGroup.alpha = Mathf.SmoothDamp(fadeGroup.alpha, 0.01f, ref fadeVelocity, 0.1f);
@@ -214,11 +302,6 @@ public class Test : MonoBehaviour
         raycasts.Clear();
         raycaster.Raycast(pointer, raycasts);
         bool valid = raycasts.Count == 0;
-
-        if (play)
-        {
-            timelineSlider.value = (timelineSlider.value + Time.deltaTime * fps * playbackSpeed) % data.frameCount;
-        }
 
         int frame = GetFrame();
 
