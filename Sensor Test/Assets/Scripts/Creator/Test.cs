@@ -136,12 +136,7 @@ public class Test : MonoBehaviour
 
         yield return null;
 
-        foreach (var image in data.images)
-        {
-            image.sprite = imageResources[Random.Range(0, imageResources.Count)].sprite;
-        }
-
-        data.SetFrameCount(30);
+        data.SetFrameCount(15);
         scene.SetConfig(data);
 
         timelineSlider.maxValue = data.frameCount;
@@ -240,7 +235,7 @@ public class Test : MonoBehaviour
         draggingScaling = false;
     }
 
-    private int fps = 10;
+    private int fps = 5;
 
     public void StepBack()
     {
