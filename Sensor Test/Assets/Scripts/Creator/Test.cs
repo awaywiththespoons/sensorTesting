@@ -16,6 +16,9 @@ public class Test : MonoBehaviour
     private InstancePoolSetup imagesSetup;
     private InstancePool<ImageResource> images;
 
+    [SerializeField]
+    private GameObject objectControls;
+
     public class ImageResource
     {
         public string name;
@@ -167,16 +170,12 @@ public class Test : MonoBehaviour
 
     private int GetFrame(int offset = 0)
     {
-        if (selected == -1)
-        {
-            return data.images[0].frameCount;
-        }
-
+        int count = data.frameCount;
         int frame = Mathf.CeilToInt(timelineSlider.value)
-                  + data.images[selected].frameCount
+                  + count
                   + offset;
 
-        frame %= data.images[selected].frameCount;
+        frame %= count;
 
         return frame;
     }
@@ -286,6 +285,8 @@ public class Test : MonoBehaviour
     {
         if (scene.config == null)
             return;
+
+        objectControls.SetActive(selected >= 0);
 
         if (positionDrag.dragging || rotationDrag.dragging || scalingDrag.dragging)
         {
