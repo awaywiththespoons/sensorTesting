@@ -13,15 +13,24 @@ public class ImageView : InstanceView<Model.Image>
     [SerializeField]
     private Image image;
 
+    public bool selected;
+
+    private void Update()
+    {
+        if (selected)
+        {
+            image.color = Color.HSVToRGB(Time.timeSinceLevelLoad % 1, .25f, 1);
+        }
+        else
+        {
+            image.color = Color.white;
+        }
+    }
+
     protected override void Configure()
     {
         image.sprite = config.sprite;
         image.SetNativeSize();
-    }
-
-    public override void Refresh()
-    {
-        SetFrame(0);
     }
 
     public void SetFrame(float frame)

@@ -15,7 +15,7 @@ public class SceneView : InstanceView<Model.Scene>
 
     [SerializeField]
     private ImageView imageTemplate;
-    private IndexedPool<ImageView> images;
+    public IndexedPool<ImageView> images;
 
     private void Awake()
     {

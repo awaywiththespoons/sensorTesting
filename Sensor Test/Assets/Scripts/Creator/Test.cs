@@ -24,6 +24,8 @@ public class Test : MonoBehaviour
 
     [SerializeField]
     private GraphicRaycaster raycaster;
+    [SerializeField]
+    private GraphicRaycaster sceneRaycaster;
 
     [SerializeField]
     private Slider timelineSlider;
@@ -77,9 +79,14 @@ public class Test : MonoBehaviour
 
     private int GetFrame()
     {
+        if (selected == -1)
+        {
+            return data.images[0].frameCount;
+        }
+
         int frame = Mathf.CeilToInt(timelineSlider.value);
 
-        frame %= data.images[0].frameCount;
+        frame %= data.images[selected].frameCount;
 
         return frame;
     }
@@ -89,14 +96,14 @@ public class Test : MonoBehaviour
         int frame = GetFrame();
 
         draggingPosition = true;
-        initialPosition = data.images[0].positions[frame];
+        initialPosition = data.images[selected].positions[frame];
     }
 
     private void OnPositionDragChange(Vector2 displacement)
     {
         int frame = GetFrame();
 
-        data.images[0].positions[frame] = initialPosition + displacement;
+        data.images[selected].positions[frame] = initialPosition + displacement;
     }
 
     private void OnPositionDragEnd()
@@ -109,14 +116,14 @@ public class Test : MonoBehaviour
         int frame = GetFrame();
 
         draggingRotation = true;
-        initialRotation = data.images[0].directions[frame];
+        initialRotation = data.images[selected].directions[frame];
     }
 
     private void OnRotationDragChange(Vector2 displacement)
     {
         int frame = GetFrame();
 
-        data.images[0].directions[frame] = initialRotation + displacement.y * 0.001f * 360;
+        data.images[selected].directions[frame] = initialRotation + displacement.y * 0.001f * 360;
     }
 
     private void OnRotationDragEnd()
@@ -129,14 +136,14 @@ public class Test : MonoBehaviour
         int frame = GetFrame();
 
         draggingScaling = true;
-        initialScaling = data.images[0].scales[frame];
+        initialScaling = data.images[selected].scales[frame];
     }
 
     private void OnScalingDragChange(Vector2 displacement)
     {
         int frame = GetFrame();
 
-        data.images[0].scales[frame] = initialScaling + displacement.y * 0.001f;
+        data.images[selected].scales[frame] = initialScaling + displacement.y * 0.001f;
     }
 
     private void OnScalingDragEnd()
@@ -158,15 +165,19 @@ public class Test : MonoBehaviour
 
     private List<RaycastResult> raycasts = new List<RaycastResult>();
 
+    private float fadeVelocity;
+
+    int selected = -1;
+
     private void Update()
     {
         if (positionDrag.dragging || rotationDrag.dragging || scalingDrag.dragging)
         {
-            fadeGroup.alpha = 0.01f;
+            fadeGroup.alpha = Mathf.SmoothDamp(fadeGroup.alpha, 0.01f, ref fadeVelocity, 0.1f);
         }
         else
         {
-            fadeGroup.alpha = 1f;
+            fadeGroup.alpha = Mathf.SmoothDamp(fadeGroup.alpha, 1f, ref fadeVelocity, 0.1f);
         }
 
         var pointer = new PointerEventData(EventSystem.current);
@@ -183,28 +194,41 @@ public class Test : MonoBehaviour
 
         int frame = GetFrame();
 
-        if (Input.GetMouseButton(0) && valid)
+        if (Input.GetMouseButtonDown(0) && valid)
         {
-            if (angle)
-            {
-                var center = new Vector2(Camera.main.pixelWidth / 2,
-                                         Camera.main.pixelHeight / 2);
+            raycasts.Clear();
+            sceneRaycaster.Raycast(pointer, raycasts);
 
-                float max = Mathf.Min(center.x, center.y);
+            var images = raycasts.Select(cast => cast.gameObject.GetComponent<ImageView>())
+                                 .OfType<ImageView>()
+                                 .ToList();
 
-                Vector2 direction = (Vector2) Input.mousePosition - center;
+            bool selectionChanged = false;
 
-                float scale = Mathf.Min(direction.magnitude, max);
-                float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+            if (selected >= 0)
+            { 
+                for (int i = 0; i < images.Count - 1; ++i)
+                {
+                    var view = images[i];
 
-                data.images[0].directions[frame] = angle;
-                data.images[0].scales[frame] = scale / max;
+                    if (data.images[selected] == view.config)
+                    {
+                        selected = data.images.IndexOf(images[i + 1].config);
+                        selectionChanged = true;
+                    }
+                }
             }
-            else
+
+            if (!selectionChanged && images.Count > 0)
             {
-                data.images[0].positions[frame] = Input.mousePosition;
+                selected = data.images.IndexOf(images[0].config);
             }
         }
+
+        scene.images.MapActive((i, view) =>
+        {
+            view.selected = (i == selected);
+        });
 
         scene.SetFrame(timelineSlider.value);
     }
