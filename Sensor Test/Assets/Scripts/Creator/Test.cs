@@ -81,7 +81,7 @@ public class Test : MonoBehaviour
             if (angle)
             {
                 var center = new Vector2(Camera.main.pixelWidth / 2,
-                                            Camera.main.pixelHeight / 2);
+                                         Camera.main.pixelHeight / 2);
 
                 float max = Mathf.Min(center.x, center.y);
 
