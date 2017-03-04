@@ -8,8 +8,13 @@ using System.Collections.Generic;
 
 using Random = UnityEngine.Random;
 
+using UnityEngine.EventSystems;
+
 public class Test : MonoBehaviour 
 {
+    [SerializeField]
+    private GraphicRaycaster raycaster;
+
     [SerializeField]
     private Slider timelineSlider;
 
@@ -51,8 +56,17 @@ public class Test : MonoBehaviour
         timelineSlider.value = Mathf.FloorToInt(timelineSlider.value + 1) % data.frameCount;
     }
 
+    private List<RaycastResult> raycasts = new List<RaycastResult>();
+
     private void Update()
     {
+        var pointer = new PointerEventData(EventSystem.current);
+        pointer.position = Input.mousePosition;
+
+        raycasts.Clear();
+        raycaster.Raycast(pointer, raycasts);
+        bool valid = raycasts.Count == 0;
+
         if (play)
         {
             timelineSlider.value = (timelineSlider.value + Time.deltaTime * fps * playbackSpeed) % data.frameCount;
@@ -62,7 +76,7 @@ public class Test : MonoBehaviour
 
         frame %= data.images[0].frameCount;
 
-        if (Input.GetMouseButton(0))
+        if (Input.GetMouseButton(0) && valid)
         {
             if (angle)
             {
