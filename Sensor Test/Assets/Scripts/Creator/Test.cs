@@ -13,6 +13,16 @@ using UnityEngine.EventSystems;
 public class Test : MonoBehaviour 
 {
     [SerializeField]
+    private DragListener positionDrag;
+    [SerializeField]
+    private DragListener rotationDrag;
+    [SerializeField]
+    private DragListener scalingDrag;
+
+    [SerializeField]
+    private CanvasGroup fadeGroup;
+
+    [SerializeField]
     private GraphicRaycaster raycaster;
 
     [SerializeField]
@@ -42,6 +52,96 @@ public class Test : MonoBehaviour
         scene.SetConfig(data);
 
         timelineSlider.maxValue = data.frameCount;
+
+        positionDrag.OnBegin += OnPositionDragBegin;
+        positionDrag.OnDisplacementChanged += OnPositionDragChange;
+        positionDrag.OnEnd += OnPositionDragEnd;
+
+        rotationDrag.OnBegin += OnRotationDragBegin;
+        rotationDrag.OnDisplacementChanged += OnRotationDragChange;
+        rotationDrag.OnEnd += OnRotationDragEnd;
+
+        scalingDrag.OnBegin += OnScalingDragBegin;
+        scalingDrag.OnDisplacementChanged += OnScalingDragChange;
+        scalingDrag.OnEnd += OnScalingDragEnd;
+    }
+
+    private bool draggingPosition;
+    private Vector2 initialPosition;
+
+    private bool draggingRotation;
+    private float initialRotation;
+
+    private bool draggingScaling;
+    private float initialScaling;
+
+    private int GetFrame()
+    {
+        int frame = Mathf.CeilToInt(timelineSlider.value);
+
+        frame %= data.images[0].frameCount;
+
+        return frame;
+    }
+
+    private void OnPositionDragBegin()
+    {
+        int frame = GetFrame();
+
+        draggingPosition = true;
+        initialPosition = data.images[0].positions[frame];
+    }
+
+    private void OnPositionDragChange(Vector2 displacement)
+    {
+        int frame = GetFrame();
+
+        data.images[0].positions[frame] = initialPosition + displacement;
+    }
+
+    private void OnPositionDragEnd()
+    {
+        draggingPosition = false;
+    }
+
+    private void OnRotationDragBegin()
+    {
+        int frame = GetFrame();
+
+        draggingRotation = true;
+        initialRotation = data.images[0].directions[frame];
+    }
+
+    private void OnRotationDragChange(Vector2 displacement)
+    {
+        int frame = GetFrame();
+
+        data.images[0].directions[frame] = initialRotation + displacement.y * 0.001f * 360;
+    }
+
+    private void OnRotationDragEnd()
+    {
+        draggingRotation = false;
+    }
+
+    private void OnScalingDragBegin()
+    {
+        int frame = GetFrame();
+
+        draggingScaling = true;
+        initialScaling = data.images[0].scales[frame];
+    }
+
+    private void OnScalingDragChange(Vector2 displacement)
+    {
+        int frame = GetFrame();
+
+        data.images[0].scales[frame] = initialScaling + displacement.y * 0.001f;
+    }
+
+    private void OnScalingDragEnd()
+    {
+        draggingScaling = false;
     }
 
     private int fps = 10;
@@ -60,6 +160,15 @@ public class Test : MonoBehaviour
 
     private void Update()
     {
+        if (positionDrag.dragging || rotationDrag.dragging || scalingDrag.dragging)
+        {
+            fadeGroup.alpha = 0.01f;
+        }
+        else
+        {
+            fadeGroup.alpha = 1f;
+        }
+
         var pointer = new PointerEventData(EventSystem.current);
         pointer.position = Input.mousePosition;
 
@@ -72,9 +181,7 @@ public class Test : MonoBehaviour
             timelineSlider.value = (timelineSlider.value + Time.deltaTime * fps * playbackSpeed) % data.frameCount;
         }
 
-        int frame = Mathf.CeilToInt(timelineSlider.value);
-
-        frame %= data.images[0].frameCount;
+        int frame = GetFrame();
 
         if (Input.GetMouseButton(0) && valid)
         {
