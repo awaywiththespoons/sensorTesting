@@ -24,6 +24,11 @@ public class SceneView : InstanceView<Model.Scene>
 
     protected override void Configure()
     {
+        Refresh();
+    }
+
+    public override void Refresh()
+    {
         images.SetActive(config.images.Count);
         images.MapActive((i, image) => image.SetConfig(config.images[i]));
     }

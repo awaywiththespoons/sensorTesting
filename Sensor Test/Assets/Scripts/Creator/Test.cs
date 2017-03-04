@@ -80,14 +80,16 @@ public class Test : MonoBehaviour
     private bool draggingScaling;
     private float initialScaling;
 
-    private int GetFrame()
+    private int GetFrame(int offset = 0)
     {
         if (selected == -1)
         {
             return data.images[0].frameCount;
         }
 
-        int frame = Mathf.CeilToInt(timelineSlider.value);
+        int frame = Mathf.CeilToInt(timelineSlider.value)
+                  + data.images[selected].frameCount
+                  + offset;
 
         frame %= data.images[selected].frameCount;
 
@@ -171,6 +173,29 @@ public class Test : MonoBehaviour
     private float fadeVelocity;
 
     int selected = -1;
+    
+    public void RemoveSelected()
+    {
+        toolbarObject.SetActive(false);
+
+        data.images.RemoveAt(selected);
+        scene.Refresh();
+        selected = -1;
+    }
+
+    public void CopyForwardSelected()
+    {
+        int prev = GetFrame();
+        int next = GetFrame(1);
+
+        var image = data.images[selected];
+
+        image.positions[next] = image.positions[prev];
+        image.directions[next] = image.directions[prev];
+        image.scales[next] = image.scales[prev];
+
+        timelineSlider.value = next;
+    }
 
     private void Update()
     {
