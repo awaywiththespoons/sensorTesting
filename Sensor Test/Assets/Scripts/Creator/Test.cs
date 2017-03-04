@@ -45,6 +45,9 @@ public class Test : MonoBehaviour
     private bool angle;
 
     [SerializeField]
+    private GameObject toolbarObject;
+
+    [SerializeField]
     [Range(0, 1)]
     private float playbackSpeed = 1;
 
@@ -223,6 +226,8 @@ public class Test : MonoBehaviour
             {
                 selected = data.images.IndexOf(images[0].config);
             }
+
+            toolbarObject.SetActive(true);
         }
 
         scene.images.MapActive((i, view) =>
