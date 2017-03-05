@@ -22,7 +22,6 @@ public class Test : MonoBehaviour
     public class ImageResource
     {
         public string name;
-        public Texture2D texture;
         public Sprite sprite;
     }
 
@@ -65,8 +64,27 @@ public class Test : MonoBehaviour
 
     private List<ImageResource> imageResources = new List<ImageResource>();
 
+    public bool replaceMode;
+
+    public void SetReplaceMode()
+    {
+        replaceMode = true;
+    }
+
+    public void ReplaceImageResource(ImageResource resource)
+    {
+        selectedImage.sprite = resource.sprite;
+        scene.Refresh();
+    }
+
     public void AddImageResource(ImageResource resource)
     {
+        if (replaceMode)
+        {
+            ReplaceImageResource(resource);
+            return;
+        }
+
         var graphic = new Model.Image
         {
             path = resource.name,
@@ -123,7 +141,6 @@ public class Test : MonoBehaviour
                 imageResources.Add(new ImageResource
                 {
                     name = name,
-                    texture = texture,
                     sprite = Sprite.Create(texture, 
                                            Rect.MinMaxRect(0, 0, texture.width, texture.height), 
                                            Vector2.one * 0.5f,
