@@ -66,6 +66,36 @@ public class Test : MonoBehaviour
 
     public bool replaceMode;
 
+    public void LoadScene()
+    {
+        string path = Application.persistentDataPath + "/test.json";
+
+        try
+        {
+            string data = System.IO.File.ReadAllText(path);
+            this.data = JsonUtility.FromJson<Model.Scene>(data);
+
+            foreach (var image in this.data.images)
+            {
+                image.sprite = imageResources.Find(r => r.name == image.path).sprite;
+            }
+
+            scene.SetConfig(this.data);
+            scene.Refresh();
+        }
+        catch (Exception)
+        {
+            Debug.Log("no scene to load");
+        }
+    }
+
+    public void SaveScene()
+    {
+        string path = Application.persistentDataPath + "/test.json";
+
+        System.IO.File.WriteAllText(path, JsonUtility.ToJson(data));
+    }
+
     public void SetReplaceMode()
     {
         replaceMode = true;
@@ -162,32 +192,25 @@ public class Test : MonoBehaviour
 
         data.SetFrameCount(15);
         scene.SetConfig(data);
+        LoadScene();
 
         timelineSlider.maxValue = data.frameCount;
 
         positionDrag.OnBegin += OnPositionDragBegin;
         positionDrag.OnDisplacementChanged += OnPositionDragChange;
-        positionDrag.OnEnd += OnPositionDragEnd;
 
         rotationDrag.OnBegin += OnRotationDragBegin;
         rotationDrag.OnDisplacementChanged += OnRotationDragChange;
-        rotationDrag.OnEnd += OnRotationDragEnd;
 
         scalingDrag.OnBegin += OnScalingDragBegin;
         scalingDrag.OnDisplacementChanged += OnScalingDragChange;
-        scalingDrag.OnEnd += OnScalingDragEnd;
 
         layerDrag.OnBegin += OnLayerDragBegin;
         layerDrag.OnDisplacementChanged += OnLayerDragChange;
     }
-
-    private bool draggingPosition;
+    
     private Vector2 initialPosition;
-
-    private bool draggingRotation;
     private float initialRotation;
-
-    private bool draggingScaling;
     private float initialScaling;
     private int initialLayer;
 
@@ -208,8 +231,7 @@ public class Test : MonoBehaviour
     private void OnPositionDragBegin()
     {
         int frame = GetFrame();
-
-        draggingPosition = true;
+        
         initialPosition = selectedImage.positions[frame];
     }
 
@@ -220,16 +242,10 @@ public class Test : MonoBehaviour
         selectedImage.positions[frame] = initialPosition + displacement;
     }
 
-    private void OnPositionDragEnd()
-    {
-        draggingPosition = false;
-    }
-
     private void OnRotationDragBegin()
     {
         int frame = GetFrame();
 
-        draggingRotation = true;
         initialRotation = selectedImage.directions[frame];
     }
 
@@ -240,16 +256,10 @@ public class Test : MonoBehaviour
         selectedImage.directions[frame] = initialRotation + displacement.y * 0.001f * 360;
     }
 
-    private void OnRotationDragEnd()
-    {
-        draggingRotation = false;
-    }
-
     private void OnScalingDragBegin()
     {
         int frame = GetFrame();
 
-        draggingScaling = true;
         initialScaling = selectedImage.scales[frame];
     }
 
@@ -258,11 +268,6 @@ public class Test : MonoBehaviour
         int frame = GetFrame();
 
         selectedImage.scales[frame] = initialScaling * Mathf.Pow(4, displacement.y * 0.001f);
-    }
-
-    private void OnScalingDragEnd()
-    {
-        draggingScaling = false;
     }
 
     private void OnLayerDragBegin()
@@ -286,8 +291,6 @@ public class Test : MonoBehaviour
         data.images.Insert(nextLayer, selectedImage);
         scene.Refresh();
     }
-
-    private int fps = 5;
 
     public void StepBack()
     {
@@ -373,6 +376,10 @@ public class Test : MonoBehaviour
                 }
 
                 selectedImage = images[next];
+            }
+            else if (images.Count > 0)
+            {
+                selectedImage = images[0];
             }
             else
             {
