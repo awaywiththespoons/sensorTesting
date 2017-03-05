@@ -37,6 +37,8 @@ public class Test : MonoBehaviour
     private DragListener rotationDrag;
     [SerializeField]
     private DragListener scalingDrag;
+    [SerializeField]
+    private DragListener layerDrag;
 
     [SerializeField]
     private CanvasGroup fadeGroup;
@@ -77,7 +79,7 @@ public class Test : MonoBehaviour
         graphic.positions[0] = new Vector2(Camera.main.pixelWidth, Camera.main.pixelHeight) * 0.5f;
         graphic.SetFrameCount(data.frameCount);
 
-        selected = data.images.Count - 1;
+        selectedImage = graphic;
 
         scene.Refresh();
     }
@@ -152,6 +154,9 @@ public class Test : MonoBehaviour
         scalingDrag.OnBegin += OnScalingDragBegin;
         scalingDrag.OnDisplacementChanged += OnScalingDragChange;
         scalingDrag.OnEnd += OnScalingDragEnd;
+
+        layerDrag.OnBegin += OnLayerDragBegin;
+        layerDrag.OnDisplacementChanged += OnLayerDragChange;
     }
 
     private bool draggingPosition;
@@ -162,6 +167,9 @@ public class Test : MonoBehaviour
 
     private bool draggingScaling;
     private float initialScaling;
+    private int initialLayer;
+
+    private Model.Image selectedImage;
 
     private int GetFrame(int offset = 0)
     {
@@ -180,14 +188,14 @@ public class Test : MonoBehaviour
         int frame = GetFrame();
 
         draggingPosition = true;
-        initialPosition = data.images[selected].positions[frame];
+        initialPosition = selectedImage.positions[frame];
     }
 
     private void OnPositionDragChange(Vector2 displacement)
     {
         int frame = GetFrame();
 
-        data.images[selected].positions[frame] = initialPosition + displacement;
+        selectedImage.positions[frame] = initialPosition + displacement;
     }
 
     private void OnPositionDragEnd()
@@ -200,14 +208,14 @@ public class Test : MonoBehaviour
         int frame = GetFrame();
 
         draggingRotation = true;
-        initialRotation = data.images[selected].directions[frame];
+        initialRotation = selectedImage.directions[frame];
     }
 
     private void OnRotationDragChange(Vector2 displacement)
     {
         int frame = GetFrame();
 
-        data.images[selected].directions[frame] = initialRotation + displacement.y * 0.001f * 360;
+        selectedImage.directions[frame] = initialRotation + displacement.y * 0.001f * 360;
     }
 
     private void OnRotationDragEnd()
@@ -220,19 +228,41 @@ public class Test : MonoBehaviour
         int frame = GetFrame();
 
         draggingScaling = true;
-        initialScaling = data.images[selected].scales[frame];
+        initialScaling = selectedImage.scales[frame];
     }
 
     private void OnScalingDragChange(Vector2 displacement)
     {
         int frame = GetFrame();
 
-        data.images[selected].scales[frame] = initialScaling * Mathf.Pow(4, displacement.y * 0.001f);
+        selectedImage.scales[frame] = initialScaling * Mathf.Pow(4, displacement.y * 0.001f);
     }
 
     private void OnScalingDragEnd()
     {
         draggingScaling = false;
+    }
+
+    private void OnLayerDragBegin()
+    {
+        int frame = GetFrame();
+
+        initialLayer = data.images.IndexOf(selectedImage);
+    }
+
+    private void OnLayerDragChange(Vector2 displacement)
+    {
+        int frame = GetFrame();
+
+        //initialScaling * Mathf.Pow(4, displacement.y * 0.001f);
+
+        int offset = Mathf.FloorToInt(displacement.y * 0.01f);
+
+        int nextLayer = Mathf.Clamp(initialLayer + offset, 0, data.images.Count - 1);
+
+        data.images.Remove(selectedImage);
+        data.images.Insert(nextLayer, selectedImage);
+        scene.Refresh();
     }
 
     private int fps = 5;
@@ -251,15 +281,13 @@ public class Test : MonoBehaviour
 
     private float fadeVelocity;
 
-    int selected = -1;
-    
     public void RemoveSelected()
     {
         toolbarObject.SetActive(false);
 
-        data.images.RemoveAt(selected);
+        data.images.Remove(selectedImage);
         scene.Refresh();
-        selected = -1;
+        selectedImage = null;
     }
 
     public void CopyForwardSelected()
@@ -267,11 +295,9 @@ public class Test : MonoBehaviour
         int prev = GetFrame();
         int next = GetFrame(1);
 
-        var image = data.images[selected];
-
-        image.positions[next] = image.positions[prev];
-        image.directions[next] = image.directions[prev];
-        image.scales[next] = image.scales[prev];
+        selectedImage.positions[next] = selectedImage.positions[prev];
+        selectedImage.directions[next] = selectedImage.directions[prev];
+        selectedImage.scales[next] = selectedImage.scales[prev];
 
         timelineSlider.value = next;
     }
@@ -281,9 +307,12 @@ public class Test : MonoBehaviour
         if (scene.config == null)
             return;
 
-        objectControls.SetActive(selected >= 0);
+        objectControls.SetActive(selectedImage != null);
 
-        if (positionDrag.dragging || rotationDrag.dragging || scalingDrag.dragging)
+        if (positionDrag.dragging 
+         || rotationDrag.dragging 
+         || scalingDrag.dragging
+         || layerDrag.dragging)
         {
             fadeGroup.alpha = Mathf.SmoothDamp(fadeGroup.alpha, 0.01f, ref fadeVelocity, 0.1f);
         }
@@ -308,27 +337,24 @@ public class Test : MonoBehaviour
 
             var images = raycasts.Select(cast => cast.gameObject.GetComponent<ImageView>())
                                  .OfType<ImageView>()
+                                 .Select(view => view.config)
                                  .ToList();
 
-            bool selectionChanged = false;
-
-            if (selected >= 0)
-            { 
-                for (int i = 0; i < images.Count - 1; ++i)
-                {
-                    var view = images[i];
-
-                    if (data.images[selected] == view.config)
-                    {
-                        selected = data.images.IndexOf(images[i + 1].config);
-                        selectionChanged = true;
-                    }
-                }
-            }
-
-            if (!selectionChanged && images.Count > 0)
+            if (selectedImage != null && images.Count > 0)
             {
-                selected = data.images.IndexOf(images[0].config);
+                int index = images.IndexOf(selectedImage);
+                int next = 0;
+
+                if (index >= 0)
+                {
+                    next = (index + 1) % images.Count;
+                }
+
+                selectedImage = images[next];
+            }
+            else
+            {
+                selectedImage = null;
             }
 
             toolbarObject.SetActive(true);
@@ -336,7 +362,7 @@ public class Test : MonoBehaviour
 
         scene.images.MapActive((i, view) =>
         {
-            view.selected = (i == selected);
+            view.selected = (view.config == selectedImage);
         });
 
         scene.SetFrame(timelineSlider.value);
