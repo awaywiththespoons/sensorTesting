@@ -76,7 +76,12 @@ public class Test : MonoBehaviour
 
         data.images.Add(graphic);
 
-        graphic.positions[0] = new Vector2(Camera.main.pixelWidth, Camera.main.pixelHeight) * 0.5f;
+        var screen = new Vector2(Camera.main.pixelWidth, Camera.main.pixelHeight);
+
+        float scale = screen.x / graphic.sprite.rect.width * 0.75f;
+
+        graphic.positions[0] = screen * 0.5f;
+        graphic.scales[0] = scale;
         graphic.SetFrameCount(data.frameCount);
 
         selectedImage = graphic;
