@@ -25,6 +25,6 @@ public class SceneBrowserItem : InstanceView<int>
 
     protected override void Configure()
     {
-        nameText.text = string.Format("Token {0}'s Scene", config);
+        nameText.text = string.Format("Edit Scene {0}", config);
     }
 }
