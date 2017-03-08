@@ -36,8 +36,13 @@ public class Test : MonoBehaviour
     [SerializeField]
     private GameObject tokenBrowsePanel;
     [SerializeField]
+    private GameObject sceneCreatorHUD;
+    [SerializeField]
     private InstancePoolSetup storiesSetup;
     private InstancePool<string> stories;
+    [SerializeField]
+    private InstancePoolSetup scenesSetup;
+    private InstancePool<int> scenes;
 
     [SerializeField]
     private DragListener positionDrag;
@@ -65,9 +70,7 @@ public class Test : MonoBehaviour
     [SerializeField]
     private SceneView scene;
 
-    [SerializeField]
-    private Model.Scene data;
-
+    public Model.Scene editScene;
     public Model.Story story;
 
     [SerializeField]
@@ -85,6 +88,22 @@ public class Test : MonoBehaviour
         return System.IO.Directory.GetFiles(path).Select(file => Path.GetFileNameWithoutExtension(file));
     }
 
+    public void OpenScene(int scene)
+    {
+        OpenScene(story.scenes[scene]);
+
+        tokenBrowsePanel.SetActive(false);
+        sceneCreatorHUD.SetActive(true);
+    }
+
+    public void OpenScene(Model.Scene scene)
+    {
+        editScene = scene;
+
+        this.scene.SetConfig(scene);
+        this.scene.Refresh();
+    }
+
     public void OpenStory(string name)
     {
         System.IO.Directory.CreateDirectory(Application.persistentDataPath + "/stories/");
@@ -98,18 +117,27 @@ public class Test : MonoBehaviour
         string data = System.IO.File.ReadAllText(path);
         var story = JsonUtility.FromJson<Model.Story>(data);
         story.name = name;
-
-        this.data = story.scenes[0];
+        
         this.story = story;
 
-        foreach (var image in this.data.images)
+        foreach (var scene in story.scenes)
         {
-            image.sprite = imageResources.Find(r => r.name == image.path).sprite;
+            foreach (var image in scene.images)
+            {
+                image.sprite = imageResources.Find(r => r.name == image.path).sprite;
+            }
         }
 
-        scene.SetConfig(this.data);
-        scene.Refresh();
+        for (int i = story.scenes.Count; i < 9; ++i)
+        {
+            story.scenes.Add(new Model.Scene
+            {
+                frameCount = 15,
+                images = new List<Model.Image>(),
+            });
+        }
 
+        scenes.SetActive(Enumerable.Range(0, 9).ToList());
         tokenBrowsePanel.SetActive(true);
     }
 
@@ -155,7 +183,7 @@ public class Test : MonoBehaviour
             name = resource.name,
         };
 
-        data.images.Add(graphic);
+        editScene.images.Add(graphic);
 
         var screen = new Vector2(Camera.main.pixelWidth, Camera.main.pixelHeight);
 
@@ -163,7 +191,7 @@ public class Test : MonoBehaviour
 
         graphic.positions[0] = screen * 0.5f;
         graphic.scales[0] = scale;
-        graphic.SetFrameCount(data.frameCount);
+        graphic.SetFrameCount(editScene.frameCount);
 
         selectedImage = graphic;
 
@@ -177,6 +205,7 @@ public class Test : MonoBehaviour
             // TODO: create blank storiess
         }
 
+        scenes = scenesSetup.Finalise<int>();
         stories = storiesSetup.Finalise<string>();
         images = imagesSetup.Finalise<ImageResource>();
 
@@ -229,10 +258,10 @@ public class Test : MonoBehaviour
 
         yield return null;
 
-        data.SetFrameCount(15);
-        scene.SetConfig(data);
+        editScene.SetFrameCount(15);
+        scene.SetConfig(editScene);
 
-        timelineSlider.maxValue = data.frameCount;
+        timelineSlider.maxValue = editScene.frameCount;
 
         positionDrag.OnBegin += OnPositionDragBegin;
         positionDrag.OnDisplacementChanged += OnPositionDragChange;
@@ -258,7 +287,7 @@ public class Test : MonoBehaviour
 
     private int GetFrame(int offset = 0)
     {
-        int count = data.frameCount;
+        int count = editScene.frameCount;
         int frame = Mathf.CeilToInt(timelineSlider.value)
                   + count
                   + offset;
@@ -314,7 +343,7 @@ public class Test : MonoBehaviour
     {
         int frame = GetFrame();
 
-        initialLayer = data.images.IndexOf(selectedImage);
+        initialLayer = editScene.images.IndexOf(selectedImage);
     }
 
     private void OnLayerDragChange(Vector2 displacement)
@@ -325,21 +354,21 @@ public class Test : MonoBehaviour
 
         int offset = Mathf.FloorToInt(displacement.y * 0.01f);
 
-        int nextLayer = Mathf.Clamp(initialLayer + offset, 0, data.images.Count - 1);
+        int nextLayer = Mathf.Clamp(initialLayer + offset, 0, editScene.images.Count - 1);
 
-        data.images.Remove(selectedImage);
-        data.images.Insert(nextLayer, selectedImage);
+        editScene.images.Remove(selectedImage);
+        editScene.images.Insert(nextLayer, selectedImage);
         scene.Refresh();
     }
 
     public void StepBack()
     {
-        timelineSlider.value = Mathf.CeilToInt(timelineSlider.value + data.frameCount - 1) % data.frameCount;
+        timelineSlider.value = Mathf.CeilToInt(timelineSlider.value + editScene.frameCount - 1) % editScene.frameCount;
     }
 
     public void StepForward()
     {
-        timelineSlider.value = Mathf.FloorToInt(timelineSlider.value + 1) % data.frameCount;
+        timelineSlider.value = Mathf.FloorToInt(timelineSlider.value + 1) % editScene.frameCount;
     }
 
     private List<RaycastResult> raycasts = new List<RaycastResult>();
@@ -350,7 +379,7 @@ public class Test : MonoBehaviour
     {
         toolbarObject.SetActive(false);
 
-        data.images.Remove(selectedImage);
+        editScene.images.Remove(selectedImage);
         scene.Refresh();
         selectedImage = null;
     }
