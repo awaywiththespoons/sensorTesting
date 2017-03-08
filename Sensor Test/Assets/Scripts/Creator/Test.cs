@@ -7,6 +7,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 using Random = UnityEngine.Random;
+using Path = System.IO.Path;
 
 using UnityEngine.EventSystems;
 
@@ -29,6 +30,14 @@ public class Test : MonoBehaviour
     private GameObject loadingScreen;
     [SerializeField]
     private Slider loadingSlider;
+
+    [SerializeField]
+    private GameObject storyBrowsePanel;
+    [SerializeField]
+    private GameObject tokenBrowsePanel;
+    [SerializeField]
+    private InstancePoolSetup storiesSetup;
+    private InstancePool<string> stories;
 
     [SerializeField]
     private DragListener positionDrag;
@@ -59,6 +68,8 @@ public class Test : MonoBehaviour
     [SerializeField]
     private Model.Scene data;
 
+    public Model.Story story;
+
     [SerializeField]
     private GameObject toolbarObject;
 
@@ -66,16 +77,30 @@ public class Test : MonoBehaviour
 
     public bool replaceMode;
 
+    public IEnumerable<string> GetStories()
+    {
+        string path = string.Format("{0}/stories/", 
+                                    Application.persistentDataPath);
+
+        return System.IO.Directory.GetFiles(path).Select(file => Path.GetFileNameWithoutExtension(file));
+    }
+
     public void OpenStory(string name)
     {
-        string path = string.Format("{0}/{1}.json", 
+        System.IO.Directory.CreateDirectory(Application.persistentDataPath + "/stories/");
+
+        storyBrowsePanel.SetActive(false);
+
+        string path = string.Format("{0}/stories/{1}.json", 
                                     Application.persistentDataPath, 
                                     name);
 
         string data = System.IO.File.ReadAllText(path);
         var story = JsonUtility.FromJson<Model.Story>(data);
         story.name = name;
+
         this.data = story.scenes[0];
+        this.story = story;
 
         foreach (var image in this.data.images)
         {
@@ -84,11 +109,15 @@ public class Test : MonoBehaviour
 
         scene.SetConfig(this.data);
         scene.Refresh();
+
+        tokenBrowsePanel.SetActive(true);
     }
 
     public void SaveStory(Model.Story story)
     {
-        string path = string.Format("{0}/{1}.json", 
+        System.IO.Directory.CreateDirectory(Application.persistentDataPath + "/stories/");
+
+        string path = string.Format("{0}/stories/{1}.json", 
                                     Application.persistentDataPath, 
                                     story.name);
 
@@ -96,13 +125,7 @@ public class Test : MonoBehaviour
     }
 
     public void SaveScene()
-    {
-        var story = new Model.Story
-        {
-            name = "story1",
-            scenes = new List<Model.Scene> { data },
-        };
-
+    { 
         SaveStory(story);
     }
 
@@ -149,6 +172,12 @@ public class Test : MonoBehaviour
 
     private IEnumerator Start()
     {
+        if (GetStories().Count() == 0)
+        {
+            // TODO: create blank storiess
+        }
+
+        stories = storiesSetup.Finalise<string>();
         images = imagesSetup.Finalise<ImageResource>();
 
         loadingScreen.SetActive(true);
@@ -202,7 +231,6 @@ public class Test : MonoBehaviour
 
         data.SetFrameCount(15);
         scene.SetConfig(data);
-        OpenStory("story1");
 
         timelineSlider.maxValue = data.frameCount;
 
@@ -217,6 +245,8 @@ public class Test : MonoBehaviour
 
         layerDrag.OnBegin += OnLayerDragBegin;
         layerDrag.OnDisplacementChanged += OnLayerDragChange;
+
+        stories.SetActive(GetStories());
     }
     
     private Vector2 initialPosition;
