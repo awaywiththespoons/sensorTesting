@@ -79,6 +79,7 @@ public class Test : MonoBehaviour
     private List<ImageResource> imageResources = new List<ImageResource>();
 
     public bool replaceMode;
+    public bool playMode;
 
     public IEnumerable<string> GetStories()
     {
@@ -396,10 +397,38 @@ public class Test : MonoBehaviour
         timelineSlider.value = next;
     }
 
+    public void PreviewScene()
+    {
+        PlayScene(editScene);
+    }
+
+    public void StopPreview()
+    {
+        sceneCreatorHUD.SetActive(true);
+        playMode = false;
+    }
+
+    public void PlayScene(Model.Scene scene)
+    {
+        OpenScene(scene);
+
+        sceneCreatorHUD.SetActive(false);
+
+        playMode = true;
+    }
+
     private void Update()
     {
         if (scene.config == null)
             return;
+
+        if (playMode)
+        {
+            float time = timelineSlider.value;
+            time += Time.deltaTime * 10;
+            time %= timelineSlider.maxValue;
+            timelineSlider.value = time;
+        }
 
         objectControls.SetActive(selectedImage != null);
 
@@ -426,6 +455,8 @@ public class Test : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0) && valid)
         {
+            StopPreview();
+
             raycasts.Clear();
             sceneRaycaster.Raycast(pointer, raycasts);
 
