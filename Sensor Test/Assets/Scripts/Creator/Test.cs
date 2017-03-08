@@ -66,34 +66,44 @@ public class Test : MonoBehaviour
 
     public bool replaceMode;
 
-    public void LoadScene()
+    public void OpenStory(string name)
     {
-        string path = Application.persistentDataPath + "/test.json";
+        string path = string.Format("{0}/{1}.json", 
+                                    Application.persistentDataPath, 
+                                    name);
 
-        try
+        string data = System.IO.File.ReadAllText(path);
+        var story = JsonUtility.FromJson<Model.Story>(data);
+        story.name = name;
+        this.data = story.scenes[0];
+
+        foreach (var image in this.data.images)
         {
-            string data = System.IO.File.ReadAllText(path);
-            this.data = JsonUtility.FromJson<Model.Scene>(data);
-
-            foreach (var image in this.data.images)
-            {
-                image.sprite = imageResources.Find(r => r.name == image.path).sprite;
-            }
-
-            scene.SetConfig(this.data);
-            scene.Refresh();
+            image.sprite = imageResources.Find(r => r.name == image.path).sprite;
         }
-        catch (Exception)
-        {
-            Debug.Log("no scene to load");
-        }
+
+        scene.SetConfig(this.data);
+        scene.Refresh();
+    }
+
+    public void SaveStory(Model.Story story)
+    {
+        string path = string.Format("{0}/{1}.json", 
+                                    Application.persistentDataPath, 
+                                    story.name);
+
+        System.IO.File.WriteAllText(path, JsonUtility.ToJson(story));
     }
 
     public void SaveScene()
     {
-        string path = Application.persistentDataPath + "/test.json";
+        var story = new Model.Story
+        {
+            name = "story1",
+            scenes = new List<Model.Scene> { data },
+        };
 
-        System.IO.File.WriteAllText(path, JsonUtility.ToJson(data));
+        SaveStory(story);
     }
 
     public void SetReplaceMode()
@@ -192,7 +202,7 @@ public class Test : MonoBehaviour
 
         data.SetFrameCount(15);
         scene.SetConfig(data);
-        LoadScene();
+        OpenStory("story1");
 
         timelineSlider.maxValue = data.frameCount;
 

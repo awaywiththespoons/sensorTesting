@@ -17,7 +17,7 @@ namespace Model
         public string name;
         public string path;
 
-        //[NonSerialized]
+        [NonSerialized]
         public Sprite sprite;
 
         public int frameCount;
@@ -83,6 +83,7 @@ namespace Model
     [Serializable]
     public class Story
     {
+        public string name;
         public List<Scene> scenes = new List<Scene>();
     }
 }
