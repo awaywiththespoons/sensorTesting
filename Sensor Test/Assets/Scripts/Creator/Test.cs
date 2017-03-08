@@ -52,6 +52,8 @@ public class Test : MonoBehaviour
     private DragListener scalingDrag;
     [SerializeField]
     private DragListener layerDrag;
+    [SerializeField]
+    private Toggle ghostToggle;
 
     [SerializeField]
     private CanvasGroup fadeGroup;
@@ -83,6 +85,8 @@ public class Test : MonoBehaviour
 
     public IEnumerable<string> GetStories()
     {
+        System.IO.Directory.CreateDirectory(Application.persistentDataPath + "/stories/");
+
         string path = string.Format("{0}/stories/", 
                                     Application.persistentDataPath);
 
@@ -203,7 +207,14 @@ public class Test : MonoBehaviour
     {
         if (GetStories().Count() == 0)
         {
-            // TODO: create blank storiess
+            for (int i = 0; i < 3; ++i)
+            {
+                SaveStory(new Model.Story
+                {
+                    name = "story" + i,
+                    scenes = new List<Model.Scene>(),
+                });
+            }
         }
 
         scenes = scenesSetup.Finalise<int>();
@@ -400,6 +411,7 @@ public class Test : MonoBehaviour
     public void PreviewScene()
     {
         PlayScene(editScene);
+        selectedImage = null;
     }
 
     public void StopPreview()
@@ -486,7 +498,17 @@ public class Test : MonoBehaviour
                 selectedImage = null;
             }
 
+            if (selectedImage != null)
+            {
+                ghostToggle.isOn = selectedImage.ghost;
+            }
+
             toolbarObject.SetActive(true);
+        }
+
+        if (selectedImage != null)
+        {
+            selectedImage.ghost = ghostToggle.isOn;
         }
 
         scene.images.MapActive((i, view) =>
