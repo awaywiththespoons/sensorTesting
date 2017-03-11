@@ -418,6 +418,7 @@ public class Test : MonoBehaviour
     {
         sceneCreatorHUD.SetActive(true);
         playMode = false;
+        timelineSlider.value = Mathf.Floor(timelineSlider.value);
     }
 
     public void PlayScene(Model.Scene scene)
