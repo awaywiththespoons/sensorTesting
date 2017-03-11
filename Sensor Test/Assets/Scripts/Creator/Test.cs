@@ -413,6 +413,18 @@ public class Test : MonoBehaviour
         timelineSlider.value = next;
     }
 
+    public void CopyForwardToEndSelected()
+    {
+        int prev = GetFrame();
+
+        for (int i = prev; i < editScene.frameCount; ++i)
+        {
+            selectedImage.positions[i] = selectedImage.positions[prev];
+            selectedImage.directions[i] = selectedImage.directions[prev];
+            selectedImage.scales[i] = selectedImage.scales[prev];
+        }
+    }
+
     public void PreviewScene()
     {
         PlayScene(editScene);
