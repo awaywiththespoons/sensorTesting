@@ -167,6 +167,11 @@ public class Test : MonoBehaviour
         replaceMode = true;
     }
 
+    public void SetAddMode()
+    {
+        replaceMode = false;
+    }
+
     public void ReplaceImageResource(ImageResource resource)
     {
         selectedImage.sprite = resource.sprite;
