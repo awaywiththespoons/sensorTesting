@@ -45,7 +45,7 @@ public class Test : MonoBehaviour
     private InstancePool<string> stories;
     [SerializeField]
     private InstancePoolSetup scenesSetup;
-    private InstancePool<int> scenes;
+    private InstancePool<Model.Scene> scenes;
 
     [SerializeField]
     private DragListener positionDrag;
@@ -96,9 +96,12 @@ public class Test : MonoBehaviour
         return System.IO.Directory.GetFiles(path).Select(file => Path.GetFileNameWithoutExtension(file));
     }
 
-    public void OpenScene(int scene)
+    public void OpenEditScene(Model.Scene scene)
     {
-        OpenScene(story.scenes[scene]);
+        editScene = scene;
+
+        this.scene.SetConfig(scene);
+        this.scene.Refresh();
 
         tokenBrowsePanel.SetActive(false);
         sceneCreatorHUD.SetActive(true);
@@ -160,12 +163,24 @@ public class Test : MonoBehaviour
         {
             story.scenes.Add(new Model.Scene
             {
+                name = "Scene " + (i + 1),
                 frameCount = 15,
                 images = new List<Model.Image>(),
             });
         }
 
-        scenes.SetActive(Enumerable.Range(0, 9).ToList());
+        int j = 0;
+        foreach (var scene in story.scenes)
+        {
+            j++;
+
+            if (string.IsNullOrEmpty(scene.name))
+            {
+                scene.name = "Scene " + j;
+            }
+        }
+
+        scenes.SetActive(story.scenes);
         tokenBrowsePanel.SetActive(true);
     }
 
@@ -250,7 +265,7 @@ public class Test : MonoBehaviour
             }
         }
 
-        scenes = scenesSetup.Finalise<int>();
+        scenes = scenesSetup.Finalise<Model.Scene>();
         stories = storiesSetup.Finalise<string>();
         images = imagesSetup.Finalise<ImageResource>();
 

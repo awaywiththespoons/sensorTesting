@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 using Random = UnityEngine.Random;
 
-public class SceneBrowserItem : InstanceView<int> 
+public class SceneBrowserItem : InstanceView<Model.Scene> 
 {
     [SerializeField]
     private Test test;
@@ -20,11 +20,11 @@ public class SceneBrowserItem : InstanceView<int>
 
     private void Awake()
     {
-        selectButton.onClick.AddListener(() => test.OpenScene(config));
+        selectButton.onClick.AddListener(() => test.OpenEditScene(config));
     }
 
     protected override void Configure()
     {
-        nameText.text = string.Format("Edit Scene {0}", config);
+        nameText.text = string.Format("Edit {0}", config.name);
     }
 }
