@@ -32,6 +32,9 @@ public class Test : MonoBehaviour
     private Slider loadingSlider;
 
     [SerializeField]
+    private Text frameCount;
+
+    [SerializeField]
     private GameObject storyBrowsePanel;
     [SerializeField]
     private GameObject tokenBrowsePanel;
@@ -465,12 +468,24 @@ public class Test : MonoBehaviour
 
     public float fps = 4;
 
+    public void AddFrame()
+    {
+        editScene.SetFrameCount(editScene.frameCount + 1);
+    }
+
+    public void SubFrame()
+    {
+        editScene.SetFrameCount(editScene.frameCount - 1);
+    }
+
     private void Update()
     {
         if (scene.config == null)
             return;
 
         timelineSlider.maxValue = editScene.frameCount;
+
+        frameCount.text = string.Format("{0} Key Frames @ {1} KFPS ({2} seconds)", editScene.frameCount, fps, editScene.frameCount * fps);
 
         if (playMode)
         {
