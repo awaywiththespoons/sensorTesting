@@ -485,7 +485,7 @@ public class Test : MonoBehaviour
 
         timelineSlider.maxValue = editScene.frameCount;
 
-        frameCount.text = string.Format("{0} Key Frames @ {1} KFPS ({2} seconds)", editScene.frameCount, fps, editScene.frameCount * fps);
+        frameCount.text = string.Format("{0} Key Frames @ {1} KFPS ({2} seconds)", editScene.frameCount, fps, (editScene.frameCount + 1) / fps);
 
         if (playMode)
         {
