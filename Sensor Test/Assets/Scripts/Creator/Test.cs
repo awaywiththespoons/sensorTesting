@@ -468,6 +468,8 @@ public class Test : MonoBehaviour
         playMode = true;
     }
 
+    public float fps = 4;
+
     private void Update()
     {
         if (scene.config == null)
@@ -476,7 +478,7 @@ public class Test : MonoBehaviour
         if (playMode)
         {
             float time = timelineSlider.value;
-            time += Time.deltaTime * 10;
+            time += Time.deltaTime * fps;
             time %= timelineSlider.maxValue;
             timelineSlider.value = time;
         }
