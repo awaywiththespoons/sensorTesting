@@ -129,6 +129,26 @@ public class Test : MonoBehaviour
         {
             foreach (var image in scene.images)
             {
+                if (image.frameCount > 0)
+                {
+                    image.keyframes.Clear();
+
+                    for (int i = 0; i < image.frameCount; ++i)
+                    {
+                        image.keyframes.Add(new Model.KeyFrame
+                        {
+                            position = image.positions[i],
+                            direction = image.directions[i],
+                            scale = image.scales[i],
+                        });
+                    }
+
+                    image.frameCount = 0;
+                    image.positions.Clear();
+                    image.directions.Clear();
+                    image.scales.Clear();
+                }
+
                 image.sprite = imageResources.Find(r => r.name == image.path).sprite;
             }
         }
@@ -199,8 +219,13 @@ public class Test : MonoBehaviour
 
         float scale = screen.x / graphic.sprite.rect.width * 0.75f;
 
-        graphic.positions[0] = screen * 0.5f;
-        graphic.scales[0] = scale;
+        graphic.keyframes.Add(new Model.KeyFrame
+        {
+            position = screen * 0.5f,
+            scale = scale,
+            direction = 0,
+        });
+
         graphic.SetFrameCount(editScene.frameCount);
 
         selectedImage = graphic;
@@ -318,42 +343,42 @@ public class Test : MonoBehaviour
     {
         int frame = GetFrame();
         
-        initialPosition = selectedImage.positions[frame];
+        initialPosition = selectedImage.keyframes[frame].position;
     }
 
     private void OnPositionDragChange(Vector2 displacement)
     {
         int frame = GetFrame();
 
-        selectedImage.positions[frame] = initialPosition + displacement;
+        selectedImage.keyframes[frame].position = initialPosition + displacement;
     }
 
     private void OnRotationDragBegin()
     {
         int frame = GetFrame();
 
-        initialRotation = selectedImage.directions[frame];
+        initialRotation = selectedImage.keyframes[frame].direction;
     }
 
     private void OnRotationDragChange(Vector2 displacement)
     {
         int frame = GetFrame();
 
-        selectedImage.directions[frame] = initialRotation + displacement.y * 0.001f * 360;
+        selectedImage.keyframes[frame].direction = initialRotation + displacement.y * 0.001f * 360;
     }
 
     private void OnScalingDragBegin()
     {
         int frame = GetFrame();
 
-        initialScaling = selectedImage.scales[frame];
+        initialScaling = selectedImage.keyframes[frame].scale;
     }
 
     private void OnScalingDragChange(Vector2 displacement)
     {
         int frame = GetFrame();
 
-        selectedImage.scales[frame] = initialScaling * Mathf.Pow(4, displacement.y * 0.001f);
+        selectedImage.keyframes[frame].scale = initialScaling * Mathf.Pow(4, displacement.y * 0.001f);
     }
 
     private void OnLayerDragBegin()
@@ -406,9 +431,7 @@ public class Test : MonoBehaviour
         int prev = GetFrame();
         int next = GetFrame(1);
 
-        selectedImage.positions[next] = selectedImage.positions[prev];
-        selectedImage.directions[next] = selectedImage.directions[prev];
-        selectedImage.scales[next] = selectedImage.scales[prev];
+        selectedImage.keyframes[next] = Model.KeyFrame.Copy(selectedImage.keyframes[prev]);
 
         timelineSlider.value = next;
     }
@@ -419,9 +442,7 @@ public class Test : MonoBehaviour
 
         for (int i = prev; i < editScene.frameCount; ++i)
         {
-            selectedImage.positions[i] = selectedImage.positions[prev];
-            selectedImage.directions[i] = selectedImage.directions[prev];
-            selectedImage.scales[i] = selectedImage.scales[prev];
+            selectedImage.keyframes[i] = Model.KeyFrame.Copy(selectedImage.keyframes[prev]);
         }
     }
 

@@ -11,6 +11,24 @@ using Random = UnityEngine.Random;
 namespace Model
 {
     [Serializable]
+    public class KeyFrame
+    {
+        public static KeyFrame Copy(KeyFrame original)
+        {
+            return new KeyFrame
+            {
+                position = original.position,
+                direction = original.direction,
+                scale = original.scale,
+            };
+        }
+
+        public Vector2 position;
+        public float direction;
+        public float scale;
+    }
+
+    [Serializable]
     public partial class Image
     {
         public bool ghost;
@@ -20,42 +38,44 @@ namespace Model
         [NonSerialized]
         public Sprite sprite;
 
+        // obsolete
         public int frameCount;
         public List<Vector2> positions = new List<Vector2> { Vector2.zero };
         public List<float> directions = new List<float> { 0 };
         public List<float> scales = new List<float> { 1 };
+        //
+
+        public List<KeyFrame> keyframes = new List<KeyFrame>();
     }
 
     public partial class Image
     {
         public void SetFrameCount(int frames)
         {
-            frameCount = frames;
-            positions.SetLength(frames);
-            directions.SetLength(frames);
-            scales.SetLength(frames);
-        }
-    }
+            KeyFrame template;
 
-    public static partial class Extensions
-    {
-        public static void SetLength<T>(this IList<T> list, int length)
-        {
-            T value = default(T);
-
-            if (list.Count > 0)
+            if (keyframes.Count > 0)
             {
-                value = list[list.Count - 1];
+                template = keyframes.Last();
+            }
+            else
+            {
+                template = new KeyFrame
+                {
+                    position = Vector2.zero,
+                    direction = 0,
+                    scale = 1,
+                };
             }
 
-            while (list.Count > length)
+            while (keyframes.Count > frames)
             {
-                list.RemoveAt(list.Count - 1);
+                keyframes.RemoveAt(keyframes.Count - 1);
             }
 
-            while (list.Count < length)
+            while (keyframes.Count < frames)
             {
-                list.Add(value);
+                keyframes.Add(KeyFrame.Copy(template));
             }
         }
     }
