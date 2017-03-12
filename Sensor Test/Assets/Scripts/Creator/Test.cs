@@ -300,11 +300,6 @@ public class Test : MonoBehaviour
 
         yield return null;
 
-        editScene.SetFrameCount(15);
-        scene.SetConfig(editScene);
-
-        timelineSlider.maxValue = editScene.frameCount;
-
         positionDrag.OnBegin += OnPositionDragBegin;
         positionDrag.OnDisplacementChanged += OnPositionDragChange;
 
@@ -474,6 +469,8 @@ public class Test : MonoBehaviour
     {
         if (scene.config == null)
             return;
+
+        timelineSlider.maxValue = editScene.frameCount;
 
         if (playMode)
         {
