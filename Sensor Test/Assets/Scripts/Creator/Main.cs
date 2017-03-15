@@ -21,12 +21,22 @@ public class Main : MonoBehaviour
     private InstancePool<ImageResource> images;
 
     [SerializeField]
+    private InstancePoolSetup soundsSetup;
+    private InstancePool<SoundResource> sounds;
+
+    [SerializeField]
     private GameObject objectControls;
 
     public class ImageResource
     {
         public string name;
         public Sprite sprite;
+    }
+
+    public class SoundResource
+    {
+        public string name;
+        public AudioClip sound;
     }
 
     [SerializeField]
@@ -85,6 +95,8 @@ public class Main : MonoBehaviour
     private GameObject toolbarObject;
 
     private List<ImageResource> imageResources = new List<ImageResource>();
+    private Dictionary<string, SoundResource> soundResources 
+        = new Dictionary<string, SoundResource>();
 
     public bool replaceMode;
     public bool previewMode;
@@ -230,6 +242,14 @@ public class Main : MonoBehaviour
         replaceMode = false;
     }
 
+    [SerializeField]
+    private AudioSource audioSource;
+
+    public void SetSoundResource(SoundResource resource)
+    {
+        audioSource.PlayOneShot(resource.sound);
+    }
+
     public void ReplaceImageResource(ImageResource resource)
     {
         selectedImage.sprite = resource.sprite;
@@ -311,6 +331,7 @@ public class Main : MonoBehaviour
         scenes = scenesSetup.Finalise<Model.Scene>();
         stories = storiesSetup.Finalise<string>();
         images = imagesSetup.Finalise<ImageResource>();
+        sounds = soundsSetup.Finalise<SoundResource>();
 
         loadingScreen.SetActive(true);
 
@@ -327,9 +348,8 @@ public class Main : MonoBehaviour
 
         foreach (string file in System.IO.Directory.GetFiles(root))
         {
-            var texture = new Texture2D(1, 1);
-
-            string name = System.IO.Path.GetFileNameWithoutExtension(file);
+            string name = Path.GetFileNameWithoutExtension(file);
+            string type = Path.GetExtension(file);
 
             loadingSlider.maxValue += 1;
 
@@ -337,18 +357,37 @@ public class Main : MonoBehaviour
                                                //read =>
             {
                 //texture.LoadImage(read.data, true);
-                texture.LoadImage(System.IO.File.ReadAllBytes(file), true);
 
-                imageResources.Add(new ImageResource
+                var request = new WWW("file://" + file);
+
+                yield return request;
+
+                if (type == ".png" || type == ".jpg")
+                { 
+                    var texture = new Texture2D(1, 1);
+                    texture.LoadImage(request.bytes, true);
+
+                    imageResources.Add(new ImageResource
+                    {
+                        name = name,
+                        sprite = Sprite.Create(texture,
+                                               Rect.MinMaxRect(0, 0, texture.width, texture.height),
+                                               Vector2.one * 0.5f,
+                                               100,
+                                               0,
+                                               SpriteMeshType.FullRect),
+                    });
+                }
+                else if (type == ".wav" || type == ".ogg")
                 {
-                    name = name,
-                    sprite = Sprite.Create(texture, 
-                                           Rect.MinMaxRect(0, 0, texture.width, texture.height), 
-                                           Vector2.one * 0.5f,
-                                           100,
-                                           0,
-                                           SpriteMeshType.FullRect),
-                });
+                    var clip = request.GetAudioClip(false, false);
+
+                    soundResources.Add(name, new SoundResource
+                    {
+                        name = name,
+                        sound = clip,
+                    });
+                }
 
                 loadingSlider.value += 1;
             }//);
@@ -358,6 +397,7 @@ public class Main : MonoBehaviour
 
         loadingScreen.SetActive(false);
         images.SetActive(imageResources);
+        sounds.SetActive(soundResources.Values);
 
         yield return null;
 
@@ -597,7 +637,7 @@ public class Main : MonoBehaviour
 
         raycasts.Clear();
         raycaster.Raycast(pointer, raycasts);
-        bool valid = raycasts.Count == 0 && !(playingMode || previewMode);
+        bool valid = raycasts.Count == 0 && !playingMode;
 
         int frame = GetFrame();
 
