@@ -570,8 +570,9 @@ public class Main : MonoBehaviour
             scene.images.MapActive((i, view) =>
             {
                 if (view.config.ghost)
+                // TODO: fix
                 {
-                    view.transform.Translate(frame_.position * Screen.dpi / 2.54f - offset);
+                    view.transform.position = view.transform.position + (Vector3) (frame_.position * Screen.dpi / 2.54f - offset);
                     view.transform.Rotate(Vector3.forward * frame_.direction);
                 }
             });
