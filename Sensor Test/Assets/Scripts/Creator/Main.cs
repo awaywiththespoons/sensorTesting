@@ -247,7 +247,7 @@ public class Main : MonoBehaviour
 
     public void SetSoundResource(SoundResource resource)
     {
-        audioSource.PlayOneShot(resource.sound);
+        //audioSource.PlayOneShot(resource.sound);
     }
 
     public void ReplaceImageResource(ImageResource resource)
@@ -346,12 +346,12 @@ public class Main : MonoBehaviour
         loadingSlider.value = 0;
         loadingSlider.maxValue = 0;
 
+        loadingSlider.maxValue = System.IO.Directory.GetFiles(root).Length;
+
         foreach (string file in System.IO.Directory.GetFiles(root))
         {
             string name = Path.GetFileNameWithoutExtension(file);
             string type = Path.GetExtension(file);
-
-            loadingSlider.maxValue += 1;
 
             //ThreadedJob.Run<ThreadedReadBytes>(read => read.path = file,
                                                //read =>

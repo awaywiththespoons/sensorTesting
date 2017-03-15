@@ -16,10 +16,18 @@ public class SoundResourceView : InstanceView<Main.SoundResource>
     private Button selectButton;
     [SerializeField]
     private Text nameText;
+    [SerializeField]
+    private AudioSource source;
 
     private void Start()
     {
-        selectButton.onClick.AddListener(() => test.SetSoundResource(config));
+        selectButton.onClick.AddListener(() =>
+        {
+            source.Stop();
+            source.clip = config.sound;
+            source.Play();
+            test.SetSoundResource(config);
+        });
     }
 
     protected override void Configure()
