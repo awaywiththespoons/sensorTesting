@@ -11,8 +11,11 @@ using Path = System.IO.Path;
 
 using UnityEngine.EventSystems;
 
-public class Test : MonoBehaviour 
+public class Main : MonoBehaviour 
 {
+    [SerializeField]
+    private Sensor sensor;
+
     [SerializeField]
     private InstancePoolSetup imagesSetup;
     private InstancePool<ImageResource> images;
@@ -84,7 +87,24 @@ public class Test : MonoBehaviour
     private List<ImageResource> imageResources = new List<ImageResource>();
 
     public bool replaceMode;
-    public bool playMode;
+    public bool previewMode;
+    public bool playingMode;
+
+    [SerializeField]
+    private Canvas menuCanvas;
+
+    public void PlayStory()
+    {
+        playingMode = true;
+        menuCanvas.gameObject.SetActive(false);
+        PlayRealScene(-1);
+    }
+
+    public void ExitStory()
+    {
+        playingMode = false;
+        menuCanvas.gameObject.SetActive(true);
+    }
 
     public IEnumerable<string> GetStories()
     {
@@ -251,8 +271,31 @@ public class Test : MonoBehaviour
         scene.Refresh();
     }
 
+    private void PlayRealScene(int id)
+    {
+        PlayScene(story.scenes[id + 1]);
+        previewMode = false;
+        timelineSlider.value = 0;
+    }
+
     private IEnumerator Start()
     {
+        sensor.OnTokenClassified += token =>
+        {
+            if (playingMode)
+            {
+                PlayRealScene(token.id);
+            }
+        };
+
+        sensor.OnTokenLifted += () =>
+        {
+            if (playingMode)
+            {
+                PlayRealScene(-1);
+            }
+        };
+
         if (GetStories().Count() == 0)
         {
             for (int i = 0; i < 3; ++i)
@@ -468,7 +511,7 @@ public class Test : MonoBehaviour
     public void StopPreview()
     {
         sceneCreatorHUD.SetActive(true);
-        playMode = false;
+        previewMode = false;
         timelineSlider.value = Mathf.Floor(timelineSlider.value);
     }
 
@@ -478,7 +521,7 @@ public class Test : MonoBehaviour
 
         sceneCreatorHUD.SetActive(false);
 
-        playMode = true;
+        previewMode = true;
     }
 
     public float fps = 4;
@@ -495,6 +538,11 @@ public class Test : MonoBehaviour
 
     private void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.Q))
+        {
+            ExitStory();
+        }
+
         if (scene.config == null)
             return;
 
@@ -502,12 +550,31 @@ public class Test : MonoBehaviour
 
         frameCount.text = string.Format("{0} Key Frames @ {1} KFPS ({2} seconds)", editScene.frameCount, fps, (editScene.frameCount + 1) / fps);
 
-        if (playMode)
+        if (previewMode || playingMode)
         {
             float time = timelineSlider.value;
             time += Time.deltaTime * fps;
             time %= timelineSlider.maxValue;
             timelineSlider.value = time;
+
+            selectedImage = null;
+        }
+
+        scene.SetFrame(timelineSlider.value);
+
+        if (playingMode && sensor.history.Count > 0)
+        {
+            var frame_ = sensor.history.Last();
+            var offset = new Vector2(Screen.width, Screen.height) * 0.5f;
+
+            scene.images.MapActive((i, view) =>
+            {
+                if (view.config.ghost)
+                {
+                    view.transform.Translate(frame_.position * Screen.dpi / 2.54f - offset);
+                    view.transform.Rotate(Vector3.forward * frame_.direction);
+                }
+            });
         }
 
         objectControls.SetActive(selectedImage != null);
@@ -529,7 +596,7 @@ public class Test : MonoBehaviour
 
         raycasts.Clear();
         raycaster.Raycast(pointer, raycasts);
-        bool valid = raycasts.Count == 0;
+        bool valid = raycasts.Count == 0 && !(playingMode || previewMode);
 
         int frame = GetFrame();
 
@@ -583,7 +650,5 @@ public class Test : MonoBehaviour
         {
             view.selected = (view.config == selectedImage);
         });
-
-        scene.SetFrame(timelineSlider.value);
     }
 }

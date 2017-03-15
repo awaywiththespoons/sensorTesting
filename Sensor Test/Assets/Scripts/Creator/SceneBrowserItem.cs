@@ -11,7 +11,7 @@ using Random = UnityEngine.Random;
 public class SceneBrowserItem : InstanceView<Model.Scene> 
 {
     [SerializeField]
-    private Test test;
+    private Main test;
 
     [SerializeField]
     private Text nameText;

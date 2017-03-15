@@ -8,10 +8,10 @@ using System.Collections.Generic;
 
 using Random = UnityEngine.Random;
 
-public class ImageResourceView : InstanceView<Test.ImageResource> 
+public class ImageResourceView : InstanceView<Main.ImageResource> 
 {
     [SerializeField]
-    private Test test;
+    private Main test;
     [SerializeField]
     private Button selectButton;
     [SerializeField]
