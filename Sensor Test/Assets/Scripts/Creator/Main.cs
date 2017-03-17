@@ -13,6 +13,8 @@ using UnityEngine.EventSystems;
 
 public class Main : MonoBehaviour 
 {
+    public Transform ghostReference;
+
     [SerializeField]
     private Sensor sensor;
 
@@ -709,13 +711,17 @@ public class Main : MonoBehaviour
             var frame_ = sensor.history.Last();
             var offset = new Vector2(Screen.width, Screen.height) * 0.5f;
 
+            ghostReference.position = frame_.position * Screen.dpi / 2.54f;
+            ghostReference.eulerAngles = Vector3.forward * frame_.direction;
+
             scene.images.MapActive((i, view) =>
             {
                 if (view.config.ghost)
-                // TODO: fix
                 {
-                    view.transform.position = view.transform.position + (Vector3) (frame_.position * Screen.dpi / 2.54f - offset);
-                    view.transform.Rotate(Vector3.forward * frame_.direction);
+                    Vector3 position = (Vector3) offset - view.transform.position;
+
+                    view.transform.position = ghostReference.TransformPoint(position);
+                    view.transform.Rotate(Vector3.forward, frame_.direction);
                 }
             });
         }
