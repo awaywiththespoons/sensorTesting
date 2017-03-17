@@ -34,6 +34,7 @@ namespace Model
         public bool ghost;
         public string name;
         public string path;
+        public bool text;
 
         [NonSerialized]
         public Sprite sprite;
@@ -79,6 +80,12 @@ namespace Model
             }
         }
     }
+    
+    [Serializable]
+    public class SoundFrame
+    {
+        public List<string> sounds = new List<string>();
+    }
 
     [Serializable]
     public partial class Scene
@@ -86,6 +93,7 @@ namespace Model
         public string name;
         public int frameCount = 5;
         public List<Image> images;
+        public List<SoundFrame> sounds;
     }
 
     public partial class Scene
@@ -97,6 +105,16 @@ namespace Model
             for (int i = 0; i < images.Count; ++i)
             {
                 images[i].SetFrameCount(frames);
+            }
+
+            while (sounds.Count > frames)
+            {
+                sounds.RemoveAt(sounds.Count - 1);
+            }
+
+            while (sounds.Count < frames)
+            {
+                sounds.Add(new SoundFrame());
             }
         }
     }

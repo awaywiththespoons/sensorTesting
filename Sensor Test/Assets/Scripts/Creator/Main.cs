@@ -27,6 +27,9 @@ public class Main : MonoBehaviour
     [SerializeField]
     private GameObject objectControls;
 
+    [SerializeField]
+    private Sprite clearSprite;
+
     public class ImageResource
     {
         public string name;
@@ -46,6 +49,9 @@ public class Main : MonoBehaviour
 
     [SerializeField]
     private Text frameCount;
+
+    [SerializeField]
+    private InputField hiddenInputField;
 
     [SerializeField]
     private GameObject storyBrowsePanel;
@@ -118,6 +124,46 @@ public class Main : MonoBehaviour
         menuCanvas.gameObject.SetActive(true);
     }
 
+    public void ClickedAddText()
+    {
+        if (replaceMode)
+        {
+            selectedImage.path = "text";
+            selectedImage.text = true;
+        }
+        else
+        {
+            var graphic = new Model.Image
+            {
+                path = "some text",
+                sprite = null,
+                name = "text graphic",
+                text = true,
+            };
+
+            editScene.images.Add(graphic);
+
+            var screen = new Vector2(Screen.width, Screen.height);
+
+            graphic.keyframes.Add(new Model.KeyFrame
+            {
+                position = screen * 0.5f,
+                scale = 1,
+                direction = 0,
+            });
+
+            graphic.SetFrameCount(editScene.frameCount);
+
+            selectedImage = graphic;
+
+            scene.Refresh();
+        }
+
+        hiddenInputField.onValueChanged.RemoveAllListeners();
+        hiddenInputField.onValueChanged.AddListener(text => selectedImage.path = hiddenInputField.text);
+        hiddenInputField.Select();
+    }
+
     public IEnumerable<string> GetStories()
     {
         System.IO.Directory.CreateDirectory(Application.persistentDataPath + "/stories/");
@@ -160,7 +206,7 @@ public class Main : MonoBehaviour
         string data = System.IO.File.ReadAllText(path);
         var story = JsonUtility.FromJson<Model.Story>(data);
         story.name = name;
-        
+
         this.story = story;
 
         foreach (var scene in story.scenes)
@@ -187,18 +233,22 @@ public class Main : MonoBehaviour
                     image.scales.Clear();
                 }
 
-                image.sprite = imageResources.Find(r => r.name == image.path).sprite;
+                image.sprite = image.text ? clearSprite : imageResources.Find(r => r.name == image.path).sprite;
             }
+
+            // because data may be missing in old save files...
+            scene.SetFrameCount(scene.frameCount);
         }
 
         for (int i = story.scenes.Count; i < 9; ++i)
         {
-            story.scenes.Add(new Model.Scene
+            var scene = new Model.Scene
             {
                 name = "Scene " + (i + 1),
-                frameCount = 15,
                 images = new List<Model.Image>(),
-            });
+            };
+
+            scene.SetFrameCount(10);
         }
 
         int j = 0;
@@ -245,13 +295,34 @@ public class Main : MonoBehaviour
     [SerializeField]
     private AudioSource audioSource;
 
-    public void SetSoundResource(SoundResource resource)
+    public bool FrameContainsSound(SoundResource resource)
     {
-        //audioSource.PlayOneShot(resource.sound);
+        var sounds = editScene.sounds[GetFrame()];
+
+        return sounds.sounds.Contains(resource.name);
+    }
+
+    public bool ToggleSoundResource(SoundResource resource)
+    {
+        var sounds = editScene.sounds[GetFrame()];
+
+        if (FrameContainsSound(resource))
+        {
+            sounds.sounds.Remove(resource.name);
+
+            return false;
+        }
+        else
+        {
+            sounds.sounds.Add(resource.name);
+
+            return true;
+        }
     }
 
     public void ReplaceImageResource(ImageResource resource)
     {
+        selectedImage.text = false;
         selectedImage.sprite = resource.sprite;
         scene.Refresh();
     }
@@ -296,6 +367,7 @@ public class Main : MonoBehaviour
         PlayScene(story.scenes[id + 1]);
         previewMode = false;
         timelineSlider.value = 0;
+        PlayFrameSounds(0);
     }
 
     private IEnumerator Start()
@@ -422,6 +494,17 @@ public class Main : MonoBehaviour
     private int initialLayer;
 
     private Model.Image selectedImage;
+
+    private int GetFrameFromTime(float time)
+    {
+        int count = editScene.frameCount;
+        int frame = Mathf.CeilToInt(time)
+                  + count;
+
+        frame %= count;
+
+        return frame;
+    }
 
     private int GetFrame(int offset = 0)
     {
@@ -576,6 +659,14 @@ public class Main : MonoBehaviour
         editScene.SetFrameCount(editScene.frameCount - 1);
     }
 
+    private void PlayFrameSounds(int frame)
+    {
+        foreach (var sound in editScene.sounds[GetFrame()].sounds)
+        {
+            audioSource.PlayOneShot(soundResources[sound].sound);
+        }
+    }
+
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.Q))
@@ -592,10 +683,21 @@ public class Main : MonoBehaviour
 
         if (previewMode || playingMode)
         {
-            float time = timelineSlider.value;
+            float prev = timelineSlider.value;
+            float time = prev;
             time += Time.deltaTime * fps;
             time %= timelineSlider.maxValue;
             timelineSlider.value = time;
+
+            int prevFrame = GetFrameFromTime(prev);
+            int nextFrame = GetFrameFromTime(time);
+
+            while (prevFrame != nextFrame)
+            {
+                prevFrame = (prevFrame + 1) % editScene.frameCount;
+
+                PlayFrameSounds(prevFrame);
+            }
 
             selectedImage = null;
         }

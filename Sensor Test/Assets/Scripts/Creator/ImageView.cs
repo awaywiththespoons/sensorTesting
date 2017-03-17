@@ -12,6 +12,8 @@ public class ImageView : InstanceView<Model.Image>
 {
     [SerializeField]
     private Image image;
+    [SerializeField]
+    private Text text;
 
     public bool selected;
 
@@ -25,6 +27,11 @@ public class ImageView : InstanceView<Model.Image>
         {
             image.color = Color.white;
         }
+
+        text.color = image.color;
+
+        text.enabled = config.text;
+        image.enabled = !config.text;
     }
 
     protected override void Configure()
@@ -48,5 +55,7 @@ public class ImageView : InstanceView<Model.Image>
                            * Vector3.forward;
         rtrans.localScale = Mathf.Lerp(prev.scale, next.scale, u)
                           * Vector3.one;
+
+        text.text = config.path;
     }
 }

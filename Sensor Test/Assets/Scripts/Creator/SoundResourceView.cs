@@ -15,6 +15,8 @@ public class SoundResourceView : InstanceView<Main.SoundResource>
     [SerializeField]
     private Button selectButton;
     [SerializeField]
+    private GameObject selectedObject;
+    [SerializeField]
     private Text nameText;
     [SerializeField]
     private AudioSource source;
@@ -26,7 +28,8 @@ public class SoundResourceView : InstanceView<Main.SoundResource>
             source.Stop();
             source.clip = config.sound;
             source.Play();
-            test.SetSoundResource(config);
+            test.ToggleSoundResource(config);
+            Update();
         });
     }
 
@@ -35,5 +38,10 @@ public class SoundResourceView : InstanceView<Main.SoundResource>
         base.Configure();
 
         nameText.text = config.name;
+    }
+    
+    private void Update()
+    {
+        selectedObject.SetActive(test.FrameContainsSound(config));
     }
 }
