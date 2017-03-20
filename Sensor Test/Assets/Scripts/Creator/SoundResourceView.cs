@@ -8,20 +8,29 @@ using System.Collections.Generic;
 
 using Random = UnityEngine.Random;
 
-public class ImageResourceView : InstanceView<Main.ImageResource> 
+public class SoundResourceView : InstanceView<Main.SoundResource> 
 {
     [SerializeField]
     private Main test;
     [SerializeField]
     private Button selectButton;
     [SerializeField]
+    private GameObject selectedObject;
+    [SerializeField]
     private Text nameText;
     [SerializeField]
-    private Image image;
+    private AudioSource source;
 
     private void Start()
     {
-        selectButton.onClick.AddListener(() => test.AddImageResource(config));
+        selectButton.onClick.AddListener(() =>
+        {
+            source.Stop();
+            source.clip = config.sound;
+            source.Play();
+            test.ToggleSoundResource(config);
+            Update();
+        });
     }
 
     protected override void Configure()
@@ -29,6 +38,10 @@ public class ImageResourceView : InstanceView<Main.ImageResource>
         base.Configure();
 
         nameText.text = config.name;
-        image.sprite = config.sprite;
+    }
+    
+    private void Update()
+    {
+        selectedObject.SetActive(test.FrameContainsSound(config));
     }
 }

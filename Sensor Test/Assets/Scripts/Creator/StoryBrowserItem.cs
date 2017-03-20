@@ -11,7 +11,7 @@ using Random = UnityEngine.Random;
 public class StoryBrowserItem : InstanceView<string> 
 {
     [SerializeField]
-    private Test test;
+    private Main test;
 
     [SerializeField]
     private Text nameText;

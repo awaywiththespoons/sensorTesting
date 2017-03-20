@@ -11,60 +11,89 @@ using Random = UnityEngine.Random;
 namespace Model
 {
     [Serializable]
+    public class KeyFrame
+    {
+        public static KeyFrame Copy(KeyFrame original)
+        {
+            return new KeyFrame
+            {
+                position = original.position,
+                direction = original.direction,
+                scale = original.scale,
+            };
+        }
+
+        public Vector2 position;
+        public float direction;
+        public float scale;
+    }
+
+    [Serializable]
     public partial class Image
     {
         public bool ghost;
         public string name;
         public string path;
+        public bool text;
 
         [NonSerialized]
         public Sprite sprite;
 
+        // obsolete
         public int frameCount;
         public List<Vector2> positions = new List<Vector2> { Vector2.zero };
         public List<float> directions = new List<float> { 0 };
         public List<float> scales = new List<float> { 1 };
+        //
+
+        public List<KeyFrame> keyframes = new List<KeyFrame>();
     }
 
     public partial class Image
     {
         public void SetFrameCount(int frames)
         {
-            frameCount = frames;
-            positions.SetLength(frames);
-            directions.SetLength(frames);
-            scales.SetLength(frames);
+            KeyFrame template;
+
+            if (keyframes.Count > 0)
+            {
+                template = keyframes.Last();
+            }
+            else
+            {
+                template = new KeyFrame
+                {
+                    position = Vector2.zero,
+                    direction = 0,
+                    scale = 1,
+                };
+            }
+
+            while (keyframes.Count > frames)
+            {
+                keyframes.RemoveAt(keyframes.Count - 1);
+            }
+
+            while (keyframes.Count < frames)
+            {
+                keyframes.Add(KeyFrame.Copy(template));
+            }
         }
     }
-
-    public static partial class Extensions
+    
+    [Serializable]
+    public class SoundFrame
     {
-        public static void SetLength<T>(this IList<T> list, int length)
-        {
-            T value = default(T);
-
-            if (list.Count > 0)
-            {
-                value = list[list.Count - 1];
-            }
-
-            while (list.Count > length)
-            {
-                list.RemoveAt(list.Count - 1);
-            }
-
-            while (list.Count < length)
-            {
-                list.Add(value);
-            }
-        }
+        public List<string> sounds = new List<string>();
     }
 
     [Serializable]
     public partial class Scene
     {
+        public string name;
         public int frameCount = 5;
         public List<Image> images;
+        public List<SoundFrame> sounds;
     }
 
     public partial class Scene
@@ -76,6 +105,16 @@ namespace Model
             for (int i = 0; i < images.Count; ++i)
             {
                 images[i].SetFrameCount(frames);
+            }
+
+            while (sounds.Count > frames)
+            {
+                sounds.RemoveAt(sounds.Count - 1);
+            }
+
+            while (sounds.Count < frames)
+            {
+                sounds.Add(new SoundFrame());
             }
         }
     }

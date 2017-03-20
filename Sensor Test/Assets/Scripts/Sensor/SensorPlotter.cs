@@ -116,7 +116,7 @@ public class SensorPlotter : MonoBehaviour
             });
         }
 
-        sensor.knowledge.tokens[highlight].directionOffset = directionOffsetSlider.value * 180;
+        //sensor.knowledge.tokens[highlight].directionOffset = directionOffsetSlider.value * 180;
 
         if (trainToggle.isOn && sensor.training == null)
         {

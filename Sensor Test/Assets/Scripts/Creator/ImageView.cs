@@ -12,6 +12,8 @@ public class ImageView : InstanceView<Model.Image>
 {
     [SerializeField]
     private Image image;
+    [SerializeField]
+    private Text text;
 
     public bool selected;
 
@@ -25,6 +27,11 @@ public class ImageView : InstanceView<Model.Image>
         {
             image.color = Color.white;
         }
+
+        text.color = image.color;
+
+        text.enabled = config.text;
+        image.enabled = !config.text;
     }
 
     protected override void Configure()
@@ -37,20 +44,18 @@ public class ImageView : InstanceView<Model.Image>
     {
         var rtrans = transform as RectTransform;
 
-        int next = Mathf.CeilToInt(frame) % config.frameCount;
-        int prev = Mathf.FloorToInt(frame) % config.frameCount;
+        int count = config.keyframes.Count;
+
+        var next = config.keyframes[Mathf.CeilToInt(frame) % count];
+        var prev = config.keyframes[Mathf.FloorToInt(frame) % count];
         float u = frame % 1;
 
-        rtrans.position = Vector2.Lerp(config.positions[prev],
-                                       config.positions[next],
-                                       u);
-        rtrans.eulerAngles = Mathf.LerpAngle(config.directions[prev],
-                                             config.directions[next],
-                                             u)
+        rtrans.position = Vector2.Lerp(prev.position, next.position, u);
+        rtrans.eulerAngles = Mathf.LerpAngle(prev.direction, next.direction, u)
                            * Vector3.forward;
-        rtrans.localScale = Mathf.Lerp(config.scales[prev],
-                                       config.scales[next],
-                                       u)
+        rtrans.localScale = Mathf.Lerp(prev.scale, next.scale, u)
                           * Vector3.one;
+
+        text.text = config.path;
     }
 }
