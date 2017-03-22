@@ -359,6 +359,11 @@ public class Main : MonoBehaviour
 
     public void CreateBlankStory(string name)
     {
+        if (name == "")
+        {
+            name = "Story " + Random.Range(0, 1000);
+        }
+
         var story = new Model.Story
         {
             name = name,
