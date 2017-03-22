@@ -42,6 +42,8 @@ public class SoundResourceView : InstanceView<Main.SoundResource>
     
     private void Update()
     {
-        selectedObject.SetActive(test.FrameContainsSound(config));
+        bool active = (test.BGSoundMode && test.editScene.bgloop == config.name)
+                   || test.FrameContainsSound(config);
+        selectedObject.SetActive(active);
     }
 }

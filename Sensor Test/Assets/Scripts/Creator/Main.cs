@@ -127,6 +127,7 @@ public class Main : MonoBehaviour
     {
         playingMode = false;
         menuCanvas.gameObject.SetActive(true);
+        audioSource.Stop();
     }
 
     public void ClickedAddText()
@@ -280,6 +281,8 @@ public class Main : MonoBehaviour
     [SerializeField]
     private AudioSource audioSource;
 
+    public bool BGSoundMode;
+
     public bool FrameContainsSound(SoundResource resource)
     {
         var sounds = editScene.sounds[GetFrame()];
@@ -287,8 +290,34 @@ public class Main : MonoBehaviour
         return sounds.sounds.Contains(resource.name);
     }
 
+    public void SetBGMMode()
+    {
+        BGSoundMode = true;
+    }
+
+    public void CancelBGMMode()
+    {
+        BGSoundMode = false;
+    }
+
     public bool ToggleSoundResource(SoundResource resource)
     {
+        if (BGSoundMode)
+        {
+            if (editScene.bgloop != resource.name)
+            {
+                editScene.bgloop = resource.name;
+                PlayBGLoop(resource);
+            }
+            else
+            {
+                editScene.bgloop = "";
+                audioSource.Stop();
+            }
+
+            return false;
+        }
+
         var sounds = editScene.sounds[GetFrame()];
 
         if (FrameContainsSound(resource))
@@ -634,6 +663,7 @@ public class Main : MonoBehaviour
         sceneCreatorHUD.SetActive(true);
         previewMode = false;
         timelineSlider.value = Mathf.Floor(timelineSlider.value);
+        audioSource.Stop();
     }
 
     public void PlayScene(Model.Scene scene)
@@ -643,6 +673,9 @@ public class Main : MonoBehaviour
         sceneCreatorHUD.SetActive(false);
 
         previewMode = true;
+
+        audioSource.clip = soundResources[editScene.bgloop].sound;
+        audioSource.Play();
     }
 
     public float fps = 4;
@@ -691,11 +724,11 @@ public class Main : MonoBehaviour
     {
         GetInput(name, OnComplete: text =>
         {
-            string prev = string.Format("{0}/stories/{1}.json", 
-                                        Application.persistentDataPath, 
+            string prev = string.Format("{0}/stories/{1}.json",
+                                        Application.persistentDataPath,
                                         name);
-            string next = string.Format("{0}/stories/{1}.json", 
-                                        Application.persistentDataPath, 
+            string next = string.Format("{0}/stories/{1}.json",
+                                        Application.persistentDataPath,
                                         text);
 
             try
@@ -710,6 +743,12 @@ public class Main : MonoBehaviour
 
             stories.SetActive(GetStories());
         });
+    }
+
+    public void PlayBGLoop(SoundResource resource)
+    {
+        audioSource.clip = resource.sound;
+        audioSource.Play();
     }
 
     private void Update()
