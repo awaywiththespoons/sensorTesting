@@ -17,6 +17,9 @@ public class SensorPlotter : MonoBehaviour
     private ParticleSystem plotSystem;
 
     [SerializeField]
+    private Transform rotate;
+
+    [SerializeField]
     private Text activeIDText;
     [SerializeField]
     private Toggle trainToggle;
@@ -108,6 +111,8 @@ public class SensorPlotter : MonoBehaviour
 
     private void LateUpdate()
     {
+        rotate.Rotate(Vector3.up, Time.deltaTime * 45);
+
         for (int i = sensor.knowledge.tokens.Count; i < 9; ++i)
         {
             sensor.knowledge.tokens.Add(new Sensor.Token

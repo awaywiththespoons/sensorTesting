@@ -32,6 +32,9 @@ public class Main : MonoBehaviour
     [SerializeField]
     private Sprite clearSprite;
 
+    [SerializeField]
+    private Text soundCountText;
+
     public class ImageResource
     {
         public string name;
@@ -215,26 +218,6 @@ public class Main : MonoBehaviour
         {
             foreach (var image in scene.images)
             {
-                if (image.frameCount > 0)
-                {
-                    image.keyframes.Clear();
-
-                    for (int i = 0; i < image.frameCount; ++i)
-                    {
-                        image.keyframes.Add(new Model.KeyFrame
-                        {
-                            position = image.positions[i],
-                            direction = image.directions[i],
-                            scale = image.scales[i],
-                        });
-                    }
-
-                    image.frameCount = 0;
-                    image.positions.Clear();
-                    image.directions.Clear();
-                    image.scales.Clear();
-                }
-
                 image.sprite = image.text ? clearSprite : imageResources.Find(r => r.name == image.path).sprite;
             }
 
@@ -374,6 +357,18 @@ public class Main : MonoBehaviour
         PlayFrameSounds(0);
     }
 
+    public void CreateBlankStory(string name)
+    {
+        var story = new Model.Story
+        {
+            name = name,
+            scenes = new List<Model.Scene>(),
+        };
+
+        SaveStory(story);
+        stories.SetActive(GetStories());
+    }
+
     private IEnumerator Start()
     {
         sensor.OnTokenClassified += token =>
@@ -392,22 +387,18 @@ public class Main : MonoBehaviour
             }
         };
 
-        if (GetStories().Count() == 0)
-        {
-            for (int i = 0; i < 3; ++i)
-            {
-                SaveStory(new Model.Story
-                {
-                    name = "story" + i,
-                    scenes = new List<Model.Scene>(),
-                });
-            }
-        }
-
         scenes = scenesSetup.Finalise<Model.Scene>();
         stories = storiesSetup.Finalise<string>();
         images = imagesSetup.Finalise<ImageResource>();
         sounds = soundsSetup.Finalise<SoundResource>();
+
+        if (GetStories().Count() == 0)
+        {
+            for (int i = 0; i < 3; ++i)
+            {
+                CreateBlankStory("Blank Story " + (i + 1));
+            }
+        }
 
         loadingScreen.SetActive(true);
 
@@ -680,6 +671,8 @@ public class Main : MonoBehaviour
 
         if (scene.config == null)
             return;
+
+        soundCountText.text = editScene.sounds[GetFrame()].sounds.Count.ToString();
 
         timelineSlider.maxValue = editScene.frameCount;
 

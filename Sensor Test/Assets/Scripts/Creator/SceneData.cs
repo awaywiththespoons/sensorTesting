@@ -39,13 +39,6 @@ namespace Model
         [NonSerialized]
         public Sprite sprite;
 
-        // obsolete
-        public int frameCount;
-        public List<Vector2> positions = new List<Vector2> { Vector2.zero };
-        public List<float> directions = new List<float> { 0 };
-        public List<float> scales = new List<float> { 1 };
-        //
-
         public List<KeyFrame> keyframes = new List<KeyFrame>();
     }
 
