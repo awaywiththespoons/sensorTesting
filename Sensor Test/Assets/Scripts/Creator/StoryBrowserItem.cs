@@ -17,10 +17,13 @@ public class StoryBrowserItem : InstanceView<string>
     private Text nameText;
     [SerializeField]
     private Button selectButton;
+    [SerializeField]
+    private Button renameButton;
 
     private void Awake()
     {
         selectButton.onClick.AddListener(() => test.OpenStory(config));
+        renameButton.onClick.AddListener(() => test.RenameStory(config));
     }
 
     protected override void Configure()

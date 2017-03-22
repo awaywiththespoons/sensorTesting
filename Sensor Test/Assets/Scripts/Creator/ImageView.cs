@@ -31,7 +31,13 @@ public class ImageView : InstanceView<Model.Image>
         text.color = image.color;
 
         text.enabled = config.text;
-        image.enabled = !config.text;
+        image.color = new Color(1, 1, 1, config.text ? 0 : 1);
+
+        if (config.text)
+        {
+            image.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, text.preferredWidth);
+            image.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, text.preferredHeight);
+        }
     }
 
     protected override void Configure()

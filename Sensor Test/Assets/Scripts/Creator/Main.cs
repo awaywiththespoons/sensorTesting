@@ -164,9 +164,7 @@ public class Main : MonoBehaviour
             scene.Refresh();
         }
 
-        hiddenInputField.onValueChanged.RemoveAllListeners();
-        hiddenInputField.onValueChanged.AddListener(text => selectedImage.path = hiddenInputField.text);
-        hiddenInputField.Select();
+        GetInput(selectedImage.path, OnChanged: text => selectedImage.path = hiddenInputField.text);
     }
 
     public IEnumerable<string> GetStories()
@@ -665,6 +663,53 @@ public class Main : MonoBehaviour
         {
             audioSource.PlayOneShot(soundResources[sound].sound);
         }
+    }
+
+    public void GetInput(string prev, 
+                         Action<string> OnChanged = null,
+                         Action<string> OnComplete = null)
+    {
+        hiddenInputField.onValueChanged.RemoveAllListeners();
+        hiddenInputField.onEndEdit.RemoveAllListeners();
+
+        hiddenInputField.text = prev;
+
+        if (OnChanged != null)
+        {
+            hiddenInputField.onValueChanged.AddListener(text => OnChanged(text));
+        }
+
+        if (OnComplete != null)
+        {
+            hiddenInputField.onEndEdit.AddListener(text => OnComplete(text));
+        }
+
+        hiddenInputField.Select();
+    }
+
+    public void RenameStory(string name)
+    {
+        GetInput(name, OnComplete: text =>
+        {
+            string prev = string.Format("{0}/stories/{1}.json", 
+                                        Application.persistentDataPath, 
+                                        name);
+            string next = string.Format("{0}/stories/{1}.json", 
+                                        Application.persistentDataPath, 
+                                        text);
+
+            try
+            {
+                System.IO.File.Move(prev, next);
+            }
+            catch (Exception e)
+            {
+                Debug.LogFormat("Couldn't rename!");
+                Debug.LogException(e);
+            }
+
+            stories.SetActive(GetStories());
+        });
     }
 
     private void Update()
