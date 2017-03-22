@@ -10,7 +10,12 @@ using Random = UnityEngine.Random;
 
 using UnityEngine.EventSystems;
 
-public class DragListener : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
+public class DragListener : MonoBehaviour, 
+                            IPointerDownHandler,
+                            IPointerUpHandler,
+                            IBeginDragHandler, 
+                            IDragHandler, 
+                            IEndDragHandler
 {
     [SerializeField]
     private CanvasGroup group;
@@ -20,6 +25,20 @@ public class DragListener : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
     public event Action OnEnd = delegate { };
 
     public bool dragging;
+
+    void IPointerDownHandler.OnPointerDown(PointerEventData eventData)
+    {
+        dragging = true;
+        group.ignoreParentGroups = true;
+        group.alpha = 0.5f;
+    }
+
+    void IPointerUpHandler.OnPointerUp(PointerEventData eventData)
+    {
+        dragging = false;
+        group.ignoreParentGroups = false;
+        group.alpha = 1f;
+    }
 
     void IBeginDragHandler.OnBeginDrag(PointerEventData eventData)
     {
