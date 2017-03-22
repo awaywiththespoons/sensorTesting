@@ -250,6 +250,8 @@ public class Main : MonoBehaviour
                 images = new List<Model.Image>(),
             };
 
+            story.scenes.Add(scene);
+
             scene.SetFrameCount(10);
         }
 

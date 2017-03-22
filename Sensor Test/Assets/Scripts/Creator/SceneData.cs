@@ -93,7 +93,7 @@ namespace Model
         public string name;
         public int frameCount = 5;
         public List<Image> images;
-        public List<SoundFrame> sounds;
+        public List<SoundFrame> sounds = new List<SoundFrame>();
     }
 
     public partial class Scene
