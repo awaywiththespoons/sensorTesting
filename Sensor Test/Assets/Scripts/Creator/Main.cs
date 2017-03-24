@@ -777,13 +777,22 @@ public class Main : MonoBehaviour
         string prev = string.Format("{0}/stories/{1}.json",
                                     Application.persistentDataPath,
                                     name);
-        string next = string.Format("{0}/stories/deleted/{1}.json",
+        string next = string.Format("{0}/stories/deleted/{1}-{2}.json",
                                     Application.persistentDataPath,
-                                    name);
+                                    name,
+                                    DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss"));
 
         System.IO.Directory.CreateDirectory(del);
 
-        System.IO.File.Move(prev, next);
+        try
+        {
+            System.IO.File.Move(prev, next);
+        }
+        catch (Exception e)
+        {
+            Debug.LogErrorFormat("Couldn't move '{0}' to '{1}' during delete", prev, next);
+            Debug.LogException(e);
+        }
 
         stories.SetActive(GetStories());
     }
