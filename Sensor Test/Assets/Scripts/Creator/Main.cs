@@ -388,7 +388,23 @@ public class Main : MonoBehaviour
     {
         if (name == "")
         {
-            name = "Story " + Random.Range(0, 1000);
+            int i = 1;
+
+            while (true)
+            {
+                name = "Blank Story " + i;
+
+                string path = string.Format("{0}/stories/{1}.json", 
+                                            Application.persistentDataPath,
+                                            name);
+
+                i += 1;
+
+                if (!System.IO.File.Exists(path))
+                {
+                    break;
+                }
+            }
         }
 
         var story = new Model.Story
@@ -743,6 +759,25 @@ public class Main : MonoBehaviour
 
             stories.SetActive(GetStories());
         });
+    }
+
+    public void RemoveStory(string name)
+    {
+        string del = string.Format("{0}/stories/deleted/",
+                                   Application.persistentDataPath);
+
+        string prev = string.Format("{0}/stories/{1}.json",
+                                    Application.persistentDataPath,
+                                    name);
+        string next = string.Format("{0}/stories/deleted/{1}.json",
+                                    Application.persistentDataPath,
+                                    name);
+
+        System.IO.Directory.CreateDirectory(del);
+
+        System.IO.File.Move(prev, next);
+
+        stories.SetActive(GetStories());
     }
 
     public void PlayBGLoop(SoundResource resource)

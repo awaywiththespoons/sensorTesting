@@ -19,11 +19,14 @@ public class StoryBrowserItem : InstanceView<string>
     private Button selectButton;
     [SerializeField]
     private Button renameButton;
+    [SerializeField]
+    private Button deleteButton;
 
     private void Awake()
     {
         selectButton.onClick.AddListener(() => test.OpenStory(config));
         renameButton.onClick.AddListener(() => test.RenameStory(config));
+        deleteButton.onClick.AddListener(() => test.RemoveStory(config));
     }
 
     protected override void Configure()
