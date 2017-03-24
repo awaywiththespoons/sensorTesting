@@ -126,6 +126,7 @@ public class Main : MonoBehaviour
     public void ExitStory()
     {
         playingMode = false;
+        previewMode = false;
         menuCanvas.gameObject.SetActive(true);
         audioSource.Stop();
     }
@@ -690,8 +691,15 @@ public class Main : MonoBehaviour
 
         previewMode = true;
 
-        audioSource.clip = soundResources[editScene.bgloop].sound;
-        audioSource.Play();
+        try
+        {
+            audioSource.clip = soundResources[editScene.bgloop].sound;
+            audioSource.Play();
+        }
+        catch (Exception e)
+        {
+            Debug.LogFormat("Couldn't play background loop");
+        }
     }
 
     public float fps = 4;
