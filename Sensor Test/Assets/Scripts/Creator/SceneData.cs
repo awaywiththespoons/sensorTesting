@@ -84,6 +84,7 @@ namespace Model
     [Serializable]
     public partial class Scene
     {
+        public int index;
         public string name;
         public int frameCount = 5;
         public List<Image> images;

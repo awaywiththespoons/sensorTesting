@@ -238,11 +238,11 @@ public class Main : MonoBehaviour
             scene.SetFrameCount(scene.frameCount);
         }
 
-        for (int i = 0; i < 9; ++i)
+        for (int i = story.scenes.Count; i < 9; ++i)
         {
             var scene = new Model.Scene
             {
-                name = "Scene " + i,
+                name = "Unnamed",
                 images = new List<Model.Image>(),
             };
 
@@ -251,7 +251,10 @@ public class Main : MonoBehaviour
             scene.SetFrameCount(10);
         }
 
-        story.scenes[0].name = "Inactivity Scene";
+        for (int i = 0; i < 9; ++i)
+        {
+            story.scenes[i].index = i;
+        }
 
         int j = 0;
         foreach (var scene in story.scenes)

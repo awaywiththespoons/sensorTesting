@@ -25,6 +25,8 @@ public class SceneBrowserItem : InstanceView<Model.Scene>
 
     protected override void Configure()
     {
-        nameText.text = string.Format("Edit {0}", config.name);
+        nameText.text = string.Format("{1}: {0}", 
+                                      config.name, 
+                                      config.index == 0 ? "Inactivity" : config.index.ToString());
     }
 }
