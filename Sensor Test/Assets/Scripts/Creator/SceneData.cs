@@ -26,6 +26,7 @@ namespace Model
         public Vector2 position;
         public float direction;
         public float scale;
+        public bool hide = false;
     }
 
     [Serializable]

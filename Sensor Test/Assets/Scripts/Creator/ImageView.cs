@@ -11,11 +11,14 @@ using Random = UnityEngine.Random;
 public class ImageView : InstanceView<Model.Image> 
 {
     [SerializeField]
+    private Main main;
+    [SerializeField]
     private Image image;
     [SerializeField]
     private Text text;
 
     public bool selected;
+    public bool hidden;
 
     private void Update()
     {
@@ -32,6 +35,14 @@ public class ImageView : InstanceView<Model.Image>
 
         text.enabled = config.text;
         image.color *= new Color(1, 1, 1, config.text ? 0 : 1);
+
+        if (hidden)
+        {
+            float value = main.previewMode ? 0 : 0.25f;
+
+            image.color *= value;
+            text.color *= value;
+        }
 
         if (config.text)
         {
@@ -63,5 +74,7 @@ public class ImageView : InstanceView<Model.Image>
                           * Vector3.one;
 
         text.text = config.path;
+
+        hidden = prev.hide;
     }
 }

@@ -81,6 +81,8 @@ public class Main : MonoBehaviour
     private DragListener layerDrag;
     [SerializeField]
     private Toggle ghostToggle;
+    [SerializeField]
+    private Toggle hideToggle;
 
     [SerializeField]
     private CanvasGroup fadeGroup;
@@ -166,12 +168,18 @@ public class Main : MonoBehaviour
             graphic.SetFrameCount(editScene.frameCount);
 
             selectedImage = graphic;
-            ghostToggle.isOn = selectedImage.ghost;
+            SetTogglesFromSelectedFrame();
 
             scene.Refresh();
         }
 
         GetInput(selectedImage.path, OnChanged: text => selectedImage.path = hiddenInputField.text);
+    }
+
+    private void SetTogglesFromSelectedFrame()
+    {
+        ghostToggle.isOn = selectedImage.ghost;
+        hideToggle.isOn = selectedImage.keyframes[GetFrame()].hide;
     }
 
     public IEnumerable<string> GetStories()
@@ -380,7 +388,7 @@ public class Main : MonoBehaviour
         graphic.SetFrameCount(editScene.frameCount);
 
         selectedImage = graphic;
-        ghostToggle.isOn = selectedImage.ghost;
+        SetTogglesFromSelectedFrame();
 
         scene.Refresh();
     }
@@ -637,11 +645,13 @@ public class Main : MonoBehaviour
     public void StepBack()
     {
         timelineSlider.value = Mathf.CeilToInt(timelineSlider.value + editScene.frameCount - 1) % editScene.frameCount;
+        SetTogglesFromSelectedFrame();
     }
 
     public void StepForward()
     {
         timelineSlider.value = Mathf.FloorToInt(timelineSlider.value + 1) % editScene.frameCount;
+        SetTogglesFromSelectedFrame();
     }
 
     private List<RaycastResult> raycasts = new List<RaycastResult>();
@@ -664,7 +674,7 @@ public class Main : MonoBehaviour
 
         selectedImage.keyframes[next] = Model.KeyFrame.Copy(selectedImage.keyframes[prev]);
 
-        timelineSlider.value = next;
+        StepForward();
     }
 
     public void CopyForwardToEndSelected()
@@ -928,7 +938,7 @@ public class Main : MonoBehaviour
 
             if (selectedImage != null)
             {
-                ghostToggle.isOn = selectedImage.ghost;
+                SetTogglesFromSelectedFrame();
             }
 
             toolbarObject.SetActive(true);
@@ -937,6 +947,7 @@ public class Main : MonoBehaviour
         if (selectedImage != null)
         {
             selectedImage.ghost = ghostToggle.isOn;
+            selectedImage.keyframes[GetFrame()].hide = hideToggle.isOn;
         }
 
         scene.images.MapActive((i, view) =>
