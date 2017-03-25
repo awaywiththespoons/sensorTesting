@@ -31,7 +31,7 @@ public class ImageView : InstanceView<Model.Image>
         text.color = image.color;
 
         text.enabled = config.text;
-        image.color = new Color(1, 1, 1, config.text ? 0 : 1);
+        image.color *= new Color(1, 1, 1, config.text ? 0 : 1);
 
         if (config.text)
         {

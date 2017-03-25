@@ -166,6 +166,7 @@ public class Main : MonoBehaviour
             graphic.SetFrameCount(editScene.frameCount);
 
             selectedImage = graphic;
+            ghostToggle.isOn = selectedImage.ghost;
 
             scene.Refresh();
         }
@@ -379,6 +380,7 @@ public class Main : MonoBehaviour
         graphic.SetFrameCount(editScene.frameCount);
 
         selectedImage = graphic;
+        ghostToggle.isOn = selectedImage.ghost;
 
         scene.Refresh();
     }
@@ -710,14 +712,14 @@ public class Main : MonoBehaviour
 
     public float fps = 4;
 
-    public void AddFrame()
+    public void AddFrame(int count)
     {
-        editScene.SetFrameCount(editScene.frameCount + 1);
+        editScene.SetFrameCount(editScene.frameCount + count);
     }
 
-    public void SubFrame()
+    public void SubFrame(int count)
     {
-        editScene.SetFrameCount(editScene.frameCount - 1);
+        editScene.SetFrameCount(Math.Max(1, editScene.frameCount - count));
     }
 
     private void PlayFrameSounds(int frame)
