@@ -203,6 +203,11 @@ public class Main : MonoBehaviour
         sceneCreatorHUD.SetActive(true);
     }
 
+    public void RenameScene(Model.Scene scene)
+    {
+        GetInput(scene.name, change => { scene.name = change; scenes.Refresh(); }, change => SaveStory(story));
+    }
+
     public void OpenScene(Model.Scene scene)
     {
         editScene = scene;

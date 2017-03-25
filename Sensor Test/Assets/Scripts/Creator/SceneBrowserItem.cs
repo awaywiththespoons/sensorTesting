@@ -17,13 +17,21 @@ public class SceneBrowserItem : InstanceView<Model.Scene>
     private Text nameText;
     [SerializeField]
     private Button selectButton;
+    [SerializeField]
+    private Button renameButton;
 
     private void Awake()
     {
         selectButton.onClick.AddListener(() => test.OpenEditScene(config));
+        renameButton.onClick.AddListener(() => test.RenameScene(config));
     }
 
     protected override void Configure()
+    {
+        Refresh();
+    }
+
+    public override void Refresh()
     {
         nameText.text = string.Format("{1}: {0}", 
                                       config.name, 
