@@ -12,6 +12,9 @@ public class Sensor : MonoBehaviour
 {
 	[SerializeField]
 	private bool debugging;
+	[SerializeField]
+	[Range(0, 5)]
+	private float removeTimeout = .25f;
 
     [Serializable]
     public class Knowledge
@@ -144,7 +147,7 @@ public class Sensor : MonoBehaviour
             tokenTimeout = 0;
         }
 
-        if (tokenTimeout > .25f)
+		if (tokenTimeout > removeTimeout)
         {
             tokenTimeout = 0;
             detected = null;
