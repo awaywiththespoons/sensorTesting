@@ -32,14 +32,12 @@ public class SensorPlotter : MonoBehaviour
     {
         highlight = Mathf.Max(highlight - 1, 0);
         sensor.SetClassify();
-        directionOffsetSlider.value = sensor.knowledge.tokens[highlight].directionOffset;
     }
 
     public void Next()
     {
         highlight = Math.Min(highlight + 1, 8);
         sensor.SetClassify();
-        directionOffsetSlider.value = sensor.knowledge.tokens[highlight].directionOffset;
     }
 
     public void Clear()
@@ -128,7 +126,7 @@ public class SensorPlotter : MonoBehaviour
             trainToggle.isOn = false;
         }
 
-        activeIDText.text = highlight.ToString();
+        activeIDText.text = (highlight + 1).ToString();
 
         int count = sensor.allTraining.Count * 3;
 

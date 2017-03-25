@@ -135,7 +135,11 @@ public class Main : MonoBehaviour
     {
         if (replaceMode)
         {
-            selectedImage.path = "text";
+            if (!selectedImage.text)
+            {
+                selectedImage.path = "text";
+            }
+
             selectedImage.text = true;
         }
         else
@@ -225,11 +229,11 @@ public class Main : MonoBehaviour
             scene.SetFrameCount(scene.frameCount);
         }
 
-        for (int i = story.scenes.Count; i < 9; ++i)
+        for (int i = 0; i < 9; ++i)
         {
             var scene = new Model.Scene
             {
-                name = "Scene " + (i + 1),
+                name = "Scene " + i,
                 images = new List<Model.Image>(),
             };
 
@@ -237,6 +241,8 @@ public class Main : MonoBehaviour
 
             scene.SetFrameCount(10);
         }
+
+        story.scenes[0].name = "Inactivity Scene";
 
         int j = 0;
         foreach (var scene in story.scenes)
