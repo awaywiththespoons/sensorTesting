@@ -442,23 +442,26 @@ public class Main : MonoBehaviour
         stories.SetActive(GetStories());
     }
 
+    private bool debuggingToken;
+    [ContextMenu("Test Scene 1")]
+    private void TestScene1()
+    {
+        SetActiveToken(0);
+        debuggingToken = true;
+    }
+
+    private void SetActiveToken(int id)
+    {
+        if (playingMode)
+        {
+            PlayRealScene(id);
+        }
+    }
+
     private IEnumerator Start()
     {
-        sensor.OnTokenClassified += token =>
-        {
-            if (playingMode)
-            {
-                PlayRealScene(token.id);
-            }
-        };
-
-        sensor.OnTokenLifted += () =>
-        {
-            if (playingMode)
-            {
-                PlayRealScene(-1);
-            }
-        };
+        sensor.OnTokenClassified += token => SetActiveToken(token.id);
+        sensor.OnTokenLifted += () => PlayRealScene(-1);
 
         scenes = scenesSetup.Finalise<Model.Scene>();
         stories = storiesSetup.Finalise<string>();
@@ -829,6 +832,10 @@ public class Main : MonoBehaviour
         audioSource.Play();
     }
 
+    public Vector2 tokenPosition;
+    [Range(0, 360)]
+    public float tokenDirection;
+
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.Q))
@@ -868,13 +875,19 @@ public class Main : MonoBehaviour
 
         scene.SetFrame(timelineSlider.value);
 
-        if (playingMode && sensor.history.Count > 0)
+        if (playingMode)
         {
-            var frame_ = sensor.history.Last();
+            if (sensor.history.Any())
+            {
+                var frame_ = sensor.history.Last();
+                tokenPosition = frame_.position * Screen.dpi / 2.54f;
+                tokenDirection = frame_.direction;
+            }
+            
             var offset = new Vector2(Screen.width, Screen.height) * 0.5f;
 
-            ghostReference.position = frame_.position * Screen.dpi / 2.54f;
-            ghostReference.eulerAngles = Vector3.forward * frame_.direction;
+            ghostReference.position = tokenPosition;
+            ghostReference.eulerAngles = Vector3.forward * tokenDirection;
 
             scene.images.MapActive((i, view) =>
             {
@@ -882,8 +895,8 @@ public class Main : MonoBehaviour
                 {
                     Vector3 position = (Vector3) offset - view.transform.position;
 
-                    view.transform.position = ghostReference.TransformPoint(position);
-                    view.transform.Rotate(Vector3.forward, frame_.direction);
+                    view.transform.position = tokenPosition - (Vector2) (ghostReference.rotation * position);
+                    view.transform.Rotate(Vector3.forward, tokenDirection);
                 }
             });
         }
