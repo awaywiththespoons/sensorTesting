@@ -728,6 +728,7 @@ public class Main : MonoBehaviour
         catch (Exception e)
         {
             Debug.LogFormat("Couldn't play background loop");
+            audioSource.Stop();
         }
     }
 
