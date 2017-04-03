@@ -78,7 +78,6 @@ public class Sensor : MonoBehaviour
 
     public void SetTraining(Token token)
     {
-        knowledge.tokens.Add(token);
         training = token;
     }
 
@@ -100,9 +99,19 @@ public class Sensor : MonoBehaviour
     {
         Reset();
 
-        string data = System.IO.File.ReadAllText(Application.persistentDataPath + "/training.json");
+        try
+        {
+            string data = System.IO.File.ReadAllText(Application.persistentDataPath + "/training.json");
 
-        knowledge = JsonUtility.FromJson<Knowledge>(data);
+            knowledge = JsonUtility.FromJson<Knowledge>(data);
+        }
+        catch (Exception exception)
+        {
+            Debug.LogFormat("Couldn't load training!");
+            Debug.LogException(exception);
+
+            knowledge = new Knowledge();
+        }
 
         ReduceNoise();
 
