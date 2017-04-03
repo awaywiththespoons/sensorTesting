@@ -21,12 +21,15 @@ public class StoryBrowserItem : InstanceView<string>
     private Button renameButton;
     [SerializeField]
     private Button deleteButton;
+    [SerializeField]
+    private Button duplicateButton;
 
     private void Awake()
     {
         selectButton.onClick.AddListener(() => test.OpenStory(config));
         renameButton.onClick.AddListener(() => test.RenameStory(config));
         deleteButton.onClick.AddListener(() => test.RemoveStory(config));
+        duplicateButton.onClick.AddListener(() => test.DuplicateStory(config));
     }
 
     protected override void Configure()

@@ -220,18 +220,28 @@ public class Main : MonoBehaviour
     {
         System.IO.Directory.CreateDirectory(Application.persistentDataPath + "/stories/");
 
+        string path = "";
+
+        try
+        {
+            path = string.Format("{0}/stories/{1}.json", 
+                                 Application.persistentDataPath, 
+                                 name);
+
+            string data = System.IO.File.ReadAllText(path);
+            story = JsonUtility.FromJson<Model.Story>(data);
+        }
+        catch (Exception exception)
+        {
+            Debug.LogFormat("Failed loading '{0}'", path);
+            Debug.LogException(exception);
+            return;
+        }
+        
         storyBrowsePanel.SetActive(false);
 
-        string path = string.Format("{0}/stories/{1}.json", 
-                                    Application.persistentDataPath, 
-                                    name);
-
-        string data = System.IO.File.ReadAllText(path);
-        var story = JsonUtility.FromJson<Model.Story>(data);
         story.name = name;
-
-        this.story = story;
-
+        
         foreach (var scene in story.scenes)
         {
             foreach (var image in scene.images)
@@ -480,7 +490,7 @@ public class Main : MonoBehaviour
         foreach (string file in System.IO.Directory.GetFiles(root))
         {
             string name = Path.GetFileNameWithoutExtension(file);
-            string type = Path.GetExtension(file);
+            string type = Path.GetExtension(file).ToLower();
 
             //ThreadedJob.Run<ThreadedReadBytes>(read => read.path = file,
                                                //read =>
@@ -812,6 +822,35 @@ public class Main : MonoBehaviour
 
             stories.SetActive(GetStories());
         });
+    }
+
+    public void DuplicateStory(string name)
+    {
+        string prev = string.Format("{0}/stories/{1}.json",
+                                    Application.persistentDataPath,
+                                    name);
+        string next = prev;
+
+        while (System.IO.File.Exists(next))
+        {
+            name += "-c";
+
+            next = string.Format("{0}/stories/{1}.json",
+                                 Application.persistentDataPath,
+                                 name);
+        }
+
+        try
+        {
+            System.IO.File.Copy(prev, next);
+        }
+        catch (Exception e)
+        {
+            Debug.LogErrorFormat("Couldn't copy '{0}' to '{1}' during copy", prev, next);
+            Debug.LogException(e);
+        }
+
+        stories.SetActive(GetStories());
     }
 
     public void RemoveStory(string name)
