@@ -452,6 +452,8 @@ public class Main : MonoBehaviour
 
     private void SetActiveToken(int id)
     {
+        inactivityTime = 0;
+
         if (playingMode)
         {
             PlayRealScene(id);
@@ -532,10 +534,15 @@ public class Main : MonoBehaviour
         StartCoroutine(ImportResources());
     }
 
+    [Range(0, 25)]
+    [SerializeField]
+    private float inactivityTimeout = 1f;
+    private float inactivityTime;
+
     private IEnumerator Start()
     {
         sensor.OnTokenClassified += token => SetActiveToken(token.id);
-        sensor.OnTokenLifted += () => PlayRealScene(-1);
+        //sensor.OnTokenLifted += () => PlayRealScene(-1);
 
         scenes = scenesSetup.Finalise<Model.Scene>();
         stories = storiesSetup.Finalise<string>();
@@ -863,6 +870,18 @@ public class Main : MonoBehaviour
 
         if (previewMode || playingMode)
         {
+            if (playingMode && sensor.detected == null)
+            {
+                if (inactivityTime < inactivityTimeout)
+                {
+                    inactivityTime += Time.deltaTime;
+                }
+                else if (editScene.index != 0)
+                {
+                    PlayRealScene(-1);
+                }
+            }
+
             float prev = timelineSlider.value;
             float time = prev;
             time += Time.deltaTime * fps;

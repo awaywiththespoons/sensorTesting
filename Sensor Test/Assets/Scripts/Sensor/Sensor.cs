@@ -13,7 +13,7 @@ public class Sensor : MonoBehaviour
 	[SerializeField]
 	private bool debugging;
 	[SerializeField]
-	[Range(0, 25)]
+	[Range(0, 2)]
 	private float removeTimeout = .25f;
 
     [Serializable]
@@ -167,7 +167,7 @@ public class Sensor : MonoBehaviour
 
             OnTokenLifted();
 
-			history.Clear ();
+			history.Clear();
         }
 
 		if (pattern.count >= 5 && debugging)

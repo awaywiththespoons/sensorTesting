@@ -111,7 +111,7 @@ public class SensorPlotter : MonoBehaviour
     {
         rotate.Rotate(Vector3.up, Time.deltaTime * 45);
 
-        for (int i = sensor.knowledge.tokens.Count; i < 9; ++i)
+        for (int i = sensor.knowledge.tokens.Count; i < 8; ++i)
         {
             sensor.knowledge.tokens.Add(new Sensor.Token
             {
