@@ -91,6 +91,8 @@ public class Sensor : MonoBehaviour
 
     public void SaveTraining()
     {
+        Debug.Log("Training is " + knowledge.tokens.Count);
+
         System.IO.File.WriteAllText(Application.persistentDataPath + "/training.json", JsonUtility.ToJson(knowledge));
     }
 
