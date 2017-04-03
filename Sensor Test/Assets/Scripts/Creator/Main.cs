@@ -458,25 +458,9 @@ public class Main : MonoBehaviour
         }
     }
 
-    private IEnumerator Start()
+    private IEnumerator ImportResources()
     {
-        sensor.OnTokenClassified += token => SetActiveToken(token.id);
-        sensor.OnTokenLifted += () => PlayRealScene(-1);
-
-        scenes = scenesSetup.Finalise<Model.Scene>();
-        stories = storiesSetup.Finalise<string>();
-        images = imagesSetup.Finalise<ImageResource>();
-        sounds = soundsSetup.Finalise<SoundResource>();
-
-        if (GetStories().Count() == 0)
-        {
-            for (int i = 0; i < 3; ++i)
-            {
-                CreateBlankStory("Blank Story " + (i + 1));
-            }
-        }
-
-        loadingScreen.SetActive(true);
+         loadingScreen.SetActive(true);
 
         string root = "/storage/emulated/0/Download/Creator Images";
 
@@ -525,11 +509,11 @@ public class Main : MonoBehaviour
                 {
                     var clip = request.GetAudioClip(false, false);
 
-                    soundResources.Add(name, new SoundResource
+                    soundResources[name] = new SoundResource
                     {
                         name = name,
                         sound = clip,
-                    });
+                    };
                 }
 
                 loadingSlider.value += 1;
@@ -541,8 +525,32 @@ public class Main : MonoBehaviour
         loadingScreen.SetActive(false);
         images.SetActive(imageResources);
         sounds.SetActive(soundResources.Values);
+    }
 
-        yield return null;
+    public void RefreshResources()
+    {
+        StartCoroutine(ImportResources());
+    }
+
+    private IEnumerator Start()
+    {
+        sensor.OnTokenClassified += token => SetActiveToken(token.id);
+        sensor.OnTokenLifted += () => PlayRealScene(-1);
+
+        scenes = scenesSetup.Finalise<Model.Scene>();
+        stories = storiesSetup.Finalise<string>();
+        images = imagesSetup.Finalise<ImageResource>();
+        sounds = soundsSetup.Finalise<SoundResource>();
+
+        if (GetStories().Count() == 0)
+        {
+            for (int i = 0; i < 3; ++i)
+            {
+                CreateBlankStory("Blank Story " + (i + 1));
+            }
+        }
+
+        yield return StartCoroutine(ImportResources());
 
         positionDrag.OnBegin += OnPositionDragBegin;
         positionDrag.OnDisplacementChanged += OnPositionDragChange;
