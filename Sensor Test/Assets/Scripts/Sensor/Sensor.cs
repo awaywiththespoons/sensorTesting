@@ -13,7 +13,7 @@ public class Sensor : MonoBehaviour
 	[SerializeField]
 	private bool debugging;
 	[SerializeField]
-	[Range(0, 5)]
+	[Range(0, 25)]
 	private float removeTimeout = .25f;
 
     [Serializable]
