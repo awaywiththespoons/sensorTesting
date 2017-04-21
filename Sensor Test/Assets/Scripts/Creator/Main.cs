@@ -131,6 +131,8 @@ public class Main : MonoBehaviour
         previewMode = false;
         menuCanvas.gameObject.SetActive(true);
         audioSource.Stop();
+
+        Rewind();
     }
 
     public void ClickedAddText()
@@ -211,6 +213,8 @@ public class Main : MonoBehaviour
     public void OpenScene(Model.Scene scene)
     {
         editScene = scene;
+
+        timelineSlider.value = 0;
 
         this.scene.SetConfig(scene);
         this.scene.Refresh();
@@ -411,11 +415,16 @@ public class Main : MonoBehaviour
         scene.Refresh();
     }
 
+    public void Rewind()
+    {
+        timelineSlider.value = 0;
+    }
+
     private void PlayRealScene(int id)
     {
         PlayScene(story.scenes[id + 1]);
         previewMode = false;
-        timelineSlider.value = 0;
+        Rewind();
         PlayFrameSounds(0);
     }
 
@@ -733,7 +742,7 @@ public class Main : MonoBehaviour
     {
         sceneCreatorHUD.SetActive(true);
         previewMode = false;
-        timelineSlider.value = Mathf.Floor(timelineSlider.value);
+        Rewind();
         audioSource.Stop();
     }
 
