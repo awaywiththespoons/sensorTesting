@@ -948,6 +948,10 @@ public class Main : MonoBehaviour
 
             selectedImage = null;
         }
+        else
+        {
+            timelineSlider.value = Mathf.Round(timelineSlider.value) % timelineSlider.maxValue;
+        }
 
         scene.SetFrame(timelineSlider.value);
 
