@@ -26,10 +26,15 @@ public class SoundResourceView : InstanceView<Main.SoundResource>
         selectButton.onClick.AddListener(() =>
         {
             source.Stop();
-            source.clip = config.sound;
-            source.Play();
+            
             test.ToggleSoundResource(config);
             Update();
+
+            if (test.FrameContainsSound(config))
+            {
+                source.clip = config.sound;
+                source.Play();
+            }
         });
     }
 
