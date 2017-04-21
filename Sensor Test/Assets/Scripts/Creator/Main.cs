@@ -107,7 +107,8 @@ public class Main : MonoBehaviour
     [SerializeField]
     private GameObject toolbarObject;
 
-    private List<ImageResource> imageResources = new List<ImageResource>();
+    private Dictionary<string, ImageResource> imageResources 
+        = new Dictionary<string, ImageResource>();
     private Dictionary<string, SoundResource> soundResources 
         = new Dictionary<string, SoundResource>();
 
@@ -250,7 +251,7 @@ public class Main : MonoBehaviour
         {
             foreach (var image in scene.images)
             {
-                image.sprite = image.text ? clearSprite : imageResources.Find(r => r.name == image.path).sprite;
+                image.sprite = image.text ? clearSprite : imageResources[image.path].sprite;
             }
 
             // because data may be missing in old save files...
@@ -499,6 +500,7 @@ public class Main : MonoBehaviour
         foreach (string file in System.IO.Directory.GetFiles(root))
         {
             string name = Path.GetFileNameWithoutExtension(file);
+            string name2 = Path.GetFileName(file);
             string type = Path.GetExtension(file).ToLower();
 
             //ThreadedJob.Run<ThreadedReadBytes>(read => read.path = file,
@@ -515,16 +517,19 @@ public class Main : MonoBehaviour
                     var texture = new Texture2D(1, 1);
                     texture.LoadImage(request.bytes, true);
 
-                    imageResources.Add(new ImageResource
+                    var image = new ImageResource
                     {
-                        name = name,
+                        name = name2,
                         sprite = Sprite.Create(texture,
                                                Rect.MinMaxRect(0, 0, texture.width, texture.height),
                                                Vector2.one * 0.5f,
                                                100,
                                                0,
                                                SpriteMeshType.FullRect),
-                    });
+                    };
+
+                    imageResources.Add(name, image);
+                    imageResources.Add(name2, image);
                 }
                 else if (type == ".wav" || type == ".ogg")
                 {
@@ -544,7 +549,7 @@ public class Main : MonoBehaviour
         }
 
         loadingScreen.SetActive(false);
-        images.SetActive(imageResources);
+        images.SetActive(imageResources.Values.Distinct());
         sounds.SetActive(soundResources.Values);
     }
 
