@@ -1003,17 +1003,7 @@ public class Main : MonoBehaviour
 
         objectControls.SetActive(selectedImage != null);
 
-        if (positionDrag.dragging 
-         || rotationDrag.dragging 
-         || scalingDrag.dragging
-         || layerDrag.dragging)
-        {
-            fadeGroup.alpha = Mathf.SmoothDamp(fadeGroup.alpha, 0.01f, ref fadeVelocity, 0.1f);
-        }
-        else
-        {
-            fadeGroup.alpha = Mathf.SmoothDamp(fadeGroup.alpha, 1f, ref fadeVelocity, 0.1f);
-        }
+        fadeGroup.alpha = Mathf.SmoothDamp(fadeGroup.alpha, (oneFinger || twoFinger) ? .01f : 1f, ref fadeVelocity, 0.1f);
 
         var pointer = new PointerEventData(EventSystem.current);
         pointer.position = Input.mousePosition;
@@ -1030,37 +1020,6 @@ public class Main : MonoBehaviour
             {
                 StopPreview();
             }
-
-            raycasts.Clear();
-            sceneRaycaster.Raycast(pointer, raycasts);
-
-            var images = raycasts.Select(cast => cast.gameObject.GetComponent<ImageView>())
-                                 .OfType<ImageView>()
-                                 .Select(view => view.config)
-                                 .ToList();
-
-            if (selectedImage != null && images.Count > 0)
-            {
-                int index = images.IndexOf(selectedImage);
-                int next = 0;
-
-                if (index >= 0)
-                {
-                    next = (index + 1) % images.Count;
-                }
-
-                Select(images[next]);
-            }
-            else if (images.Count > 0)
-            {
-                Select(images[0]);
-            }
-            else
-            {
-                Deselect();
-            }
-            
-            toolbarObject.SetActive(true);
         }
 
         if (selectedImage != null)
@@ -1076,6 +1035,12 @@ public class Main : MonoBehaviour
 
         CheckTouchSelect();
         CheckTouchTransform();
+        
+        if (Input.touchCount == 0)
+        {
+            oneFinger = false;
+            twoFinger = false;
+        }
     }
 
     [SerializeField]
