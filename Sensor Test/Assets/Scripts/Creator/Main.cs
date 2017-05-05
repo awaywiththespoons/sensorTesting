@@ -170,8 +170,7 @@ public class Main : MonoBehaviour
 
             graphic.SetFrameCount(editScene.frameCount);
 
-            selectedImage = graphic;
-            SetTogglesFromSelectedFrame();
+            Select(graphic);
 
             scene.Refresh();
         }
@@ -181,6 +180,11 @@ public class Main : MonoBehaviour
 
     private void SetTogglesFromSelectedFrame()
     {
+        if (selectedImage == null)
+        {
+            return;
+        }
+
         ghostToggle.isOn = selectedImage.ghost;
         hideToggle.isOn = selectedImage.keyframes[GetFrame()].hide;
     }
@@ -215,7 +219,7 @@ public class Main : MonoBehaviour
     {
         editScene = scene;
 
-        timelineSlider.value = 0;
+        Rewind();
 
         this.scene.SetConfig(scene);
         this.scene.Refresh();
@@ -410,8 +414,7 @@ public class Main : MonoBehaviour
 
         graphic.SetFrameCount(editScene.frameCount);
 
-        selectedImage = graphic;
-        SetTogglesFromSelectedFrame();
+        Select(graphic);
 
         scene.Refresh();
     }
@@ -708,13 +711,25 @@ public class Main : MonoBehaviour
 
     private float fadeVelocity;
 
+    public void Deselect()
+    {
+        selectedImage = null;
+
+        SetTogglesFromSelectedFrame();
+    }
+
+    public void Select(Model.Image image)
+    {
+        selectedImage = image;
+    }
+
     public void RemoveSelected()
     {
         toolbarObject.SetActive(false);
 
         editScene.images.Remove(selectedImage);
         scene.Refresh();
-        selectedImage = null;
+        Deselect();
     }
 
     public void CopyForwardSelected()
@@ -740,7 +755,7 @@ public class Main : MonoBehaviour
     public void PreviewScene()
     {
         PlayScene(editScene);
-        selectedImage = null;
+        Deselect();
     }
 
     public void StopPreview()
@@ -951,7 +966,7 @@ public class Main : MonoBehaviour
                 PlayFrameSounds(prevFrame);
             }
 
-            selectedImage = null;
+            Deselect();
         }
         else
         {
@@ -1011,7 +1026,10 @@ public class Main : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0) && valid)
         {
-            StopPreview();
+            if (previewMode)
+            {
+                StopPreview();
+            }
 
             raycasts.Clear();
             sceneRaycaster.Raycast(pointer, raycasts);
@@ -1031,22 +1049,17 @@ public class Main : MonoBehaviour
                     next = (index + 1) % images.Count;
                 }
 
-                selectedImage = images[next];
+                Select(images[next]);
             }
             else if (images.Count > 0)
             {
-                selectedImage = images[0];
+                Select(images[0]);
             }
             else
             {
-                selectedImage = null;
+                Deselect();
             }
-
-            if (selectedImage != null)
-            {
-                SetTogglesFromSelectedFrame();
-            }
-
+            
             toolbarObject.SetActive(true);
         }
 
@@ -1060,5 +1073,204 @@ public class Main : MonoBehaviour
         {
             view.selected = (view.config == selectedImage);
         });
+
+        CheckTouchSelect();
+        CheckTouchTransform();
     }
+
+    [SerializeField]
+    private GraphicRaycaster creatorRaycaster;
+    [SerializeField]
+    private GraphicRaycaster viewerRaycaster;
+
+    #region Editor Touch Controls
+
+    private bool tapping;
+    private Vector2 tapPosition;
+    private float holdTime = 0;
+
+    private void CheckTouchSelect()
+    {
+        // if there's a single touch just beginning, and it is not blocked
+        // by the ui, this is the start of a tap
+        if (Input.touchCount == 1 
+         && Input.GetTouch(0).phase == TouchPhase.Began
+         && !creatorRaycaster.IsPointBlocked(Input.GetTouch(0).position))
+        {
+            tapping = true;
+            holdTime = 0;
+            tapPosition = Input.GetTouch(0).position;
+        }
+
+        // track how long we have been holding the press
+        if (tapping)
+        {
+            holdTime += Time.deltaTime;
+        }
+
+        // if it's too long, it's not a tap
+        if (holdTime > .5f)
+        {
+            tapping = false;
+        }
+
+        // if we are tapping, and the tap touch is ending
+        if (Input.touchCount > 0 
+         && Input.GetTouch(0).phase == TouchPhase.Ended
+         && tapping)
+        {
+            // check if the touch moved too much to be considered a tap
+            float delta = (Input.GetTouch(0).position - tapPosition).magnitude;
+
+            if (delta < 5f)
+            {
+                var prev = selectedImage;
+
+                Deselect();
+
+                var hits = viewerRaycaster.Raycast(tapPosition);
+                var hit = hits.Select(h => h.gameObject.GetComponent<ImageView>())
+                              .OfType<ImageView>()
+                              .FirstOrDefault();
+
+                if (hit != null && hit.config != prev)
+                {
+                    Select(hit.config);
+                }
+            }
+
+            tapping = false;
+        }
+    }
+
+    private bool oneFinger;
+    private bool twoFinger;
+    private Vector2 prevTouch1, prevTouch2;
+    private float baseScale, baseAngle;
+    private Vector2 basePosition;
+
+    private void ResetGestures()
+    {
+        oneFinger = false;
+        twoFinger = false;
+    }
+
+    private void CheckTouchTransform()
+    {
+        if (selectedImage == null)
+        {
+            return;
+        }
+
+        var selected = selectedImage;
+
+        Vector2 nextTouch1 = Vector2.zero;
+        Vector2 nextTouch2 = Vector2.zero;
+
+        bool mouse = false;
+
+        if (Input.touchCount > 0)
+        {
+            nextTouch1 = Input.GetTouch(0).position;
+        }
+        else if (Input.GetMouseButton(0))
+        {
+            nextTouch1 = Input.mousePosition;
+            mouse = true;
+        }
+
+        if (Input.touchCount > 1)
+        {
+            nextTouch2 = Input.GetTouch(1).position;
+        }
+
+        bool blocked1 = creatorRaycaster.IsPointBlocked(nextTouch1);
+        bool blocked2 = creatorRaycaster.IsPointBlocked(nextTouch2);
+
+        /*
+        if (this.selected != null)
+        {
+            nextTouch1 = worldTransform.InverseTransformPoint(nextTouch1);
+            nextTouch2 = worldTransform.InverseTransformPoint(nextTouch2);
+        }
+        */
+
+        bool touch1Begin = Input.touchCount == 1 && Input.GetTouch(0).phase == TouchPhase.Began;
+        bool touch2Begin = Input.touchCount == 2 && Input.GetTouch(1).phase == TouchPhase.Began;
+
+        bool touch1Move = Input.touchCount == 1;
+
+        var frame = selectedImage.keyframes[GetFrame()];
+
+        if ((touch1Begin || mouse) && !oneFinger && !blocked1)
+        {
+            prevTouch1 = nextTouch1;
+            basePosition = frame.position;
+
+            oneFinger = true;
+        }
+        else if ((touch1Move || mouse) && oneFinger)
+        {
+            frame.position = basePosition - prevTouch1 + nextTouch1;
+        }
+        else
+        {
+            oneFinger = false;
+        }
+
+        if (touch2Begin && !twoFinger && !blocked2)
+        {
+            twoFinger = true;
+
+            prevTouch1 = nextTouch1;
+            prevTouch2 = nextTouch2;
+
+            baseScale = frame.scale;
+            baseAngle = frame.direction;
+            basePosition = frame.position;
+        }
+        else if (Input.touchCount == 2 && twoFinger)
+        {
+            Vector2 a = prevTouch1 - basePosition;
+            Vector2 b = prevTouch2 - basePosition;
+            Vector2 c = prevTouch2 - prevTouch1;
+
+            float prevD = (prevTouch2 - prevTouch1).magnitude;
+            float nextD = (nextTouch2 - nextTouch1).magnitude;
+            float scaleMult = nextD / prevD;
+
+            float prevAngle = Angle(c);
+            float nextAngle = Angle(nextTouch2 - nextTouch1);
+            float deltaAngle = Mathf.DeltaAngle(prevAngle, nextAngle);
+
+            Vector2 nexta = Rotate(a * scaleMult, deltaAngle);
+            Vector2 nextO = nextTouch1 - nexta;
+
+            frame.scale = Mathf.Max(0.1f, baseScale * scaleMult);
+            frame.direction = baseAngle + deltaAngle;
+            frame.position = nextO;
+        }
+        else
+        {
+            twoFinger = false;
+        }
+    }
+
+    private static float Angle(Vector2 vector)
+    {
+        return Mathf.Atan2(vector.y, vector.x) * Mathf.Rad2Deg;
+    }
+
+    private static Vector2 Rotate(Vector2 vector, float angle)
+    {
+        float d = vector.magnitude;
+        float a = Angle(vector);
+
+        a += angle;
+        a *= Mathf.Deg2Rad;
+
+        return new Vector2(d * Mathf.Cos(a), d * Mathf.Sin(a));
+    }
+
+    #endregion
 }
