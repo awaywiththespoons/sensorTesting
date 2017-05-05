@@ -742,11 +742,11 @@ public class Main : MonoBehaviour
         StepForward();
     }
 
-    public void CopyForwardToEndSelected()
+    public void CopyForwardToAllSelected()
     {
         int prev = GetFrame();
 
-        for (int i = prev; i < editScene.frameCount; ++i)
+        for (int i = 0; i < editScene.frameCount; ++i)
         {
             selectedImage.keyframes[i] = Model.KeyFrame.Copy(selectedImage.keyframes[prev]);
         }
