@@ -54,6 +54,7 @@ public class ImageView : InstanceView<Model.Image>
     protected override void Configure()
     {
         image.sprite = config.sprite;
+        image.alphaHitTestMinimumThreshold = 0.25f;
         image.SetNativeSize();
     }
 
