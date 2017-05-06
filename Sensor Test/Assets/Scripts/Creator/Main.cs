@@ -85,6 +85,10 @@ public class Main : MonoBehaviour
     private Toggle hideToggle;
     [SerializeField]
     private GameObject crosshair;
+    [SerializeField]
+    private GameObject refParent;
+    [SerializeField]
+    private Image ref1, ref2, ref3;
 
     [SerializeField]
     private CanvasGroup fadeGroup;
@@ -1047,6 +1051,48 @@ public class Main : MonoBehaviour
 
         crosshair.SetActive(selectedImage != null && selectedImage.ghost);
 
+        if (selectedImage != null && selectedImage.ghost)
+        {
+            int index = editScene.index;
+
+            if (index >= 1)
+            {
+                refParent.SetActive(true);
+
+                var token = sensor.knowledge.tokens[index - 1];
+
+                Debug.Log(token.feature);
+
+                Vector2 p1 = Vector2.zero;
+                Vector2 p2 = p1 + Vector2.right * token.feature.x;
+                Vector2 p3 = CircleCircle(p1, token.feature.z,
+                                          p2, token.feature.y);
+
+                
+                p1 = Rotate(p1, -90);
+                p2 = Rotate(p2, -90);
+                p3 = Rotate(p3, -90);
+
+                Vector2 c = (p1 + p2 + p3) / 3f;
+
+                p1 -= c;
+                p2 -= c;
+                p3 -= c;
+
+                ref1.transform.localPosition = p1;
+                ref2.transform.localPosition = p2;
+                ref3.transform.localPosition = p3;
+            }
+            else
+            {
+                refParent.SetActive(false);
+            }
+        }
+        else
+        {
+            refParent.SetActive(false);
+        }
+
         scene.images.MapActive((i, view) =>
         {
             view.selected = (view.config == selectedImage);
@@ -1084,6 +1130,21 @@ public class Main : MonoBehaviour
     private GraphicRaycaster creatorRaycaster;
     [SerializeField]
     private GraphicRaycaster viewerRaycaster;
+
+    private Vector2 CircleCircle(Vector2 ac, float ar,
+                                 Vector2 bc, float br)
+    {
+        float d = (bc - ac).magnitude;
+        float a = (ar * ar - br * br + d * d) / (2 * d);
+        float h = Mathf.Sqrt(ar * ar - a * a);
+
+        Vector2 p2 = (bc - ac) * (a / d) + ac;
+
+        float x = p2.x + h * (bc.y - ac.y)/d;
+        float y = p2.y - h * (bc.x - ac.x)/d;
+
+        return new Vector2(x, y);
+    }
 
     #region Editor Touch Controls
 
