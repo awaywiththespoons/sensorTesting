@@ -1073,6 +1073,11 @@ public class Main : MonoBehaviour
         {
             background.gameObject.SetActive(false);
         }
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            toolbarObject.gameObject.SetActive(true);
+        }
     }
 
     [SerializeField]
