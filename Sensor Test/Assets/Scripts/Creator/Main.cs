@@ -83,6 +83,8 @@ public class Main : MonoBehaviour
     private Toggle ghostToggle;
     [SerializeField]
     private Toggle hideToggle;
+    [SerializeField]
+    private GameObject crosshair;
 
     [SerializeField]
     private CanvasGroup fadeGroup;
@@ -1027,6 +1029,8 @@ public class Main : MonoBehaviour
             selectedImage.ghost = ghostToggle.isOn;
             selectedImage.keyframes[GetFrame()].hide = hideToggle.isOn;
         }
+
+        crosshair.SetActive(selectedImage != null && selectedImage.ghost);
 
         scene.images.MapActive((i, view) =>
         {
