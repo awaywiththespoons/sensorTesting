@@ -436,6 +436,7 @@ public class Main : MonoBehaviour
     public void Rewind()
     {
         timelineSlider.value = 0;
+        backgroundTimer = 0;
     }
 
     private void PlayRealScene(int id)
@@ -934,6 +935,8 @@ public class Main : MonoBehaviour
     [Range(0, 360)]
     public float tokenDirection;
 
+    private float backgroundTimer = 0;
+
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.Q))
@@ -1062,6 +1065,9 @@ public class Main : MonoBehaviour
         {
             background.gameObject.SetActive(true);
             background.SetConfig(story.scenes[9]);
+            background.SetFrame(backgroundTimer);
+
+            backgroundTimer += Time.deltaTime * fps;
         }
         else
         {
@@ -1127,6 +1133,8 @@ public class Main : MonoBehaviour
                 if (hit != null && hit.config != prev)
                 {
                     Select(hit.config);
+                    oneFinger = false;
+                    twoFinger = false;
                 }
             }
 
