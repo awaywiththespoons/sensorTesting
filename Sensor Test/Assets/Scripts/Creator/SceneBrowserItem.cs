@@ -33,8 +33,19 @@ public class SceneBrowserItem : InstanceView<Model.Scene>
 
     public override void Refresh()
     {
+        string id = config.index.ToString();
+
+        if (config.index == 0)
+        {
+            id = "Inactivity";
+        }
+        else if (config.index == Main.backgroundID)
+        {
+            id = "Background";
+        }
+
         nameText.text = string.Format("{1}: {0}", 
                                       config.name, 
-                                      config.index == 0 ? "Inactivity" : config.index.ToString());
+                                      id);
     }
 }

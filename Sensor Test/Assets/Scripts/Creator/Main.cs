@@ -102,6 +102,8 @@ public class Main : MonoBehaviour
 
     [SerializeField]
     private SceneView scene;
+    [SerializeField]
+    private SceneView background;
 
     public Model.Scene editScene;
     public Model.Story story;
@@ -120,6 +122,32 @@ public class Main : MonoBehaviour
 
     [SerializeField]
     private Canvas menuCanvas;
+
+    public const int maxSceneID = 9;
+    public const int backgroundID = maxSceneID;
+
+    public void NormaliseStory(Model.Story story)
+    {
+        int sceneCount = maxSceneID + 1;
+
+        for (int i = story.scenes.Count; i < sceneCount; ++i)
+        {
+            var scene = new Model.Scene
+            {
+                name = "Unnamed",
+                images = new List<Model.Image>(),
+            };
+
+            story.scenes.Add(scene);
+
+            scene.SetFrameCount(10);
+        }
+
+        for (int i = 0; i < sceneCount; ++i)
+        {
+            story.scenes[i].index = i;
+        }
+    }
 
     public void PlayStory()
     {
@@ -264,23 +292,7 @@ public class Main : MonoBehaviour
             scene.SetFrameCount(scene.frameCount);
         }
 
-        for (int i = story.scenes.Count; i < 9; ++i)
-        {
-            var scene = new Model.Scene
-            {
-                name = "Unnamed",
-                images = new List<Model.Image>(),
-            };
-
-            story.scenes.Add(scene);
-
-            scene.SetFrameCount(10);
-        }
-
-        for (int i = 0; i < 9; ++i)
-        {
-            story.scenes[i].index = i;
-        }
+        NormaliseStory(story);
 
         int j = 0;
         foreach (var scene in story.scenes)
@@ -1044,6 +1056,16 @@ public class Main : MonoBehaviour
         {
             oneFinger = false;
             twoFinger = false;
+        }
+
+        if (playingMode || previewMode)
+        {
+            background.gameObject.SetActive(true);
+            background.SetConfig(story.scenes[9]);
+        }
+        else
+        {
+            background.gameObject.SetActive(false);
         }
     }
 
