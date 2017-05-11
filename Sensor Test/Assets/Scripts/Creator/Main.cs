@@ -289,7 +289,15 @@ public class Main : MonoBehaviour
         {
             foreach (var image in scene.images)
             {
-                image.sprite = image.text ? clearSprite : imageResources[image.path].sprite;
+                if (imageResources.ContainsKey(image.path))
+                {
+                    image.sprite = image.text ? clearSprite : imageResources[image.path].sprite;
+                }
+                else
+                {
+                    Debug.LogErrorFormat("Couldn't Find graphic on tablet: {0}", image.path);
+                    image.sprite = clearSprite;
+                }
             }
 
             // because data may be missing in old save files...
