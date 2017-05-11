@@ -326,7 +326,10 @@ public class Main : MonoBehaviour
 
     public void SaveScene()
     { 
-        SaveStory(story);
+        if (story != null)
+        {
+            SaveStory(story);
+        }
     }
 
     public void SetReplaceMode()
