@@ -740,6 +740,8 @@ public class Main : MonoBehaviour
     public void Select(Model.Image image)
     {
         selectedImage = image;
+
+        SetTogglesFromSelectedFrame();
     }
 
     public void RemoveSelected()
