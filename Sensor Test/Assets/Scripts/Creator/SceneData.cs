@@ -20,6 +20,7 @@ namespace Model
                 position = original.position,
                 direction = original.direction,
                 scale = original.scale,
+                hide = original.hide,
             };
         }
 
