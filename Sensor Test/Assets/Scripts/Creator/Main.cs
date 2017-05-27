@@ -1335,7 +1335,7 @@ public class Main : MonoBehaviour
             Vector2 nexta = Rotate(a * scaleMult, deltaAngle);
             Vector2 nextO = nextTouch1 - nexta;
 
-            frame.scale = Mathf.Max(0.1f, baseScale * scaleMult);
+            frame.scale = Mathf.Max(MinimumScale(selected.sprite), baseScale * scaleMult);
             frame.direction = baseAngle + deltaAngle;
             frame.position = nextO;
         }
@@ -1343,6 +1343,13 @@ public class Main : MonoBehaviour
         {
             twoFinger = false;
         }
+    }
+
+    public static float MinimumScale(Sprite sprite)
+    {
+        float size = Mathf.Min(sprite.rect.width, sprite.rect.height);
+
+        return 20f / size;
     }
 
     private static float Angle(Vector2 vector)
