@@ -239,6 +239,8 @@ public class Main : MonoBehaviour
 
         tokenBrowsePanel.SetActive(false);
         sceneCreatorHUD.SetActive(true);
+
+        Rewind();
     }
 
     public void RenameScene(Model.Scene scene)
@@ -447,6 +449,7 @@ public class Main : MonoBehaviour
 
     public void Rewind()
     {
+        lingerTimeSlider.value = editScene.inactivityTimeout;
         timelineSlider.value = 0;
         backgroundTimer = 0;
     }
@@ -588,9 +591,11 @@ public class Main : MonoBehaviour
         StartCoroutine(ImportResources());
     }
 
-    [Range(0, 25)]
     [SerializeField]
-    private float inactivityTimeout = 1f;
+    private Slider lingerTimeSlider;
+    [SerializeField]
+    private Text lingerTimeText;
+
     private float inactivityTime;
 
     private IEnumerator Start()
@@ -962,7 +967,7 @@ public class Main : MonoBehaviour
         {
             if (playingMode && sensor.detected == null)
             {
-                if (inactivityTime < inactivityTimeout)
+                if (inactivityTime < editScene.inactivityTimeout)
                 {
                     inactivityTime += Time.deltaTime;
                 }
@@ -1134,6 +1139,9 @@ public class Main : MonoBehaviour
         {
             toolbarObject.gameObject.SetActive(true);
         }
+
+        editScene.inactivityTimeout = lingerTimeSlider.value;
+        lingerTimeText.text = string.Format("Linger Time: {0:0.0}s", editScene.inactivityTimeout);
     }
 
     [SerializeField]

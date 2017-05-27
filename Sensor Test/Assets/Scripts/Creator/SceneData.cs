@@ -91,6 +91,7 @@ namespace Model
         public List<Image> images;
         public List<SoundFrame> sounds = new List<SoundFrame>();
         public string bgloop;
+        public float inactivityTimeout = 3;
     }
 
     public partial class Scene
