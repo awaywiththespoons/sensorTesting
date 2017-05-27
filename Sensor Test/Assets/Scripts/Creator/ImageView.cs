@@ -16,20 +16,16 @@ public class ImageView : InstanceView<Model.Image>
     private Image image;
     [SerializeField]
     private Text text;
+    [SerializeField]
+    private Image selectedImage;
 
     public bool selected;
     public bool hidden;
 
     private void Update()
     {
-        if (selected)
-        {
-            image.color = Color.HSVToRGB(Time.timeSinceLevelLoad % 1, .25f, 1);
-        }
-        else
-        {
-            image.color = Color.white;
-        }
+        selectedImage.gameObject.SetActive(selected);
+        selectedImage.color = Color.HSVToRGB(Time.timeSinceLevelLoad % 1, .25f, 1);
 
         text.color = image.color;
 
