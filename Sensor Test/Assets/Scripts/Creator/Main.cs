@@ -72,11 +72,8 @@ public class Main : MonoBehaviour
     private InstancePool<Model.Scene> scenes;
 
     [SerializeField]
-    private DragListener positionDrag;
-    [SerializeField]
-    private DragListener rotationDrag;
-    [SerializeField]
-    private DragListener scalingDrag;
+    private Button copyForwardButton;
+
     [SerializeField]
     private DragListener layerDrag;
     [SerializeField]
@@ -616,15 +613,6 @@ public class Main : MonoBehaviour
 
         yield return StartCoroutine(ImportResources());
 
-        positionDrag.OnBegin += OnPositionDragBegin;
-        positionDrag.OnDisplacementChanged += OnPositionDragChange;
-
-        rotationDrag.OnBegin += OnRotationDragBegin;
-        rotationDrag.OnDisplacementChanged += OnRotationDragChange;
-
-        scalingDrag.OnBegin += OnScalingDragBegin;
-        scalingDrag.OnDisplacementChanged += OnScalingDragChange;
-
         layerDrag.OnBegin += OnLayerDragBegin;
         layerDrag.OnDisplacementChanged += OnLayerDragChange;
 
@@ -1008,6 +996,15 @@ public class Main : MonoBehaviour
         }
 
         scene.SetFrame(timelineSlider.value);
+
+        if (timelineSlider.value == editScene.frameCount - 1)
+        {
+            copyForwardButton.interactable = false;
+        }
+        else
+        {
+            copyForwardButton.interactable = true;
+        }
 
         if (playingMode)
         {
