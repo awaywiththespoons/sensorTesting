@@ -1277,9 +1277,23 @@ public class Main : MonoBehaviour
 
         var frame = selectedImage.keyframes[GetFrame()];
 
-        if ((touch1Begin || mouse) && !oneFinger && !blocked1)
+        if (touch1Begin && !oneFinger && !blocked1)
         {
             prevTouch1 = nextTouch1;
+
+            //Deselect();
+
+            var hits = viewerRaycaster.Raycast(tapPosition);
+            var hit = hits.Select(h => h.gameObject.GetComponent<ImageView>())
+                            .OfType<ImageView>()
+                            .FirstOrDefault();
+
+            if (hit != null)
+            {
+                Select(hit.config);
+                frame = selectedImage.keyframes[GetFrame()];
+            }
+
             basePosition = frame.position;
 
             oneFinger = true;
