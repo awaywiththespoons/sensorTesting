@@ -23,6 +23,10 @@ public class StoryBrowserItem : InstanceView<string>
     private Button deleteButton;
     [SerializeField]
     private Button duplicateButton;
+    [SerializeField]
+    private Button toggleLockButton;
+    [SerializeField]
+    private GameObject unlockedButtons;
 
     private void Awake()
     {
@@ -30,14 +34,14 @@ public class StoryBrowserItem : InstanceView<string>
         renameButton.onClick.AddListener(() => test.RenameStory(config));
         deleteButton.onClick.AddListener(() => test.RemoveStory(config));
         duplicateButton.onClick.AddListener(() => test.DuplicateStory(config));
+        toggleLockButton.onClick.AddListener(() => test.ToggleLockStory(config));
     }
 
     protected override void Configure()
     {
         bool locked = config.EndsWith("_L");
 
-        renameButton.gameObject.SetActive(!locked);
-        deleteButton.gameObject.SetActive(!locked);
+        unlockedButtons.SetActive(!locked);
 
         nameText.text = locked 
                       ? config.Substring(0, config.Length - 2) 

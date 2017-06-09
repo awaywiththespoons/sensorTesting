@@ -68,6 +68,9 @@ public class Main : MonoBehaviour
     private InstancePoolSetup storiesSetup;
     private InstancePool<string> stories;
     [SerializeField]
+    private InstancePoolSetup stories2Setup;
+    private InstancePool<string> stories2;
+    [SerializeField]
     private InstancePoolSetup scenesSetup;
     private InstancePool<Model.Scene> scenes;
 
@@ -509,6 +512,7 @@ public class Main : MonoBehaviour
 
         SaveStory(story);
         stories.SetActive(GetStories());
+        stories2.SetActive(GetStories());
     }
 
     private bool debuggingToken;
@@ -621,6 +625,7 @@ public class Main : MonoBehaviour
 
         scenes = scenesSetup.Finalise<Model.Scene>();
         stories = storiesSetup.Finalise<string>();
+        stories2 = stories2Setup.Finalise<string>();
         images = imagesSetup.Finalise<ImageResource>();
         sounds = soundsSetup.Finalise<SoundResource>();
 
@@ -638,6 +643,7 @@ public class Main : MonoBehaviour
         layerDrag.OnDisplacementChanged += OnLayerDragChange;
 
         stories.SetActive(GetStories());
+        stories2.SetActive(GetStories());
     }
     
     private Vector2 initialPosition;
@@ -873,24 +879,7 @@ public class Main : MonoBehaviour
     {
         GetInput(name, OnComplete: text =>
         {
-            string prev = string.Format("{0}/stories/{1}.json",
-                                        Application.persistentDataPath,
-                                        name);
-            string next = string.Format("{0}/stories/{1}.json",
-                                        Application.persistentDataPath,
-                                        text);
-
-            try
-            {
-                System.IO.File.Move(prev, next);
-            }
-            catch (Exception e)
-            {
-                Debug.LogFormat("Couldn't rename!");
-                Debug.LogException(e);
-            }
-
-            stories.SetActive(GetStories());
+            DoRenameStory(name, text);
         });
     }
 
@@ -924,6 +913,42 @@ public class Main : MonoBehaviour
         }
 
         stories.SetActive(GetStories());
+        stories2.SetActive(GetStories());
+    }
+
+    private void DoRenameStory(string prev_, string next_)
+    {
+        string prev = string.Format("{0}/stories/{1}.json",
+                                        Application.persistentDataPath,
+                                        prev_);
+        string next = string.Format("{0}/stories/{1}.json",
+                                    Application.persistentDataPath,
+                                    next_);
+
+        try
+        {
+            System.IO.File.Move(prev, next);
+        }
+        catch (Exception e)
+        {
+            Debug.LogFormat("Couldn't rename!");
+            Debug.LogException(e);
+        }
+
+        stories.SetActive(GetStories());
+        stories2.SetActive(GetStories());
+    }
+
+    public void ToggleLockStory(string name)
+    {
+        if (name.EndsWith("_L"))
+        {
+            DoRenameStory(name, name.Replace("_L", ""));
+        }
+        else
+        {
+            DoRenameStory(name, name + "_L");
+        }
     }
 
     public void RemoveStory(string name)
@@ -952,6 +977,7 @@ public class Main : MonoBehaviour
         }
 
         stories.SetActive(GetStories());
+        stories2.SetActive(GetStories());
     }
 
     public void PlayBGLoop(SoundResource resource)
