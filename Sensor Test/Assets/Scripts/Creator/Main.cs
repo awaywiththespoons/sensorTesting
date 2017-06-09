@@ -161,7 +161,18 @@ public class Main : MonoBehaviour
     {
         playingMode = false;
         previewMode = false;
-        menuCanvas.gameObject.SetActive(true);
+
+        if (story.name.EndsWith("_L"))
+        {
+            menuCanvas.gameObject.SetActive(true);
+            storyBrowsePanel.SetActive(true);
+            tokenBrowsePanel.SetActive(false);
+        }
+        else
+        {
+            menuCanvas.gameObject.SetActive(true);
+        }
+
         audioSource.Stop();
 
         Rewind();
@@ -318,6 +329,11 @@ public class Main : MonoBehaviour
 
         scenes.SetActive(story.scenes);
         tokenBrowsePanel.SetActive(true);
+
+        if (name.EndsWith("_L"))
+        {
+            PlayStory();
+        }
     }
 
     public void SaveStory(Model.Story story)
@@ -883,6 +899,7 @@ public class Main : MonoBehaviour
         string prev = string.Format("{0}/stories/{1}.json",
                                     Application.persistentDataPath,
                                     name);
+
         string next = prev;
 
         while (System.IO.File.Exists(next))
@@ -896,6 +913,8 @@ public class Main : MonoBehaviour
 
         try
         {
+            next = next.Replace("_L-c", "-c");
+
             System.IO.File.Copy(prev, next);
         }
         catch (Exception e)

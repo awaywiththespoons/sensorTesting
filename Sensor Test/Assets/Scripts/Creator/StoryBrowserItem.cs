@@ -34,6 +34,13 @@ public class StoryBrowserItem : InstanceView<string>
 
     protected override void Configure()
     {
-        nameText.text = config;
+        bool locked = config.EndsWith("_L");
+
+        renameButton.gameObject.SetActive(!locked);
+        deleteButton.gameObject.SetActive(!locked);
+
+        nameText.text = locked 
+                      ? config.Substring(0, config.Length - 2) 
+                      : config;    
     }
 }
